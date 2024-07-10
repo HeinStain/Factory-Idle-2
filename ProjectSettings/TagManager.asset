@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Interactable
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Machines
+  - 
+  - 
+  - 
+  - 
+  - Build Ghost
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Grid Tile
+    uniqueID: 2482016741
+    locked: 0
+  - name: Items
+    uniqueID: 1115253413
+    locked: 0
+  - name: Machine Frames
+    uniqueID: 921527385
+    locked: 0
+  - name: Belts
+    uniqueID: 2678020729
+    locked: 0
+  - name: Placed Machine
+    uniqueID: 3936778891
+    locked: 0
+  - name: Build Ghost
+    uniqueID: 2553288987
+    locked: 0

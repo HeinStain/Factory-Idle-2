@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda049340ecf0ef46b097422de5102d2, type: 3}
+  m_Name: Collector
+  m_EditorClassIdentifier: 
+  machineName: Collector
+  prefab: {fileID: 4042165620227280389, guid: 2502361f39edb4f4697c1e9dc17acf49, type: 3}
+  visual: {fileID: 6357890402120500870, guid: 8d14c941303325848927f4dd4ca0999c, type: 3}
+  width: 1
+  height: 1
