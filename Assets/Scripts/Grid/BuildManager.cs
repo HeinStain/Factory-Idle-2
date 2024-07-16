@@ -14,7 +14,7 @@ public class BuildManager : MonoBehaviour
 
     private Grid<GridMap.GridTile> gridArray;
     
-    [SerializeField] private List<MachineData> machineList;
+    [SerializeField] public List<MachineData> machineList;
     private MachineData heldMachine;
     private MachineData.Direction direction = MachineData.Direction.Up;
 

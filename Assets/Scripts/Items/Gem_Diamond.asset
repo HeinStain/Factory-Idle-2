@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Diamond
   icon: {fileID: 21300000, guid: da4a321476099344eb1d476e94f40447, type: 3}
   value: 1150
-  tags: 0000000001000000
+  unlockLevel: 0
+  XP: 0
+  tags: 01000000

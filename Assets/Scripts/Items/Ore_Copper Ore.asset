@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Copper Ore
   icon: {fileID: 21300000, guid: a36d816fa17da3448b726fd46b1c8126, type: 3}
   value: 2
+  unlockLevel: 1
+  XP: 7
   tags: 00000000

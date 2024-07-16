@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Gold Ore
   icon: {fileID: 21300000, guid: fdb10087df169f34286da376251971bd, type: 3}
   value: 30
+  unlockLevel: 40
+  XP: 28
   tags: 00000000

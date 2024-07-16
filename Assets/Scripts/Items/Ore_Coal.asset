@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Coal
   icon: {fileID: 21300000, guid: 3b399026d69421649ae9eaa2c384fdf6, type: 3}
   value: 13
+  unlockLevel: 25
+  XP: 18
   tags: 00000000

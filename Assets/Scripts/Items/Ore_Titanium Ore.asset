@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Titanium Ore
   icon: {fileID: 21300000, guid: 00594537aa918d442a715ba715af40c6, type: 3}
   value: 65
+  unlockLevel: 50
+  XP: 65
   tags: 00000000

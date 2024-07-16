@@ -9,12 +9,14 @@ public class ItemData : ScriptableObject
     public string displayName;
     public Sprite icon;
     public int value;
+    public int unlockLevel;
+    public int XP;
     public List<ItemTag> tags;
 
 }
 
 public enum ItemTag
 {
-    MiningDrill,
+    Ore,
     Gem,
 }

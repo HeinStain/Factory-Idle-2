@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Sapphire
   icon: {fileID: 21300000, guid: 4837c191fb82cd84aa474e9139de4192, type: 3}
   value: 335
-  tags: 0000000001000000
+  unlockLevel: 0
+  XP: 0
+  tags: 01000000

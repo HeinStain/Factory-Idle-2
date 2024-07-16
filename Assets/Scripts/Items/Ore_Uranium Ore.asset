@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Uranium Ore
   icon: {fileID: 21300000, guid: 663e4679af5bc1149a5456f9400cf404, type: 3}
   value: 88
+  unlockLevel: 65
+  XP: 71
   tags: 00000000

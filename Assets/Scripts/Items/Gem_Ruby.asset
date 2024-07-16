@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Ruby
   icon: {fileID: 21300000, guid: 6985764c5bc46bb45979f216978855c6, type: 3}
   value: 555
-  tags: 0000000001000000
+  unlockLevel: 0
+  XP: 0
+  tags: 01000000

@@ -63,11 +63,10 @@ public class MouseManager : MonoBehaviour
 
     void Update()
     {
-        //Mouse Position Calculations
+        // Mouse Position Calculations
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         canvasMousePosition = Input.mousePosition;
         mouseObj.transform.position = canvasMousePosition;
-
 
         if (!menuOpen)
         {

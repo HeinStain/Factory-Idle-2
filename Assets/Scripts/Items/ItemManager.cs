@@ -15,7 +15,8 @@ public class ItemManager : MonoBehaviour
 #region Items
 
     [SerializeField] public GameObject itemPrefab;
-    [SerializeField] public List<ItemData> itemList;
+    [SerializeField] public List<ItemData> oresList;
+    [SerializeField] public List<ItemData> gemsList;
 
 #endregion 
 

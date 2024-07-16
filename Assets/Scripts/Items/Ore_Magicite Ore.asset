@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Magicite Ore
   icon: {fileID: 21300000, guid: 1955659cde0b9694194786d3fe86a83b, type: 3}
-  value: 15
+  value: 100
+  unlockLevel: 75
+  XP: 86
   tags: 00000000

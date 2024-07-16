@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Emerald
   icon: {fileID: 21300000, guid: dcd2943fa4cbdb14fb5ad2e26a2df732, type: 3}
   value: 555
-  tags: 0000000001000000
+  unlockLevel: 0
+  XP: 0
+  tags: 01000000

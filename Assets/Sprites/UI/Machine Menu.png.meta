@@ -388,7 +388,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Progress Bar
+      name: Progress Bar 1
       rect:
         serializedVersion: 2
         x: 206
@@ -429,6 +429,153 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Tab 1
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 126
+        width: 22
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c388fed60350cdc40ace66d9c5eca5c2
+      internalID: -1754428960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tab 2
+      rect:
+        serializedVersion: 2
+        x: 145
+        y: 59
+        width: 22
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef5046d2f863c5a4fb0bbd27cba911c6
+      internalID: 1457647838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Progress Bar 2
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 54
+        width: 1
+        height: 2
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09b58761093b77740bf141ce4951701e
+      internalID: 1688093476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Progress Bar 3
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 51
+        width: 1
+        height: 2
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3156967a04755f74a90a85c3e1b107ac
+      internalID: 1147264259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level Bar
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 50
+        width: 120
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88114257d8e17fd43932b9b88bd4a840
+      internalID: 515502642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Progress Bar 4
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 51
+        width: 1
+        height: 2
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2752253b76cd820498405c8531d6450a
+      internalID: -1541567533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Money Icon
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 43
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3f8585bcb52d3a48ac0fe6be8380841
+      internalID: -1038275256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -447,12 +594,19 @@ TextureImporter:
       Frame: -631474453
       Inner Box: 930696206
       Inset: 1965785510
+      Level Bar: 515502642
       Mastery Icon: -155519548
       Mastery Pool Icon: 1798807067
-      Progress Bar: -136107494
+      Money Icon: -1038275256
+      Progress Bar 1: -136107494
+      Progress Bar 2: 1688093476
+      Progress Bar 3: 1147264259
+      Progress Bar 4: -1541567533
       Stone Box: 1502420996
       Stone Inset: -2130562440
       Stone Menu: -1448229960
+      Tab 1: -1754428960
+      Tab 2: 1457647838
       XP Icon: -2039948456
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

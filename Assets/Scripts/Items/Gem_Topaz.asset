@@ -15,4 +15,6 @@ MonoBehaviour:
   displayName: Topaz
   icon: {fileID: 21300000, guid: ac29fb583c116aa4fb974bc7e92b71a4, type: 3}
   value: 225
-  tags: 0000000001000000
+  unlockLevel: 0
+  XP: 0
+  tags: 01000000

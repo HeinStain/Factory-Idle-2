@@ -140,11 +140,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1
-        y: 1
-        width: 6
-        height: 9
+        y: 19
+        width: 17
+        height: 17
       alignment: 9
-      pivot: {x: 0, y: 1}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -160,12 +160,12 @@ TextureImporter:
       name: Interact
       rect:
         serializedVersion: 2
-        x: 8
+        x: 1
         y: 1
-        width: 8
-        height: 9
+        width: 17
+        height: 17
       alignment: 9
-      pivot: {x: 0.125, y: 1}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -181,10 +181,10 @@ TextureImporter:
       name: Panning
       rect:
         serializedVersion: 2
-        x: 27
-        y: 1
-        width: 9
-        height: 9
+        x: 37
+        y: 19
+        width: 17
+        height: 17
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -202,12 +202,12 @@ TextureImporter:
       name: Build
       rect:
         serializedVersion: 2
-        x: 17
-        y: 1
-        width: 9
-        height: 9
+        x: 19
+        y: 19
+        width: 17
+        height: 17
       alignment: 9
-      pivot: {x: 0.22222222, y: 0.7777778}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -223,12 +223,12 @@ TextureImporter:
       name: Buy
       rect:
         serializedVersion: 2
-        x: 37
+        x: 19
         y: 1
-        width: 8
-        height: 9
+        width: 17
+        height: 17
       alignment: 9
-      pivot: {x: 0, y: 1}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
