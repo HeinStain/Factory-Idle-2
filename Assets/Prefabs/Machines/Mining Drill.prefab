@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9bd0d36db9bc8d4b916fd98864ce8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ticksToMine: 15
+  timeToCraft: 60
   clickBox: {fileID: 4184894340097357753}
   menuCanvas: {fileID: 877480969030081045}
   folder1Content: {fileID: 7091542318687850121}

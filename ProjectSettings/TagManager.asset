@@ -57,6 +57,9 @@ TagManager:
   - name: Placed Machine
     uniqueID: 3936778891
     locked: 0
+  - name: Grid Debug Canvas
+    uniqueID: 1614872617
+    locked: 0
   - name: Build Ghost
     uniqueID: 2553288987
     locked: 0

@@ -57,6 +57,7 @@ public class Grid <TGridObject>
         canvasObject = new GameObject ("Canvas", typeof(Canvas));
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
+        canvas.sortingLayerName = "Build Ghost";
 
         for (int x = 0; x < gridArray.GetLength(0); x ++) 
         {

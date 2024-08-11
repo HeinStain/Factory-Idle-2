@@ -8,10 +8,12 @@ using TMPro;
 public class MiningDrill : Machine
 {
     
-    [SerializeField] private int ticksToMine = 15;
+    [SerializeField] private int timeToCraft = 15;
     [SerializeField] private BoxCollider2D clickBox;
 
     private bool activated = false;
+
+    private ItemData oreToCraft;
 
     protected override void MachineSetup()
     {
@@ -22,10 +24,10 @@ public class MiningDrill : Machine
     {
         if (activated)
         {
-            if (tickTimer >= ticksToMine)
+            if (tickTimer >= timeToCraft)
             {
                 tickTimer = 0;
-                Mine();
+                FinishCraft();
             }
             ProgressBarVisuals();
         }
@@ -34,9 +36,16 @@ public class MiningDrill : Machine
     }
 
 
-    private void Mine()
+    private void FinishCraft()
     {
-        ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, ItemManager.Instance.oresList[Random.Range(0, ItemManager.Instance.oresList.Count)], new Vector3(0,0,0), Quaternion.identity);
+        
+        
+        ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, new Vector3(0,0,0), Quaternion.identity);
+
+
+      //  ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, /* position */, Quaternion.identity);
+
+
     }
 
     #region Menu
@@ -100,6 +109,7 @@ public class MiningDrill : Machine
     public void StartCrafting(string name)
     {
         Debug.Log("Crafting " + name);
+        oreToCraft = selectedOre;
         tickTimer = 0;
         activated = true;
     }
@@ -147,7 +157,7 @@ public class MiningDrill : Machine
             selectedVeinCount.text = SkillManager.Instance.CalculateVeinCount(masteryLevel).ToString() + "/" + SkillManager.Instance.CalculateVeinCount(masteryLevel).ToString();
             selectedOreValue.text = selectedOre.value.ToString();
 
-            selectedTimeToCraft.text = (ticksToMine / 5).ToString("F2");
+            selectedTimeToCraft.text = (timeToCraft / 20).ToString("F2");
             selectedXPValue.text = selectedOre.XP.ToString();
             selectedMasteryValue.text = SkillManager.Instance.CalculateOreMasteryXP(selectedOre.displayName).ToString();
             selectedMasteryPoolValue.text = SkillManager.Instance.CalculateMasteryPoolXP(selectedOre.displayName).ToString();
@@ -189,9 +199,9 @@ public class MiningDrill : Machine
     {
         if (activated)
         {
-            selectedProgressPercent.text = ((tickTimer / ticksToMine) * 100).ToString() + "%";
+            selectedProgressPercent.text = (((float)tickTimer / (float)timeToCraft) * 100).ToString("F0") + "%";
 
-            float t = Mathf.Clamp01((float)tickTimer / (float)ticksToMine);
+            float t = Mathf.Clamp01((float)tickTimer / (float)timeToCraft);
             selectedProgressBar.transform.localScale = new Vector2(t,1f);
         }
         else

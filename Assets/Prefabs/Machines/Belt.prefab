@@ -76,7 +76,7 @@ LineRenderer:
   m_SortingOrder: 1
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 1, z: 0}
+  - {x: 0, y: 0.25, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -85,7 +85,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.98999786
+        value: 1
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -191,15 +191,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ffe1bd45648e6a4e9034556f79141d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeToNextTile: 0
-  nextTileXY: {x: 0, y: 0}
-  prevTileXY: {x: 0, y: 0}
-  rightTileXY: {x: 0, y: 0}
-  leftTileXY: {x: 0, y: 0}
-  nextTilePos: {x: 0, y: 0}
-  prevTilePos: {x: 0, y: 0}
-  rightTilePos: {x: 0, y: 0}
-  leftTilePos: {x: 0, y: 0}
+  originXY: {x: 0, y: 0}
+  nextBelt: {fileID: 0}
+  rearBelt: {fileID: 0}
+  rightBelt: {fileID: 0}
+  leftBelt: {fileID: 0}
 --- !u!1001 &3740671428497927777
 PrefabInstance:
   m_ObjectHideFlags: 0

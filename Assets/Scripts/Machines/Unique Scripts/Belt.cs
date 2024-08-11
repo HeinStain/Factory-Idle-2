@@ -32,21 +32,7 @@ public class Belt : Machine
         gridArray = GameManager.Instance.GetGrid();
         lineRenderer = GetComponentInChildren<LineRenderer>();
 
-        GetNeighbourTiles();
-        GetNeighbourBelts();
-
-        UpdateNeighbour(nextBelt);
-        UpdateNeighbour(rearBelt);
-        UpdateNeighbour(rightBelt);
-        UpdateNeighbour(leftBelt);
-
-        void UpdateNeighbour(Belt belt)
-        {
-            if (belt != null) 
-            { 
-                belt.GetNeighbourBelts(); 
-            }
-        }
+        GetNeighbours();
     }
 
     private void Update()
@@ -60,16 +46,43 @@ public class Belt : Machine
         //DebugVisuals();
     }
 
-    #region Neighbour Checks
+#region Neighbour Checks
+
+
+    public void GetNeighbours()
+    {
+        GetNeighbourTiles();
+        GetNeighbourBelts();
+
+
+        StartCoroutine(UpdateNeighbour(nextBelt));
+        StartCoroutine(UpdateNeighbour(rearBelt));
+        StartCoroutine(UpdateNeighbour(rightBelt));
+        StartCoroutine(UpdateNeighbour(leftBelt));
+
+
+        IEnumerator UpdateNeighbour(Belt belt)
+        {   
+            yield return new WaitForEndOfFrame();
+            if (belt != null) 
+            { 
+                //Debug.Log("Updating Neighbour: " + belt.originXY);
+                belt.GetNeighbourBelts(); 
+                //BeltManager.Instance.UpdateBeltPath(belt);
+            }
+        }
+
+        //BeltManager.Instance.UpdateBeltPath(this);
+    }
 
     private void GetNeighbourTiles()
     {
-        nextTile  = Get(originXY + MachineData.GetNextTileXY(direction));
-        rearTile  = Get(originXY + MachineData.GetNextTileXY(direction) * -1);
-        rightTile = Get(originXY + MachineData.GetRightTileXY(direction));
-        leftTile  = Get(originXY + MachineData.GetRightTileXY(direction) * -1);
+        nextTile  = GetTile(originXY + MachineData.GetNextTileXY(direction));
+        rearTile  = GetTile(originXY + MachineData.GetNextTileXY(direction) * -1);
+        rightTile = GetTile(originXY + MachineData.GetRightTileXY(direction));
+        leftTile  = GetTile(originXY + MachineData.GetRightTileXY(direction) * -1);
 
-        GridMap.GridTile Get(Vector2Int neighbourXY)
+        GridMap.GridTile GetTile(Vector2Int neighbourXY)
         {
             return gridArray.ValidateGridPosition(neighbourXY) ? gridArray.GetGridTile(neighbourXY.x, neighbourXY.y) : null; 
         }
@@ -77,32 +90,38 @@ public class Belt : Machine
 
     public void GetNeighbourBelts()
     {
-        nextBelt = Get(nextTile);
-        rearBelt = Get(rearTile);
-        rightBelt = Get(rightTile);
-        leftBelt = Get(leftTile);
+        nextBelt = GetBelt(nextTile);
+        rearBelt = GetBelt(rearTile);
+        rightBelt = GetBelt(rightTile);
+        leftBelt = GetBelt(leftTile);
 
-        Belt Get(GridMap.GridTile tile)
+        Belt GetBelt(GridMap.GridTile tile)
         {
             if (CheckForNeighbourTile(tile))
             {
                 if (tile.GetMachine() != null)
                 {
-                    Belt name = tile.GetMachine().GetMachineName() == "Belt" ? (Belt)tile.GetMachine() : null;
-                    Debug.Log(name);
-                    return name;
+                    Belt b = tile.GetMachine().GetMachineName() == "Belt" ? (Belt)tile.GetMachine() : null;
+                    //Debug.Log("Tile " + originXY + " Returned belt at " + b.originXY);
+                    return b;
                 }
                 else
                 {
+                    //Debug.Log("Tile " + originXY + " Returned no machine");
                     return null;
                 }
             }
             else
             {
+                //Debug.Log("Tile " + originXY + " Returned no tile");
                 return null;
             }
         }
 
+        // if (nextBelt != null) { Debug.Log("nextBelt Found"); }
+        // if (rearBelt != null) { Debug.Log("rearBelt Found"); }
+        // if (rightBelt != null) { Debug.Log("rightBelt Found"); }
+        // if (leftBelt != null) { Debug.Log("leftBelt Found"); }
     }
 
 
@@ -111,7 +130,19 @@ public class Belt : Machine
         return tile != null ? true : false;
     }
 
-    #endregion
+#endregion
+
+#region Neighour External Access
+
+    public Belt GetNextBelt() { return nextBelt == null ? null : nextBelt; }
+    public Belt GetRearBelt() { return rearBelt == null ? null : rearBelt; }
+    public Belt GetRightBelt() { return rightBelt == null ? null : rightBelt; }
+    public Belt GetLeftBelt() { return leftBelt == null ? null : leftBelt; }
+
+    public MachineData.Direction GetDirection() { return direction; }
+    
+
+#endregion
     
     #region Visuals
 
@@ -132,5 +163,15 @@ public class Belt : Machine
         }
     }
     */
-    #endregion
+#endregion
+
+    protected override void ClearMachine()
+    {
+        // clear self from any belt lists
+        List<Belt> path = BeltManager.Instance.GetBeltPath(this);
+        BeltManager.Instance.RemoveFromPath(this, path);
+        BeltManager.Instance.UpdateDebugPathVisual();
+        BeltManager.Instance.UpdateDebugListVisual();
+        Debug.Log("Cleared Belt at " + originXY);
+    }
 }

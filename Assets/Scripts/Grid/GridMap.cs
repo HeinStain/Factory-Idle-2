@@ -62,21 +62,11 @@ public class GridMap
     
     #endregion
     
-    #region Get/Set Grid
-
-    public void SetBuildManager(BuildManager buildManager)
-    {
-        buildManager.SetGrid(gridArray);
-    }
+    #region Set Game Manager
 
     public void SetGameManager(GameManager gameManager)
     {
         gameManager.SetGrid(gridArray);
-    }
-
-    public void SetGridBuyManager(GridBuyManager gridBuyManager)
-    {
-        gridBuyManager.SetGrid(gridArray);
     }
     
     #endregion

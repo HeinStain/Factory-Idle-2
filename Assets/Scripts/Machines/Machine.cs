@@ -6,7 +6,7 @@ public class Machine : MonoBehaviour
 {
     
     private MachineData machineData;
-    protected Vector2Int originXY;
+    [SerializeField] protected Vector2Int originXY;
     protected MachineData.Direction direction;
 
     protected int tickTimer;
@@ -49,10 +49,16 @@ public class Machine : MonoBehaviour
     {
         return machineData.machineName;
     }
-
+    public Vector2Int GetMachineOrigin()
+    {
+        return originXY;
+    }
 
     public void DestroySelf()
     {
+        ClearMachine();
         Destroy(gameObject);
     }
+
+    protected virtual void ClearMachine() {}
 }

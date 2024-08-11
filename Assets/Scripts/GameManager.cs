@@ -24,11 +24,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] int lowY = 3;
     [SerializeField] int highY = 5;
 
+    //Returned from GridMap.cs
     public void SetGrid(Grid<GridMap.GridTile> gridArray)
     {
         this.gridArray = gridArray;
     }
 
+    //Called by other managers
     public Grid<GridMap.GridTile> GetGrid()
     {
         return gridArray;
@@ -43,8 +45,6 @@ public class GameManager : MonoBehaviour
     {   
         //Create Grid
         gridMap = new GridMap(gridSizeX, gridSizeY, 1f, new Vector2 (-(gridSizeX/2f),-(gridSizeY/2f)));
-        gridMap.SetBuildManager(buildManager);
-        gridMap.SetGridBuyManager(gridBuyManager);
         gridMap.SetGameManager(this);
 
         SetBeginningGridStates();

@@ -27,14 +27,14 @@ public class GridBuyManager : MonoBehaviour
         buyMode = false;
     }
 
-    public void SetGrid(Grid<GridMap.GridTile> gridArray)
+    private void Start()
     {
-        this.gridArray = gridArray;
-        
+        gridArray = GameManager.Instance.GetGrid();
+
         UpdateWallTiles();
-        
+
         gridArray.OnGridValueChanged += Grid_OnGridValueChanged;
-    }   
+    }
 
     private void Grid_OnGridValueChanged(object sender, Grid<GridMap.GridTile>.OnGridValueChangedEventArgs e)
     {

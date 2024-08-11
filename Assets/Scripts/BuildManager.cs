@@ -9,7 +9,7 @@ public class BuildManager : MonoBehaviour
     public static BuildManager Instance { get; private set; }
 
     public event EventHandler OnSelectedChanged;
-    public event EventHandler OnMachinePlaced;
+    public event Action<Machine> OnMachinePlaced;
     public event Action<bool> OnBuildModeChanged;
 
     private Grid<GridMap.GridTile> gridArray;
@@ -29,9 +29,9 @@ public class BuildManager : MonoBehaviour
         heldMachine = machineList[0];
     }
 
-    public void SetGrid(Grid<GridMap.GridTile> gridArray)
+    private void Start()
     {
-        this.gridArray = gridArray;
+        gridArray = GameManager.Instance.GetGrid();
     }
 
     private void Update()
@@ -58,6 +58,7 @@ public class BuildManager : MonoBehaviour
     }
 
     #region Controls
+
     private void PlaceMachine()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -90,14 +91,21 @@ public class BuildManager : MonoBehaviour
                 Vector2 machineWorldPosition = gridArray.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
 
                 Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
-
+                
+                if (machine.GetMachineName() == "Belt")
+                {
+                    Belt belt = machine.GetComponent<Belt>();
+                    Debug.Log("Placed at " + belt.GetMachineOrigin());
+                    BeltManager.Instance.UpdateBeltPath(belt);
+                }
+                
                 // Tell all tiles they're occupied
                 foreach(Vector2Int position in gridPositionList)
                 {
                     gridArray.GetGridTile(position.x, position.y).SetMachine(machine);
                 }
                 
-                OnMachinePlaced?.Invoke(this, EventArgs.Empty); 
+                OnMachinePlaced?.Invoke(machine); 
             } 
             else
             {
@@ -114,7 +122,7 @@ public class BuildManager : MonoBehaviour
         if (machine != null)
         {
             machine.DestroySelf();
-
+        
             List<Vector2Int> gridPositionList = machine.GetGridPositionList();
 
             foreach(Vector2Int position in gridPositionList)
