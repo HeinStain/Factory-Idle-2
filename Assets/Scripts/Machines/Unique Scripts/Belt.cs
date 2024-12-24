@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Belt : Machine
@@ -10,12 +11,11 @@ public class Belt : Machine
     private LineRenderer lineRenderer;
 
     [Header("Neighbours")]
-    [SerializeField] private GridMap.GridTile nextTile;
-    [SerializeField] private GridMap.GridTile rearTile;
-    [SerializeField] private GridMap.GridTile rightTile;
-    [SerializeField] private GridMap.GridTile leftTile;
+    private GridMap.GridTile nextTile;
+    private GridMap.GridTile rearTile;
+    private GridMap.GridTile rightTile;
+    private GridMap.GridTile leftTile;
 
-    
     [SerializeField] private Belt nextBelt;
     [SerializeField] private Belt rearBelt;
     [SerializeField] private Belt rightBelt;
@@ -27,6 +27,7 @@ public class Belt : Machine
     private bool occupiedByItem;
     private ItemData item;
 
+    // Called on creation
     protected override void MachineSetup()
     {
         gridArray = GameManager.Instance.GetGrid();
@@ -42,52 +43,45 @@ public class Belt : Machine
             tickTimer = 0;
             // AtNextTile();
         }
-
-        //DebugVisuals();
     }
 
 #region Neighbour Checks
-
 
     public void GetNeighbours()
     {
         GetNeighbourTiles();
         GetNeighbourBelts();
 
+        StartCoroutine(UpdateNeighbours());
 
-        StartCoroutine(UpdateNeighbour(nextBelt));
-        StartCoroutine(UpdateNeighbour(rearBelt));
-        StartCoroutine(UpdateNeighbour(rightBelt));
-        StartCoroutine(UpdateNeighbour(leftBelt));
-
-
-        IEnumerator UpdateNeighbour(Belt belt)
+        IEnumerator UpdateNeighbours()
         {   
             yield return new WaitForEndOfFrame();
-            if (belt != null) 
-            { 
-                //Debug.Log("Updating Neighbour: " + belt.originXY);
-                belt.GetNeighbourBelts(); 
-                //BeltManager.Instance.UpdateBeltPath(belt);
-            }
+            if (nextBelt != null)  { nextBelt.GetNeighbourBelts();  }
+            if (rearBelt != null)  { rearBelt.GetNeighbourBelts();  }
+            if (rightBelt != null) { rightBelt.GetNeighbourBelts(); }
+            if (leftBelt != null)  { leftBelt.GetNeighbourBelts();  }
         }
-
-        //BeltManager.Instance.UpdateBeltPath(this);
     }
 
+    // Get and Set surrounding tiles internally 
     private void GetNeighbourTiles()
     {
+        //Uses parent class originXY and machineData to get neighour positions
         nextTile  = GetTile(originXY + MachineData.GetNextTileXY(direction));
         rearTile  = GetTile(originXY + MachineData.GetNextTileXY(direction) * -1);
         rightTile = GetTile(originXY + MachineData.GetRightTileXY(direction));
         leftTile  = GetTile(originXY + MachineData.GetRightTileXY(direction) * -1);
 
+        // Access gridArray and validate tile exists
         GridMap.GridTile GetTile(Vector2Int neighbourXY)
         {
+            // Return the tile
             return gridArray.ValidateGridPosition(neighbourXY) ? gridArray.GetGridTile(neighbourXY.x, neighbourXY.y) : null; 
-        }
+       }
     }
 
+    // Get and Set surrounding Belts internally
     public void GetNeighbourBelts()
     {
         nextBelt = GetBelt(nextTile);
@@ -97,81 +91,47 @@ public class Belt : Machine
 
         Belt GetBelt(GridMap.GridTile tile)
         {
-            if (CheckForNeighbourTile(tile))
+            // Check if the tile exists
+            if (tile != null)
             {
+                // Check for a machine on the tile
                 if (tile.GetMachine() != null)
                 {
-                    Belt b = tile.GetMachine().GetMachineName() == "Belt" ? (Belt)tile.GetMachine() : null;
-                    //Debug.Log("Tile " + originXY + " Returned belt at " + b.originXY);
-                    return b;
+                    // Check if the machine is a belt
+                    if (tile.GetMachine().GetMachineName() == "Belt")
+                    {
+                        //Get the belt's MachineData
+                        return (Belt)tile.GetMachine();
+                    }
+                    else { return null; }
                 }
-                else
-                {
-                    //Debug.Log("Tile " + originXY + " Returned no machine");
-                    return null;
-                }
+                else { return null; }
             }
-            else
-            {
-                //Debug.Log("Tile " + originXY + " Returned no tile");
-                return null;
-            }
+            else { return null; }
         }
-
-        // if (nextBelt != null) { Debug.Log("nextBelt Found"); }
-        // if (rearBelt != null) { Debug.Log("rearBelt Found"); }
-        // if (rightBelt != null) { Debug.Log("rightBelt Found"); }
-        // if (leftBelt != null) { Debug.Log("leftBelt Found"); }
-    }
-
-
-    private bool CheckForNeighbourTile(GridMap.GridTile tile)
-    {
-        return tile != null ? true : false;
     }
 
 #endregion
 
-#region Neighour External Access
+#region External Access
 
-    public Belt GetNextBelt() { return nextBelt == null ? null : nextBelt; }
-    public Belt GetRearBelt() { return rearBelt == null ? null : rearBelt; }
-    public Belt GetRightBelt() { return rightBelt == null ? null : rightBelt; }
-    public Belt GetLeftBelt() { return leftBelt == null ? null : leftBelt; }
+    public Belt GetNextBelt() { return nextBelt != null ? nextBelt : null; }
+    public Belt GetRearBelt() { return rearBelt != null ? rearBelt : null; }
+    public Belt GetRightBelt() { return rightBelt != null ? rightBelt : null; }
+    public Belt GetLeftBelt() { return leftBelt != null ? leftBelt : null; }
 
     public MachineData.Direction GetDirection() { return direction; }
     
 
 #endregion
     
-    #region Visuals
-
-    /* 
-    private void DebugVisuals()
-    {
-        if (CheckForNeighbourTile(nextTile))  { Spawn(1, nextTile);  }
-        if (CheckForNeighbourTile(rearTile))  { Spawn(0, rearTile);  }
-        if (CheckForNeighbourTile(rightTile)) { Spawn(0, rightTile); }
-        if (CheckForNeighbourTile(leftTile))  { Spawn(0, leftTile);  }
-
-        void Spawn(int type, GridMap.GridTile tile)
-        {
-            if (tile != null)
-            {
-                ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, ItemManager.Instance.itemList[type], tile.GetTileWorldPos(), Quaternion.identity);
-            }
-        }
-    }
-    */
-#endregion
-
+#region On Delete
     protected override void ClearMachine()
     {
         // clear self from any belt lists
-        List<Belt> path = BeltManager.Instance.GetBeltPath(this);
-        BeltManager.Instance.RemoveFromPath(this, path);
-        BeltManager.Instance.UpdateDebugPathVisual();
-        BeltManager.Instance.UpdateDebugListVisual();
+        BeltManager.Instance.HandleDeletedBelt(this);
+        BeltManager.Instance.UpdateDebugVisual();
         Debug.Log("Cleared Belt at " + originXY);
     }
+#endregion
 }
