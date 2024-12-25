@@ -119,6 +119,16 @@ public class Belt : Machine
 
 #endregion
 
+#region Visual
+
+    private void Visuals()
+    {
+        
+    }
+
+
+#endregion 
+
 #region External Access
 
     public Belt GetNextBelt() { return nextBelt != null ? nextBelt : null; }
@@ -127,7 +137,33 @@ public class Belt : Machine
     public Belt GetLeftBelt() { return leftBelt != null ? leftBelt : null; }
 
     public MachineData.Direction GetDirection() { return direction; }
-    
+
+    public MachineData.Direction GetNegativeDirection(Belt belt) 
+    { 
+        if (belt.GetDirection() == MachineData.Direction.Up) { return MachineData.Direction.Down; }
+        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Left; } 
+        else if (belt.GetDirection() == MachineData.Direction.Down) { return MachineData.Direction.Up; }
+        else if (belt.GetDirection() == MachineData.Direction.Left) { return MachineData.Direction.Right; }
+        else { return belt.GetDirection(); }
+    }
+
+    public MachineData.Direction GetCorrectRightInputDirection(Belt belt)
+    {
+        if (belt.GetDirection() == MachineData.Direction.Up) { return MachineData.Direction.Left; }
+        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Up; } 
+        else if (belt.GetDirection() == MachineData.Direction.Down) { return MachineData.Direction.Right; }
+        else if (belt.GetDirection() == MachineData.Direction.Left) { return MachineData.Direction.Down; }
+        else { return belt.GetDirection(); }
+    }
+    public MachineData.Direction GetCorrectLeftInputDirection(Belt belt)
+    {
+        if (belt.GetDirection() == MachineData.Direction.Up) { return MachineData.Direction.Right; }
+        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Down; } 
+        else if (belt.GetDirection() == MachineData.Direction.Down) { return MachineData.Direction.Left; }
+        else if (belt.GetDirection() == MachineData.Direction.Left) { return MachineData.Direction.Up; }
+        else { return belt.GetDirection(); }
+    }
+
     public Transform GetFrontSpot() { return frontSpot; }
     public Transform GetRearSpot() { return rearSpot; }
     public Transform GetLeftSpot() { return leftSpot; }
