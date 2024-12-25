@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         SetBeginningGridStates();
         gridPrefabVisual.Setup(gridArray);
         
-        MoneyManager.Instance.IncreaseMoney(10000);
+        MoneyManager.Instance.IncreaseMoney(1000000);
     }
 
 

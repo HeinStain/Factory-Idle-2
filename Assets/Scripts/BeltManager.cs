@@ -35,32 +35,53 @@ public class BeltManager : MonoBehaviour
         // Single Input
         if (CheckInputs(belt) == 1)
         {
-            //Check which neighbour exists and join path
-            if (belt.GetRearBelt() != null)
+            // If rear belt is facing same direction, join
+            if (belt.GetRearBelt() != null && belt.GetRearBelt().GetDirection() == belt.GetDirection())
             {
                 List<Belt> rearBeltPath = GetBeltPath(belt.GetRearBelt());
                 if (rearBeltPath != null) { JoinBeltPath(belt, rearBeltPath); }
             }
+            // If right belt is facing correct direction, join
             else if (belt.GetRightBelt() != null)
             {
-                List<Belt> rightBeltPath = GetBeltPath(belt.GetRightBelt());
-                if (rightBeltPath != null) { JoinBeltPath(belt, rightBeltPath); }
+                if (belt.GetDirection() == MachineData.Direction.Up && belt.GetRightBelt().GetDirection() == MachineData.Direction.Left) { JoinRight(); }
+                else if (belt.GetDirection() == MachineData.Direction.Right && belt.GetRightBelt().GetDirection() == MachineData.Direction.Up) { JoinRight(); }
+                else if (belt.GetDirection() == MachineData.Direction.Down && belt.GetRightBelt().GetDirection() == MachineData.Direction.Right) { JoinRight(); }
+                else if (belt.GetDirection() == MachineData.Direction.Left && belt.GetRightBelt().GetDirection() == MachineData.Direction.Down) { JoinRight(); }
+                else 
+                { 
+                    // Otherwise, check if left is facing correct direction and join
+                    if (belt.GetLeftBelt() != null)
+                    {
+                        if (belt.GetDirection() == MachineData.Direction.Up && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Right) { JoinLeft(); }
+                        else if (belt.GetDirection() == MachineData.Direction.Right && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Down) { JoinLeft(); }
+                        else if (belt.GetDirection() == MachineData.Direction.Down && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Left) { JoinLeft(); }
+                        else if (belt.GetDirection() == MachineData.Direction.Left && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Up) { JoinLeft(); } 
+                    }
+                    else { NewPath(); }
+                }
             }
+            // If left belt is facing correct direction, join
             else if (belt.GetLeftBelt() != null)
             {
-                List<Belt> leftBeltPath = GetBeltPath(belt.GetLeftBelt());
-                if (leftBeltPath != null) { JoinBeltPath(belt, leftBeltPath); }
+                if (belt.GetDirection() == MachineData.Direction.Up && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Right) { JoinLeft(); }
+                else if (belt.GetDirection() == MachineData.Direction.Right && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Down) { JoinLeft(); }
+                else if (belt.GetDirection() == MachineData.Direction.Down && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Left) { JoinLeft(); }
+                else if (belt.GetDirection() == MachineData.Direction.Left && belt.GetLeftBelt().GetDirection() == MachineData.Direction.Up) { JoinLeft(); }
+                else { NewPath(); }
             }
 
             if (belt.GetNextBelt() != null)
             { 
-                UpdateNextBelt(belt);
+                if (belt.GetDirection() == MachineData.Direction.Up && belt.GetNextBelt().GetDirection() != MachineData.Direction.Down) { UpdateNextBelt(belt); }
+                else if (belt.GetDirection() == MachineData.Direction.Right && belt.GetNextBelt().GetDirection() != MachineData.Direction.Left) { UpdateNextBelt(belt); }
+                else if (belt.GetDirection() == MachineData.Direction.Down && belt.GetNextBelt().GetDirection() != MachineData.Direction.Up) { UpdateNextBelt(belt); }
+                else if (belt.GetDirection() == MachineData.Direction.Left && belt.GetNextBelt().GetDirection() != MachineData.Direction.Right) { UpdateNextBelt(belt); }
             }
         }
         // Multi 
         else if (CheckInputs(belt) > 1)
         {
-            Debug.Log("SHIIIEIEET");
             CreateNewPath(belt);
             HandleDeletedBelt(belt);
             CreateNewPath(belt);
@@ -68,31 +89,40 @@ public class BeltManager : MonoBehaviour
         // No Input
         else if (CheckInputs(belt) == 0)
         {
+            NewPath();
+        }
+        
+        void JoinRight()
+        {
+            List<Belt> rightBeltPath = GetBeltPath(belt.GetRightBelt());
+            if (rightBeltPath != null) { JoinBeltPath(belt, rightBeltPath); }
+        }
+
+        void JoinLeft()
+        {
+            List<Belt> leftBeltPath = GetBeltPath(belt.GetLeftBelt());
+            if (leftBeltPath != null) { JoinBeltPath(belt, leftBeltPath); }
+        }
+
+        void NewPath()
+        {
             if (belt.GetNextBelt() != null)
             { 
-                CreateNewPath(belt);
-                UpdateNextBelt(belt);
+                if (belt.GetDirection() == MachineData.Direction.Up && belt.GetNextBelt().GetDirection() != MachineData.Direction.Down) { CreateNewPath(belt); UpdateNextBelt(belt); }
+                else if (belt.GetDirection() == MachineData.Direction.Right && belt.GetNextBelt().GetDirection() != MachineData.Direction.Left) { CreateNewPath(belt); UpdateNextBelt(belt); }
+                else if (belt.GetDirection() == MachineData.Direction.Down && belt.GetNextBelt().GetDirection() != MachineData.Direction.Up) { CreateNewPath(belt); UpdateNextBelt(belt); }
+                else if (belt.GetDirection() == MachineData.Direction.Left && belt.GetNextBelt().GetDirection() != MachineData.Direction.Right) { CreateNewPath(belt); UpdateNextBelt(belt); }
+                else { CreateNewPath(belt); }
             }
             else
             {
                 CreateNewPath(belt);
             }
         }
-
         UpdateDebugVisual();
         
     }
 
-    private void UpdateNextBelt(Belt belt)
-    {
-        StartCoroutine(UpdateNextBelt());
-        IEnumerator UpdateNextBelt()
-        {   
-            yield return new WaitForEndOfFrame();
-            belt.GetNeighbourBelts();
-            UpdateBeltPath(belt.GetNextBelt());
-        }   
-    }
 #region Belt Path
 
     private void JoinBeltPath(Belt belt, List<Belt> path)
@@ -125,10 +155,35 @@ public class BeltManager : MonoBehaviour
             {
                 belt.GetNeighbourBelts();
                 UpdateBeltPath(belt);
+
+                 
             }
+            /*
+            if (deletedBelt.GetNextBelt() != null)
+            {
+                List<Belt> nextBeltPath = GetBeltPath(deletedBelt.GetNextBelt());
+                if (nextBeltPath != path)
+                {
+                    UpdateBeltPath(deletedBelt.GetNextBelt());
+                } 
+            } 
+            */
         }
+
+         
         
         Debug.Log(deletedBelt.GetMachineOrigin() + " Removed From Path");
+    }
+    
+    private void UpdateNextBelt(Belt belt)
+    {
+        StartCoroutine(UpdateNextBelt());
+        IEnumerator UpdateNextBelt()
+        {   
+            yield return new WaitForEndOfFrame();
+            belt.GetNeighbourBelts();
+            UpdateBeltPath(belt.GetNextBelt());
+        }   
     }
 
     private void CreateNewPath(Belt belt)
@@ -158,7 +213,7 @@ public class BeltManager : MonoBehaviour
 
 #region Check Inputs
 
-    private int CheckInputs(Belt belt)
+    public int CheckInputs(Belt belt)
     {
         int inputs = 0;
 

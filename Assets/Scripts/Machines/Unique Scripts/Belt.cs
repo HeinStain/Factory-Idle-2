@@ -21,6 +21,12 @@ public class Belt : Machine
     [SerializeField] private Belt rightBelt;
     [SerializeField] private Belt leftBelt;
 
+    [Header("Item Spots")]
+    [SerializeField] private Transform frontSpot;
+    [SerializeField] private Transform middleSpot;
+    [SerializeField] private Transform rearSpot;
+    [SerializeField] private Transform rightSpot;
+    [SerializeField] private Transform leftSpot;
 
     [Header("Data")]
     private int timeToNextTile = 3;
@@ -122,6 +128,11 @@ public class Belt : Machine
 
     public MachineData.Direction GetDirection() { return direction; }
     
+    public Transform GetFrontSpot() { return frontSpot; }
+    public Transform GetRearSpot() { return rearSpot; }
+    public Transform GetLeftSpot() { return leftSpot; }
+    public Transform GetRightSpot() { return rightSpot; }
+    public Transform GetMiddleSpot() { return middleSpot; }
 
 #endregion
     
