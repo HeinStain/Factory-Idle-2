@@ -357,6 +357,22 @@ MonoBehaviour:
   rearBelt: {fileID: 0}
   rightBelt: {fileID: 0}
   leftBelt: {fileID: 0}
+  frontSpot: {fileID: 2635475949200867484}
+  middleSpot: {fileID: 3283952148428888036}
+  rearSpot: {fileID: 6845569800487059292}
+  rightSpot: {fileID: 5236879978970192075}
+  leftSpot: {fileID: 2224984266966329322}
+  spriteRenderer: {fileID: 500993486319312768}
+  straight: {fileID: 1279492805, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  rightTurn: {fileID: -88112447, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  leftTurn: {fileID: -86768545, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  straightWithRight: {fileID: 142680800, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  straightWithLeft: {fileID: -1258330821, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  bothSides: {fileID: -2040978430, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  straightWithSides: {fileID: -1152558849, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  end: {fileID: 1184773433, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  none: {fileID: 2085357177, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  start: {fileID: 31753576, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
 --- !u!1 &7905587890285003829
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,6 +461,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd6026fc66580074db2493e5372f1bf1, type: 3}
+--- !u!212 &500993486319312768 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3826487602958741985, guid: dd6026fc66580074db2493e5372f1bf1, type: 3}
+  m_PrefabInstance: {fileID: 3740671428497927777}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &907042746438384245 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4575655340692968468, guid: dd6026fc66580074db2493e5372f1bf1, type: 3}

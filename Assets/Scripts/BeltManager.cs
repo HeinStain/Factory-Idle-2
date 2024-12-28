@@ -27,68 +27,73 @@ public class BeltManager : MonoBehaviour
         gridArray = GameManager.Instance.GetGrid();
     }
 
-    // Called from BuildManager on belt placed
+#region Main
+
+    // Internal Call
     public void UpdateBeltPath(Belt belt)
     {
-        MachineData.Direction nextBeltDirection  = belt.GetNextBelt()?.GetDirection()  ?? default(MachineData.Direction);
-        MachineData.Direction rearBeltDirection  = belt.GetRearBelt()?.GetDirection()  ?? default(MachineData.Direction);
-        MachineData.Direction rightBeltDirection = belt.GetRightBelt()?.GetDirection() ?? default(MachineData.Direction);
-        MachineData.Direction leftBeltDirection  = belt.GetLeftBelt()?.GetDirection()  ?? default(MachineData.Direction);
+        StartCoroutine(UpdateBelt());
+        IEnumerator UpdateBelt()
+        {   
+            yield return new WaitForEndOfFrame();
 
-        // True if next belt exists and isn't facing this one
-        bool nextBeltExists = belt.GetNextBelt() != null ? true : false;
-        bool nextBeltAvailable = nextBeltExists && nextBeltDirection != belt.GetNegativeDirection(belt) ? true : false;
-        // True if belts exist and are moving into this one
-        bool rearInput     = belt.GetRearBelt()  != null && rearBeltDirection  == belt.GetDirection() ? true : false;
-        bool rightInput    = belt.GetRightBelt() != null && rightBeltDirection == belt.GetCorrectRightInputDirection(belt) ? true : false;
-        bool leftInput     = belt.GetLeftBelt()  != null && leftBeltDirection  == belt.GetCorrectLeftInputDirection(belt) ? true : false;
+            // Check Neighbours
+            belt.GetNeighbourBelts(); 
 
-        // Remove belt from any paths it was in
-        if (GetBeltPath(belt) != null) { HandleDeletedBelt(belt); }
+            // Remove belt from any paths it was in
+            if (GetBeltPath(belt) != null) { HandleDeletedBelt(belt); }
 
-        // No Input
-        if (!rearInput && !rightInput && !leftInput)
-        {
-            if (nextBeltAvailable) 
-            { 
-                CreateNewPath(belt); 
-                UpdateNextBelt(belt); 
+            // No Input
+            if (!belt.RearInput() && !belt.RightInput() && !belt.LeftInput())
+            {
+                if (belt.NextAvailable()) 
+                { 
+                    CreateNewPath(belt); 
+                    UpdateBeltPath(belt.GetNextBelt()); 
+                }
+                else { CreateNewPath(belt); }
             }
-            else { CreateNewPath(belt); }
-        }
-        // Rear Input Only
-        else if (rearInput && !rightInput && !leftInput)
-        {
-            List<Belt> rearBeltPath = GetBeltPath(belt.GetRearBelt());
-            if (rearBeltPath != null) { JoinBeltPath(belt, rearBeltPath); }
-            if (nextBeltAvailable) { UpdateNextBelt(belt); }
-        }
-        // Right Input Only
-        else if (!rearInput && rightInput && !leftInput)
-        {
-            List<Belt> rightBeltPath = GetBeltPath(belt.GetRightBelt());
-            if (rightBeltPath != null) { JoinBeltPath(belt, rightBeltPath); }
-            if (nextBeltAvailable) { UpdateNextBelt(belt); }
-        }
-        // Left Input Only
-        else if (!rearInput && !rightInput && leftInput)
-        {
-            List<Belt> leftBeltPath = GetBeltPath(belt.GetLeftBelt());
-            if (leftBeltPath != null) { JoinBeltPath(belt, leftBeltPath); }
-            if (nextBeltAvailable) { UpdateNextBelt(belt); }
-        }
-        // Multi Input
-        else if (( rearInput &&  rightInput && !leftInput)
-             ||  ( rearInput && !rightInput &&  leftInput)
-             ||  (!rearInput &&  rightInput &&  leftInput)
-             ||  ( rearInput &&  rightInput &&  leftInput))
-        {
-            CreateNewPath(belt);
-            if (nextBeltAvailable) { UpdateNextBelt(belt); }
-        }
+            // Rear Input Only
+            else if (belt.RearInput() && !belt.RightInput() && !belt.LeftInput())
+            {
+                List<Belt> rearBeltPath = GetBeltPath(belt.GetRearBelt());
+                if (rearBeltPath != null) { JoinBeltPath(belt, rearBeltPath); belt.GetRearBelt().UpdateVisuals(); }
+                if (belt.NextAvailable()) { UpdateBeltPath(belt.GetNextBelt()); }
+            }
+            // Right Input Only
+            else if (!belt.RearInput() && belt.RightInput() && !belt.LeftInput())
+            {
+                List<Belt> rightBeltPath = GetBeltPath(belt.GetRightBelt());
+                if (rightBeltPath != null) { JoinBeltPath(belt, rightBeltPath); belt.GetRightBelt().UpdateVisuals(); } 
+                if (belt.NextAvailable()) { UpdateBeltPath(belt.GetNextBelt()); }
+            }
+            // Left Input Only
+            else if (!belt.RearInput() && !belt.RightInput() && belt.LeftInput())
+            {
+                List<Belt> leftBeltPath = GetBeltPath(belt.GetLeftBelt());
+                if (leftBeltPath != null) { JoinBeltPath(belt, leftBeltPath); belt.GetLeftBelt().UpdateVisuals(); }
+                if (belt.NextAvailable()) { UpdateBeltPath(belt.GetNextBelt()); }
+            }
+            // Multi Input
+            else if (( belt.RearInput() &&  belt.RightInput() && !belt.LeftInput())
+                 ||  ( belt.RearInput() && !belt.RightInput() &&  belt.LeftInput())
+                 ||  (!belt.RearInput() &&  belt.RightInput() &&  belt.LeftInput())
+                 ||  ( belt.RearInput() &&  belt.RightInput() &&  belt.LeftInput()))
+            {
+                CreateNewPath(belt);  
+                if (belt.NextAvailable()) { UpdateBeltPath(belt.GetNextBelt()); }
+                if (belt.RearInput()) { belt.GetRearBelt().UpdateVisuals(); }
+                if (belt.RightInput()) { belt.GetRightBelt().UpdateVisuals(); }
+                if (belt.LeftInput()) { belt.GetLeftBelt().UpdateVisuals(); }
+            }
 
-        UpdateDebugVisual();
+            belt.UpdateVisuals();
+            UpdateDebugVisual();
+        }
     }
+
+
+#endregion
 
 #region Belt Path
     private void CreateNewPath(Belt belt)
@@ -104,40 +109,27 @@ public class BeltManager : MonoBehaviour
         // Copy other belts in this path to a new list
         List<Belt> path = GetBeltPath(deletedBelt);
         List<Belt> newBeltPath = path.Where(x => x != deletedBelt).ToList();
-  
+
         // Delete the belt
         path.Remove(deletedBelt);
 
         // Delete the path
         pathList.Remove(path);
 
-        // Update other belts
-        StartCoroutine(UpdateRemainingBelts());
-
-        IEnumerator UpdateRemainingBelts()
-        {   
-            yield return new WaitForEndOfFrame();
-
-            // Check if next belt is available
-            bool nextBeltAvailable = deletedBelt.GetNextBelt() != null && deletedBelt.GetNextBelt()?.GetDirection() != deletedBelt.GetNegativeDirection(deletedBelt) ? true : false;
-            
-            // Update next belt if it exists
-            if (nextBeltAvailable)
-            {
-                deletedBelt.GetNextBelt().GetNeighbourBelts();
-                UpdateBeltPath(deletedBelt.GetNextBelt());
-            }
-            
-            // Update other belts in this path
-            foreach (Belt belt in newBeltPath)
-            {
-                belt.GetNeighbourBelts();
-                UpdateBeltPath(belt); 
-            }
+        // Update next belt if it exists
+        if (deletedBelt.NextAvailable())
+        {
+            deletedBelt.GetNextBelt().GetNeighbourBelts();
+            UpdateBeltPath(deletedBelt.GetNextBelt());
+        }
+        
+        // Update other belts in this path
+        foreach (Belt belt in newBeltPath)
+        {
+            belt.GetNeighbourBelts();
+            UpdateBeltPath(belt); 
         }
 
-         
-        
         Debug.Log(deletedBelt.GetMachineOrigin() + " Removed From Path");
     }
 
@@ -147,17 +139,6 @@ public class BeltManager : MonoBehaviour
         Debug.Log(belt.GetMachineOrigin() + " Joined Path");
     }
 
-    private void UpdateNextBelt(Belt belt)
-    {
-        StartCoroutine(UpdateNextBelt());
-        IEnumerator UpdateNextBelt()
-        {   
-            yield return new WaitForEndOfFrame();
-            belt.GetNeighbourBelts();
-            UpdateBeltPath(belt.GetNextBelt());
-        }   
-    }
-    
     public List<Belt> GetBeltPath(Belt belt)
     {
         foreach (List<Belt> path in pathList)
