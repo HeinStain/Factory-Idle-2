@@ -18,6 +18,8 @@ public class MiningDrill : Machine
     protected override void MachineSetup()
     {
 
+        //Get output belt
+        
     }
 
     private void Update()
@@ -39,6 +41,8 @@ public class MiningDrill : Machine
     private void FinishCraft()
     {
         
+        //Check if output belt xists
+        NotificationManager.Instance.DisplayNotification("Crafting");
         
         ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, new Vector3(0,0,0), Quaternion.identity);
 

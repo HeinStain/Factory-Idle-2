@@ -45,10 +45,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 15
+  spritePixelsToUnits: 60
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -139,10 +139,10 @@ TextureImporter:
       name: Mining Drill_0
       rect:
         serializedVersion: 2
-        x: 51
-        y: 0
-        width: 30
-        height: 30
+        x: 204
+        y: 4
+        width: 120
+        height: 120
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,10 +160,10 @@ TextureImporter:
       name: Mining Drill_1
       rect:
         serializedVersion: 2
-        x: 24
-        y: 2
-        width: 26
-        height: 26
+        x: 96
+        y: 12
+        width: 104
+        height: 104
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -181,12 +181,12 @@ TextureImporter:
       name: Mining Drill_2
       rect:
         serializedVersion: 2
-        x: 82
-        y: 15
-        width: 14
-        height: 14
+        x: 326
+        y: 65
+        width: 60
+        height: 60
       alignment: 9
-      pivot: {x: 0.14285715, y: 0.85714287}
+      pivot: {x: 0.16666667, y: 0.8333334}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -202,13 +202,13 @@ TextureImporter:
       name: Mining Drill_3
       rect:
         serializedVersion: 2
-        x: 83
-        y: 1
-        width: 14
-        height: 13
+        x: 332
+        y: 6
+        width: 58
+        height: 56
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 8, y: 6, z: 12, w: 6}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -223,10 +223,10 @@ TextureImporter:
       name: Mining Drill_4
       rect:
         serializedVersion: 2
-        x: 1
-        y: 0
-        width: 18
-        height: 30
+        x: 2
+        y: 2
+        width: 76
+        height: 124
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -244,10 +244,10 @@ TextureImporter:
       name: Mining Drill_5
       rect:
         serializedVersion: 2
-        x: 20
-        y: 14
-        width: 1
-        height: 2
+        x: 80
+        y: 60
+        width: 4
+        height: 8
       alignment: 9
       pivot: {x: 0, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

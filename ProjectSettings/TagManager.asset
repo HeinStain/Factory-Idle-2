@@ -45,14 +45,14 @@ TagManager:
   - name: Grid Tile
     uniqueID: 2482016741
     locked: 0
-  - name: Items
-    uniqueID: 1115253413
-    locked: 0
   - name: Machine Frames
     uniqueID: 921527385
     locked: 0
   - name: Belts
     uniqueID: 2678020729
+    locked: 0
+  - name: Items
+    uniqueID: 1115253413
     locked: 0
   - name: Placed Machine
     uniqueID: 3936778891
@@ -62,4 +62,10 @@ TagManager:
     locked: 0
   - name: Debug
     uniqueID: 451191673
+    locked: 0
+  - name: Notifications
+    uniqueID: 851132065
+    locked: 0
+  - name: Mouse
+    uniqueID: 497914975
     locked: 0

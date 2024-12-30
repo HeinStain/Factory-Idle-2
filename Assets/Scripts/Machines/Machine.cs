@@ -24,11 +24,16 @@ public class Machine : MonoBehaviour
         Transform machineTransform = Instantiate(machineData.prefab, worldPos, Quaternion.Euler(0,0, machineData.GetRotationAngle(direction)));
         Machine machine = machineTransform.GetComponent<Machine>();
 
-        //
+        Transform visuals = machineTransform.Find("Visual");
+        if (visuals != null)
+        {
+            SpriteRenderer[] spriteRenderers = visuals.GetComponentsInChildren<SpriteRenderer>();
 
-        //machineTransform.transform.Find("Visual/Sprite").GetComponent<SpriteRenderer>().sortingLayerName = "Placed Machine";
-
-        //
+            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+            {
+                spriteRenderer.sortingLayerName = "Placed Machine";
+            }
+        }
 
         machine.machineData = machineData;
         machine.originXY = originXY;

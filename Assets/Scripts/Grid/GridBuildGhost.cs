@@ -69,8 +69,8 @@ public class GridBuildGhost : MonoBehaviour
             visual.parent = transform;
             visual.localPosition = Vector2.zero;
             visual.localEulerAngles = Vector2.zero;
-            //int ghostLayer = LayerMask.NameToLayer("Build Ghost");
-            //SetLayerRecursive(visual.gameObject, ghostLayer);
+            int ghostLayer = LayerMask.NameToLayer("Build Ghost");
+            SetLayerRecursive(visual.gameObject, ghostLayer);
         }
     }
     

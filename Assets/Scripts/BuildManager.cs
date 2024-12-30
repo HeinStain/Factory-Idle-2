@@ -57,7 +57,7 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    #region Controls
+#region Controls
 
     private void PlaceMachine()
     {
@@ -92,20 +92,13 @@ public class BuildManager : MonoBehaviour
 
                 Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
                 
-                if (machine.GetMachineName() == "Belt")
-                {
-                    Belt belt = machine.GetComponent<Belt>();
-                    Debug.Log("Placed at " + belt.GetMachineOrigin());
-                    BeltManager.Instance.UpdateBeltPath(belt);
-                }
-                
                 // Tell all tiles they're occupied
                 foreach(Vector2Int position in gridPositionList)
                 {
                     gridArray.GetGridTile(position.x, position.y).SetMachine(machine);
                 }
                 
-                OnMachinePlaced?.Invoke(machine); 
+                // OnMachinePlaced?.Invoke(machine); 
             } 
             else
             {
@@ -136,7 +129,9 @@ public class BuildManager : MonoBehaviour
     {
         direction = MachineData.GetNextRotationDirection(direction);
     }
+#endregion
 
+#region Machine Selection
     private void HandleMachineSelection()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) { SelectMachineType(0); }
@@ -149,9 +144,9 @@ public class BuildManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha8)) { SelectMachineType(7); }
         if (Input.GetKeyDown(KeyCode.Alpha0)) { DeselectAllMachineTypes(); }
     }
-    #endregion
+#endregion
 
-    #region Functions
+#region Functions
     public void BuildMode(bool b)
     {
         buildMode = b;
@@ -220,7 +215,7 @@ public class BuildManager : MonoBehaviour
     {
         return gridArray.GetGridTile(pos);
     }
-    #endregion
+#endregion
 
 
     

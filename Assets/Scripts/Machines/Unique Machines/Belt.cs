@@ -68,7 +68,20 @@ public class Belt : Machine
         gridArray = GameManager.Instance.GetGrid();
         lineRenderer = GetComponentInChildren<LineRenderer>();
 
+        Transform visuals = this.transform.Find("Visual");
+        if (visuals != null)
+        {
+            SpriteRenderer[] spriteRenderers = visuals.GetComponentsInChildren<SpriteRenderer>();
+
+            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+            {
+                spriteRenderer.sortingLayerName = "Belts";
+            }
+        }
+
+
         GetNeighbours();
+        BeltManager.Instance.UpdateBeltPath(this);
     }
 
     private void Update()
