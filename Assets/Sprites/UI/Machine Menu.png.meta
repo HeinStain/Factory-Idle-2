@@ -564,7 +564,7 @@ TextureImporter:
         width: 6
         height: 6
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -572,6 +572,27 @@ TextureImporter:
       bones: []
       spriteID: a3f8585bcb52d3a48ac0fe6be8380841
       internalID: -1038275256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Progress Bar 5
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 51
+        width: 1
+        height: 2
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f229c09b46f5dd47a850c67d4aa9cca
+      internalID: -463223376
       vertices: []
       indices: 
       edges: []
@@ -602,6 +623,7 @@ TextureImporter:
       Progress Bar 2: 1688093476
       Progress Bar 3: 1147264259
       Progress Bar 4: -1541567533
+      Progress Bar 5: -463223376
       Stone Box: 1502420996
       Stone Inset: -2130562440
       Stone Menu: -1448229960

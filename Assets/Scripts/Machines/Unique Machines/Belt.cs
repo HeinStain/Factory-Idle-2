@@ -86,11 +86,7 @@ public class Belt : Machine
 
     private void Update()
     {
-        if (tickTimer >= timeTonextAvailableTile)
-        {
-            tickTimer = 0;
-            // AtnextAvailableTile();
-        }
+       
     }
 
 #endregion

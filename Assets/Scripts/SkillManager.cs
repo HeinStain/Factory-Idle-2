@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Unity.VisualScripting;
+using UnityEngine.Animations;
 
 public class SkillManager : MonoBehaviour
 {
@@ -14,10 +16,16 @@ public class SkillManager : MonoBehaviour
     }
 
     public Dictionary<string, int> skillLevels = new Dictionary<string, int>();
+    public Dictionary<string, float> skillXP = new Dictionary<string, float>();
+    public Dictionary<string, float> skillMasteryPoolXP = new Dictionary<string, float>();
+
 
     public Dictionary<string, int> oreMasteryLevel = new Dictionary<string, int>();
-    public Dictionary<string, int> oreMasteryXP = new Dictionary<string, int>();
+    public Dictionary<string, float> oreMasteryXP = new Dictionary<string, float>();
     public Dictionary<string, bool> oreUnlocks = new Dictionary<string, bool>();
+
+    
+        public Dictionary<string, int> oreVeinMax = new Dictionary<string, int>();
 
 #region Setup
 
@@ -26,14 +34,19 @@ public class SkillManager : MonoBehaviour
         foreach (MachineData machine in BuildManager.Instance.machineList)
         {
             skillLevels.Add(machine.machineName, 1);
+            skillXP.Add(machine.machineName, 0);
+            skillMasteryPoolXP.Add(machine.machineName, 0);
         }
 
         foreach (ItemData ore in ItemManager.Instance.oresList)
         {
             oreMasteryLevel.Add(ore.displayName, 1);
-            oreMasteryXP.Add(ore.displayName, 0);
+            oreMasteryXP.Add(ore.displayName, 0f);
+
+           
+            oreVeinMax.Add(ore.displayName, 6);
             
-            if (GetDictionaryIntValue(oreMasteryLevel, ore.displayName) >= ore.unlockLevel)
+            if (GetDictionaryIntValue(skillLevels, "Mining Drill") >= ore.unlockLevel)
             {
                 oreUnlocks.Add(ore.displayName, true);
             }
@@ -50,47 +63,83 @@ public class SkillManager : MonoBehaviour
 
     public int GetDictionaryIntValue(Dictionary<string, int> dictionary, string name)
     {
-        foreach (KeyValuePair<string, int> entry in dictionary)
+        if (dictionary.ContainsKey(name))
         {
-            if (name == entry.Key)
-            {
-                return entry.Value;
-            }
+            return dictionary[name];
         }
         return 0;
     }
 
     public bool GetDictionaryBoolValue(Dictionary<string, bool> dictionary, string name)
     {
-        foreach (KeyValuePair<string, bool> entry in dictionary)
+        if (dictionary.ContainsKey(name))
         {
-            if (name == entry.Key)
-            {
-                return entry.Value;
-            }
+            return dictionary[name];
         }
         return false;
+    }
+
+    public float GetDictionaryFloatValue(Dictionary<string, float> dictionary, string name)
+    {
+        if (dictionary.ContainsKey(name))
+        {
+            return dictionary[name];
+        }
+        return 0;
+        
+    }
+
+    public void AddXP(Dictionary<string, float> dictionary, string name, float amount)
+    {
+        if (dictionary.ContainsKey(name))
+        {
+            dictionary[name] += amount;
+        }
+    }
+
+    public void SetDictionaryIntValue(Dictionary<string, int> dictionary, string name, int amount)
+    {
+        if (dictionary.ContainsKey(name))
+        {
+            dictionary[name] = amount;
+        }
+    }
+
+    public void SetDictionaryFloatValue(Dictionary<string, float> dictionary, string name, float amount)
+    {
+        if (dictionary.ContainsKey(name))
+        {
+            dictionary[name] = amount;
+        }
+    }
+
+    public void ChangeDictionaryIntValue(Dictionary<string, int> dictionary, string name, int amount)
+    {
+        if (dictionary.ContainsKey(name))
+        {
+            dictionary[name] += amount;
+        }
     }
 
 #endregion
 
 #region Ore Calculations
 
-    public int CalculateOreMasteryXP(string oreName)
+    public float CalculateGivenOreMasteryXP(string oreName)
     {
         int unlockedOres = 0;
-        foreach (KeyValuePair<string, bool> entry in oreUnlocks)
+        
+        if (oreUnlocks.ContainsKey(oreName))
         {
-            if (entry.Value == true)
+            if (oreUnlocks[oreName] == true)
             {
                 unlockedOres++;
             }
         }
 
-        int currentLevel;
-        currentLevel = GetDictionaryIntValue(oreMasteryLevel, oreName);
+        int currentLevel = GetDictionaryIntValue(oreMasteryLevel, oreName);
 
-        int result = (int)(((unlockedOres * oreMasteryLevel.Values.Sum() / (oreMasteryLevel.Count * 99)) + (currentLevel * oreMasteryLevel.Count / 10) * 1.5)); //actionTime * 0.5 * (1 + bonus);
+        float result = (float)(((unlockedOres * oreMasteryLevel.Values.Sum() / (oreMasteryLevel.Count * 99)) + (currentLevel * oreMasteryLevel.Count / 10) * 1.5)); //actionTime * 0.5 * (1 + bonus);
         return result;           
     }
 
@@ -99,14 +148,19 @@ public class SkillManager : MonoBehaviour
         return Mathf.RoundToInt(83 * Mathf.Pow(1.104027812f, (currentLevel - 1)));
     }
 
-    public int CalculateVeinCount(int currentLevel)
+    public int CalculateXPToNextLevel(int currentLevel)
+    {
+        return Mathf.FloorToInt((1f / 4f) * (currentLevel + 300 * Mathf.Pow(2, currentLevel / 7f)));
+    }
+
+    public int CalculateVeinMax(int currentLevel)
     {
         return currentLevel + 5;
     }
 
-    public int CalculateMasteryPoolXP(string oreName)
+    public float CalculateGivenMasteryPoolXP(string oreName)
     {
-        return (int)CalculateOreMasteryXP(oreName) / 4;
+        return CalculateGivenOreMasteryXP(oreName) / 4;
         
     }
 
