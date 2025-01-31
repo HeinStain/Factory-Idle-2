@@ -134,17 +134,12 @@ public class GameManager : MonoBehaviour
   
 
     #region Menu
-
-    private bool menuOpen;
-
-    public static event Action<bool> OnMenuTriggered;
-    
+ 
+    public event Action<bool> OnMenuTriggered;
     public void SetMenuOpen(bool status)
     {
-        menuOpen = status;
-        OnMenuTriggered?.Invoke(menuOpen);
+        OnMenuTriggered?.Invoke(status);
     }
-
     #endregion 
 
 }

@@ -18,15 +18,31 @@ public class GridBuildGhost : MonoBehaviour
         buildMode = false;
         Instance_OnBuildModeChanged(buildMode);
 
-        BuildManager.Instance.OnSelectedChanged += Instance_OnSelectedChanged;
+        BuildManager.Instance.OnSelectedChanged += RefreshVisual;
         BuildManager.Instance.OnBuildModeChanged += Instance_OnBuildModeChanged;
     }
 
-    private void Instance_OnSelectedChanged(object sender, System.EventArgs e)
+    private void RefreshVisual()
     {
-        RefreshVisual();
-    }
+        if (visual != null) 
+        {
+            Destroy(visual.gameObject);
+            visual = null;
+        }
 
+        MachineData machineData = BuildManager.Instance.GetHeldMachine();
+
+        if (machineData != null)
+        {
+            visual = Instantiate(machineData.visual, Vector2.zero, Quaternion.identity);
+            visual.parent = transform;
+            visual.localPosition = Vector2.zero;
+            visual.localEulerAngles = Vector2.zero;
+            int ghostLayer = LayerMask.NameToLayer("Build Ghost");
+            SetLayerRecursive(visual.gameObject, ghostLayer);
+        }
+    }
+    
     private void Instance_OnBuildModeChanged(bool arg)
     {
         buildMode = arg;
@@ -53,26 +69,7 @@ public class GridBuildGhost : MonoBehaviour
     }
 
 
-    private void RefreshVisual()
-    {
-        if (visual != null) 
-        {
-            Destroy(visual.gameObject);
-            visual = null;
-        }
 
-        MachineData machineData = BuildManager.Instance.GetHeldMachine();
-
-        if (machineData != null)
-        {
-            visual = Instantiate(machineData.visual, Vector2.zero, Quaternion.identity);
-            visual.parent = transform;
-            visual.localPosition = Vector2.zero;
-            visual.localEulerAngles = Vector2.zero;
-            int ghostLayer = LayerMask.NameToLayer("Build Ghost");
-            SetLayerRecursive(visual.gameObject, ghostLayer);
-        }
-    }
     
     // Set all visuals to "Build Ghost" layer (necessary for renderer tricks in the future)
     private void SetLayerRecursive(GameObject targetObj, int layer)

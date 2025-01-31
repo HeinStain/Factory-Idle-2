@@ -8,7 +8,7 @@ public class BuildManager : MonoBehaviour
     
     public static BuildManager Instance { get; private set; }
 
-    public event EventHandler OnSelectedChanged;
+    public event Action OnSelectedChanged;
     public event Action<Machine> OnMachinePlaced;
     public event Action<bool> OnBuildModeChanged;
 
@@ -89,6 +89,7 @@ public class BuildManager : MonoBehaviour
             {
                 Vector2Int rotationOffset = heldMachine.GetRotationOffset(direction);
                 Vector2 machineWorldPosition = gridArray.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
+                Debug.Log(rotationOffset);
 
                 Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
                 
@@ -98,7 +99,8 @@ public class BuildManager : MonoBehaviour
                     gridArray.GetGridTile(position.x, position.y).SetMachine(machine);
                 }
                 
-                // OnMachinePlaced?.Invoke(machine); 
+                OnMachinePlaced?.Invoke(machine); 
+                
             } 
             else
             {
@@ -155,7 +157,7 @@ public class BuildManager : MonoBehaviour
 
     private void RefreshSelectedMachine()
     {
-        OnSelectedChanged?.Invoke(this, EventArgs.Empty);
+        OnSelectedChanged?.Invoke();
     }
 
     public void SelectMachineType(int index)
@@ -170,6 +172,7 @@ public class BuildManager : MonoBehaviour
         RefreshSelectedMachine();
     }
     #endregion
+
 
     #region Info
     // Used by GridBuildGhost.cs

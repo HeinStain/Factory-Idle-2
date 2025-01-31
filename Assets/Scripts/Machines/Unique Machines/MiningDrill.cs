@@ -1,110 +1,105 @@
-using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.UI;
-using System.Linq;
-using TMPro;
-using Unity.Collections;
-using System.Data;
 
 public class MiningDrill : Machine
 {
-    
-    private int timeToCraft = 60;
-    private int timeToVeinRespawn = 100;
-    [SerializeField] private BoxCollider2D clickBox;
 
-    private bool mining = false;
+    [Header("Grid")]
+    private Grid<GridMap.GridTile> gridArray;
+    private GridMap.GridTile outputTile;
+    public Belt outputBelt;
 
+    [Header("Selection")]
+    public ItemData selectedOre;
     public ItemData oreToCraft;
 
-    public Dictionary<string, int> oreVeinCurrent = new Dictionary<string, int>();
+    [Header("Data")]
+    public bool mining = false;
+    public bool respawningVein;
+    public int timeToCraft = 60;
+    public int timeToVeinRespawn = 100;
+    public Dictionary<string, int> oreVeinCounts = new Dictionary<string, int>();
 
-
-    [Header("Machine Visuals")]
-
-    [SerializeField] private Animator anim;
-    [SerializeField] private Transform drillSprite;
-    [SerializeField] private Transform itemDisplay;
-    
-    [Header("Menu")]
-    
+    [Header("Visuals")]
     [SerializeField] private GameObject menuCanvas;
-    [SerializeField] private GameObject oresFolder;
-    [SerializeField] private GameObject menuItemPrefab;
-
-    private ItemData selectedOre;
-
-    private bool menuOpen;
-
-    [Header("Selection Menu")]
-    // Frame Overlay
-    [SerializeField] private GameObject noOreSelectedFrame;
-
-    // Icon
-    [SerializeField] private Image icon;
-
-    // Title and Mastery
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI oreMasteryLevelText;
-    [SerializeField] private TextMeshProUGUI oreMasteryProgressText;
-    [SerializeField] private GameObject oreMasteryProgressBar;
-
-    // Text Info Display 
-    [SerializeField] private TextMeshProUGUI veinCountText;
-    [SerializeField] private TextMeshProUGUI oreValueText;
-    [SerializeField] private TextMeshProUGUI timeToCraftText;
-    [SerializeField] private TextMeshProUGUI xpText;
-    [SerializeField] private TextMeshProUGUI masteryXPText;
-    [SerializeField] private TextMeshProUGUI masteryPoolXPText;
-
-    // Progress Bar
-    [SerializeField] private TextMeshProUGUI progressPercentText;
-    [SerializeField] private GameObject progressBar;
-
-    // Button
-    [SerializeField] private Button craftButton;
-
-    [Header("Total XP Bars")]
-    [SerializeField] private TextMeshProUGUI miningLevelText;
-    [SerializeField] private TextMeshProUGUI miningLevelProgressText;
-    [SerializeField] private GameObject miningLevelProgressBar;
-
-    [SerializeField] private TextMeshProUGUI masteryPoolPercentText;
-    [SerializeField] private TextMeshProUGUI masteryPoolProgressText;
-    [SerializeField] private GameObject masteryPoolProgressBar;
-
-    [Header("Progress Bar Sprites")]
-    private bool respawningVein;
-    [SerializeField] private Sprite darkProgressBar;
-    [SerializeField] private Sprite normalProgressBar;
-
 
 #region Main
 
     protected override void MachineSetup()
     {
-        // Set visuals
-        drillSprite.eulerAngles = new Vector3(0,0,0);
-        itemDisplay.eulerAngles = new Vector3(0,0,0);
-        foreach (ItemData ore in ItemManager.Instance.oresList)
+        // Get grid
+        gridArray = GameManager.Instance.GetGrid();
+
+        // Create Ore Vein Dictionary
+        foreach (ItemData ore in ItemManager.Instance.itemList)
         {
-            oreVeinCurrent.Add(ore.displayName, SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.oreVeinMax, ore.displayName));
+            oreVeinCounts.Add(ore.displayName, SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, ore.displayName));
         }
+        
+        //Get output belt
+        outputTile = GetOutputTile();
+        outputBelt = GetOutputBelt();
     }
 
     private void Update()
     {
-        //Crafting
-        if (mining)   { CraftingCycle(); }
-        //Visuals
-        if (menuOpen) { UpdateMenuVisuals(); }
-        //Machine Animation
-        anim.SetBool("IsActive", mining);
+        if (mining)   { CraftingCycle();     } // Crafting
     }
 
+#endregion
+
+
+
+#region Get Output Belt
+
+    private GridMap.GridTile GetOutputTile()  
+    {
+        // Get machine origin
+        Vector2Int tileXY = originXY;
+
+        // Calculate tile Position
+        switch (direction)
+        {
+            case MachineData.Direction.Up:     tileXY.x += 1; tileXY.y += 2;  break;
+            case MachineData.Direction.Right:  tileXY.x += 2;                 break;
+            case MachineData.Direction.Down:                  tileXY.y -= 1;  break;
+            case MachineData.Direction.Left:   tileXY.x -= 1; tileXY.y += 1;  break;
+        }
+
+        // Return the tile
+        return gridArray.ValidateGridPosition(tileXY) ? gridArray.GetGridTile(tileXY.x, tileXY.y) : null;
+    }
+
+    private Belt GetOutputBelt()
+    {
+        // Check for Output Tile, Open state, and machine type of Belt
+        if (outputTile == null || 
+            outputTile.GetTileState() != GridMap.GridTile.TileState.Open || 
+            outputTile.GetMachine()?.GetMachineName() != "Belt")
+        {
+            return null;
+        }
+
+        // Get Belt
+        Belt belt = outputTile.GetMachine() as Belt;
+        if (belt == null) return null;
+
+        // Check belt direction does not oppose this machine's direction
+        return direction switch
+        {
+            MachineData.Direction.Up    => belt.direction != MachineData.Direction.Down  ? belt : null,
+            MachineData.Direction.Right => belt.direction != MachineData.Direction.Left  ? belt : null,
+            MachineData.Direction.Down  => belt.direction != MachineData.Direction.Up    ? belt : null,
+            MachineData.Direction.Left  => belt.direction != MachineData.Direction.Right ? belt : null,
+            _ => null
+        };    
+    }
 
 #endregion
+
+
 
 #region Crafting
 
@@ -121,13 +116,13 @@ public class MiningDrill : Machine
             ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, new Vector3(0,0,0), Quaternion.identity);
             
             // Subtract from Vein Count
-            SkillManager.Instance.ChangeDictionaryIntValue(oreVeinCurrent, oreToCraft.displayName, -1);
+            SkillManager.Instance.ModifyDictionaryValue(oreVeinCounts, oreToCraft.displayName, -1, true);
 
             // Distribute XP
             HandleXPDistribution();
 
             // Check for last Vein
-            int currentVeinCount = SkillManager.Instance.GetDictionaryIntValue(oreVeinCurrent, oreToCraft.displayName);
+            int currentVeinCount = SkillManager.Instance.GetDictionaryValue(oreVeinCounts, oreToCraft.displayName);
             if (currentVeinCount < 1) { respawningVein = true; }   
         }
         
@@ -139,239 +134,100 @@ public class MiningDrill : Machine
                 // Timer
                 tickTimer = 0;
                 // Set vein to max
-                int maxVeinCount = SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.oreVeinMax, selectedOre.displayName);
-                SkillManager.Instance.SetDictionaryIntValue(oreVeinCurrent, selectedOre.displayName, maxVeinCount);
+                int maxVeinCount = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, oreToCraft.displayName);
+                SkillManager.Instance.ModifyDictionaryValue(oreVeinCounts, oreToCraft.displayName, maxVeinCount, false);
                 // Reset
                 respawningVein = false;
             }
         }
     }
 
+#endregion
+
+
+
+#region XP Distribution
     private void HandleXPDistribution()
     {
-        // Add Level, Mastery Pool and Mastery XP
-        SkillManager.Instance.AddXP(SkillManager.Instance.skillXP, GetMachineName(), oreToCraft.XP);
-        SkillManager.Instance.AddXP(SkillManager.Instance.skillMasteryPoolXP, GetMachineName(), SkillManager.Instance.CalculateGivenMasteryPoolXP(oreToCraft.displayName));
-        SkillManager.Instance.AddXP(SkillManager.Instance.oreMasteryXP, oreToCraft.displayName,  SkillManager.Instance.CalculateGivenOreMasteryXP(oreToCraft.displayName));
 
-        // Ore Mastery Level Up
-        int currentOreMasteryLevel = SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.oreMasteryLevel, oreToCraft.displayName);
-        float currentOreMasteryXP = SkillManager.Instance.GetDictionaryFloatValue(SkillManager.Instance.oreMasteryXP, oreToCraft.displayName);
+        string machineName = GetMachineName();
+        string oreName = oreToCraft.displayName;
+        
+        // Add Level, Mastery Pool and Mastery XP
+        AddSkillXP(SkillManager.Instance.skillXP, machineName, oreToCraft.XP);
+        AddSkillXP(SkillManager.Instance.skillMasteryPoolXP, machineName, SkillManager.Instance.CalculateGivenMasteryPoolXP(oreName));
+        AddSkillXP(SkillManager.Instance.oreMasteryXP, oreName, SkillManager.Instance.CalculateGivenOreMasteryXP(oreName));
+
+        // Handle Ore Mastery Level Up
+        HandleOreMasteryLevelUp(oreName);
+
+        // Handle Skill Level Up
+        HandleSkillLevelUp(machineName);
+    }
+    
+    private void AddSkillXP(Dictionary<string, float> xpPool, string key, float xpAmount)
+    {
+        SkillManager.Instance.AddXP(xpPool, key, xpAmount);
+    }
+
+    private void HandleOreMasteryLevelUp(string oreName)
+    {
+        int currentOreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryLevel, oreName);
+        float currentOreMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, oreName);
         float masteryLevelXPReq = SkillManager.Instance.CalculateOreMasteryXPToNextLevel(currentOreMasteryLevel);
 
         if (currentOreMasteryXP >= masteryLevelXPReq)
         {
+            // Level up and update XP
             float leftOverMasteryXP = currentOreMasteryXP - masteryLevelXPReq;
-            SkillManager.Instance.SetDictionaryIntValue(SkillManager.Instance.oreMasteryLevel, oreToCraft.displayName, currentOreMasteryLevel + 1);
-            SkillManager.Instance.SetDictionaryFloatValue(SkillManager.Instance.oreMasteryXP, oreToCraft.displayName, leftOverMasteryXP);
-            SkillManager.Instance.SetDictionaryIntValue(SkillManager.Instance.oreVeinMax, oreToCraft.displayName, SkillManager.Instance.CalculateVeinMax(currentOreMasteryLevel +1));
-            NotificationManager.Instance.DisplayNotification(oreToCraft.displayName + " Mastery Level " + SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.oreMasteryLevel, oreToCraft.displayName).ToString() + "!");
-        }
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreMasteryLevel, oreName, currentOreMasteryLevel + 1, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreMasteryXP, oreName, leftOverMasteryXP, false);
 
-        // Skill Level Up
-        int currentMiningLevel = SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.skillLevels, GetMachineName());
-        float currentMiningXP = SkillManager.Instance.GetDictionaryFloatValue(SkillManager.Instance.skillXP, GetMachineName());
+            // Update max vein and notify
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreVeinMax, oreName, SkillManager.Instance.CalculateVeinMax(currentOreMasteryLevel + 1), false);
+            NotificationManager.Instance.DisplayNotification($"{oreName} Mastery Level {currentOreMasteryLevel + 1}!");
+        }
+    }
+
+    private void HandleSkillLevelUp(string machineName)
+    {
+        int currentMiningLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, machineName);
+        float currentMiningXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, machineName);
         float levelXPReq = SkillManager.Instance.CalculateXPToNextLevel(currentMiningLevel);
-        
+
         if (currentMiningXP >= levelXPReq)
         {
+            // Level up and update XP
             float leftOverXP = currentMiningXP - levelXPReq;
-            SkillManager.Instance.SetDictionaryIntValue(SkillManager.Instance.skillLevels, GetMachineName(), currentMiningLevel + 1);
-            SkillManager.Instance.SetDictionaryFloatValue(SkillManager.Instance.skillXP, GetMachineName(), leftOverXP);
-            NotificationManager.Instance.DisplayNotification(GetMachineName() + " Level " + SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.skillLevels, GetMachineName()).ToString() + "!");
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillLevels, machineName, currentMiningLevel + 1, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, machineName, leftOverXP, false);
+
+            // Notify level up and check to unlock new ore
+            NotificationManager.Instance.DisplayNotification($"{machineName} Level {currentMiningLevel + 1}!");
+            SkillManager.Instance.UnlockNewOreCheck();
         }
     }
 
 #endregion
 
-#region Menu Function
 
-    private void GenerateItemsList()
-    {
-        if (oresFolder.transform.childCount > 0)
-        {
-            foreach (Transform child in oresFolder.transform)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-        
-        List<ItemData> sortedOres = ItemManager.Instance.oresList.OrderBy (ore => ore.value).ToList();
-        
-        foreach (ItemData ore in sortedOres)
-        {
-            if (ore.tags.Contains(ItemTag.Ore))
-            {
-                GameObject oreBlock = Instantiate(menuItemPrefab, oresFolder.transform);
-                
-                oreBlock.GetComponent<OreSelectBlock>().SetOre(ore);
-                oreBlock.GetComponent<OreSelectBlock>().UpdateBlock(this);
-                
-            }
-        }
-    }
 
-    public void SelectOre(ItemData ore)
-    {
-        if (ItemManager.Instance.oresList.Contains(ore))
-        {
-            selectedOre = ore;
-            mining = false;
-            respawningVein = false;
-        }
-    }
-
-    public void StartButton(string name)
-    {
-        // TODO
-        // Check for output belt
-        // If it exists
-            oreToCraft = selectedOre;
-            tickTimer = 0;
-            mining = true;
-        // else
-            // error
-            // break
-    }
-
-#endregion
-
-#region Open / Close Menu
+#region Open/Close Menu
 
     // Called from MouseManager
     public void OpenMenu()
     {
-        menuOpen = true;
         menuCanvas.SetActive(true);
         GameManager.Instance.SetMenuOpen(true);
-        GenerateItemsList();
     }
 
     // Called from close button
     public void CloseMenu()
     {
-        menuOpen = false;
         menuCanvas.SetActive(false);
         GameManager.Instance.SetMenuOpen(false);
     }
 
 #endregion
-
-#region Menu Visuals
-
-    public void UpdateMenuVisuals()
-    {
-        if (selectedOre != null)
-        {
-            noOreSelectedFrame.SetActive(false);
-
-            int oreMasteryLevel = SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.oreMasteryLevel, selectedOre.displayName);
-            
-            icon.gameObject.SetActive(true);
-            icon.sprite = selectedOre.icon;
-            icon.SetNativeSize();
-
-            titleText.text = selectedOre.displayName;
-            oreMasteryLevelText.text = oreMasteryLevel.ToString();
-            
-            veinCountText.text = SkillManager.Instance.GetDictionaryIntValue(oreVeinCurrent, selectedOre.displayName) + "/" + SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.oreVeinMax, selectedOre.displayName);
-            oreValueText.text = selectedOre.value.ToString();
-
-            timeToCraftText.text = (timeToCraft / 20).ToString("F2");
-            xpText.text = selectedOre.XP.ToString();
-            masteryXPText.text = ((int)(SkillManager.Instance.CalculateGivenOreMasteryXP(selectedOre.displayName))).ToString();
-            masteryPoolXPText.text = ((int)(SkillManager.Instance.CalculateGivenMasteryPoolXP(selectedOre.displayName))).ToString();
-            
-            // Ore Mastery
-            float currentMasteryXP = SkillManager.Instance.GetDictionaryFloatValue(SkillManager.Instance.oreMasteryXP, selectedOre.displayName);
-            
-            float p1 = Mathf.Clamp01(currentMasteryXP / SkillManager.Instance.CalculateOreMasteryXPToNextLevel(oreMasteryLevel));
-            oreMasteryProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p1);
-            oreMasteryProgressText.text = (int)currentMasteryXP + " / " + SkillManager.Instance.CalculateOreMasteryXPToNextLevel(oreMasteryLevel).ToString();
-
-            craftButton.onClick.RemoveAllListeners();
-            craftButton.onClick.AddListener(() => StartButton(selectedOre.displayName));
-
-            OreSelectBlock[] oreBlocks = FindObjectsOfType<OreSelectBlock>();
-            foreach (OreSelectBlock oreBlock in oreBlocks)
-            {
-                oreBlock.UpdateBlock(this);
-            }
-        }
-        else
-        {
-            noOreSelectedFrame.SetActive(true);
-            icon.gameObject.SetActive(false);
-
-            titleText.text = "";
-            oreMasteryLevelText.text = "";
-            oreMasteryProgressText.text = "";
-
-            veinCountText.text = "";
-            oreValueText.text = "";
-
-            timeToCraftText.text = "";
-            xpText.text = "";
-            masteryXPText.text = "";
-            masteryPoolXPText.text = "";
-
-            oreMasteryProgressBar.transform.localScale = new Vector2(0f,1f);
-            oreMasteryProgressText.text = "0 / 0";
-
-            progressPercentText.text = "";
-            craftButton.onClick.RemoveAllListeners();
-        }
-
-        // Mining Level and XP
-        miningLevelText.text = "Level " + SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.skillLevels, GetMachineName());
-
-        int currentMiningLevel = SkillManager.Instance.GetDictionaryIntValue(SkillManager.Instance.skillLevels, GetMachineName());
-        float currentMiningXP = SkillManager.Instance.GetDictionaryFloatValue(SkillManager.Instance.skillXP, GetMachineName());
-        
-        float p2 = Mathf.Clamp01(currentMiningXP / SkillManager.Instance.CalculateXPToNextLevel(currentMiningLevel));
-        miningLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p2);
-        miningLevelProgressText.text  =  (int)currentMiningXP + " / " + SkillManager.Instance.CalculateXPToNextLevel(currentMiningLevel).ToString();
-
-        // Mastery Pool 
-        float currentMasteryPoolXP = SkillManager.Instance.GetDictionaryFloatValue(SkillManager.Instance.skillMasteryPoolXP, GetMachineName());
-       
-        float p3 = Mathf.Clamp01(currentMasteryPoolXP / 11500000f);
-        masteryPoolProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p3);
-        masteryPoolPercentText.text = "Mastery - " + ((currentMasteryPoolXP / 11500000f) * 100f).ToString("F2") + "%";
-        masteryPoolProgressText.text  =  (int)currentMasteryPoolXP + " / " + "11,500,000";
-
-        // Progress Bar
-        if (mining)
-        {
-            if (respawningVein)
-            {
-                progressBar.GetComponent<Image>().sprite = darkProgressBar;
-                progressPercentText.text = ((float)tickTimer / (float)timeToVeinRespawn * 100).ToString("F0") + "%";
-
-                float t = Mathf.Clamp01((float)tickTimer / (float)timeToVeinRespawn);
-                progressBar.transform.localScale = new Vector2(t,1f);
-                
-            }
-            else
-            {
-                progressBar.GetComponent<Image>().sprite = normalProgressBar;
-                progressPercentText.text = (((float)tickTimer / (float)timeToCraft) * 100).ToString("F0") + "%";
-
-                float t = Mathf.Clamp01((float)tickTimer / (float)timeToCraft);
-                progressBar.transform.localScale = new Vector2(t,1f);
-            }
-        }
-        else
-        {
-            progressPercentText.text = "0%";
-            progressBar.transform.localScale = new Vector2(0f,2.5f);
-        }
-    }
-
-#endregion
-
-
-
-
 
 }

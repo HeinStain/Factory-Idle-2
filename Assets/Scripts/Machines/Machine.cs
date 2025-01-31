@@ -7,9 +7,9 @@ public class Machine : MonoBehaviour
     
     private MachineData machineData;
     [SerializeField] protected Vector2Int originXY;
-    protected MachineData.Direction direction;
+    public MachineData.Direction direction;
 
-    protected int tickTimer;
+    public int tickTimer;
 
     private void Start()
     {
@@ -34,7 +34,6 @@ public class Machine : MonoBehaviour
                 spriteRenderer.sortingLayerName = "Placed Machine";
             }
         }
-
         machine.machineData = machineData;
         machine.originXY = originXY;
         machine.direction = direction;

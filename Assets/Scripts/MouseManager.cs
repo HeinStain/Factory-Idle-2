@@ -36,20 +36,19 @@ public class MouseManager : MonoBehaviour
     { 
         GameManager.OnBuyModeTriggered += BuyModeTriggered; 
         GameManager.OnBuildModeTriggered += BuildModeTriggered;
-        GameManager.OnMenuTriggered += MenuOpenTriggered; 
+        GameManager.Instance.OnMenuTriggered += MenuOpenTriggered; 
         CameraSystem.DragPanTriggered += DragPanTriggered;
     }
     private void OnDisable() 
     { 
         GameManager.OnBuyModeTriggered -= BuyModeTriggered; 
         GameManager.OnBuildModeTriggered -= BuildModeTriggered; 
-        GameManager.OnMenuTriggered -= MenuOpenTriggered; 
         CameraSystem.DragPanTriggered -= DragPanTriggered;
     }
     
     private void BuyModeTriggered(bool buyMode) { buyModeActive = buyMode; }
     private void BuildModeTriggered(bool buildMode) { buildModeActive = buildMode; }
-    private void MenuOpenTriggered(bool menuOpenStatus) { menuOpen = menuOpenStatus; }
+    private void MenuOpenTriggered(bool status) { menuOpen = status; }
     private void DragPanTriggered(bool dragPanning) { dragPanActive = dragPanning; }
 
     #endregion 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 using Unity.VisualScripting;
 using UnityEngine.Animations;
 
@@ -23,9 +24,7 @@ public class SkillManager : MonoBehaviour
     public Dictionary<string, int> oreMasteryLevel = new Dictionary<string, int>();
     public Dictionary<string, float> oreMasteryXP = new Dictionary<string, float>();
     public Dictionary<string, bool> oreUnlocks = new Dictionary<string, bool>();
-
-    
-        public Dictionary<string, int> oreVeinMax = new Dictionary<string, int>();
+    public Dictionary<string, int> oreVeinMax = new Dictionary<string, int>();
 
 #region Setup
 
@@ -33,27 +32,19 @@ public class SkillManager : MonoBehaviour
     {
         foreach (MachineData machine in BuildManager.Instance.machineList)
         {
-            skillLevels.Add(machine.machineName, 1);
-            skillXP.Add(machine.machineName, 0);
-            skillMasteryPoolXP.Add(machine.machineName, 0);
+            skillLevels.TryAdd(machine.machineName, 1);
+            skillXP.TryAdd(machine.machineName, 0);
+            skillMasteryPoolXP.TryAdd(machine.machineName, 0);
         }
 
-        foreach (ItemData ore in ItemManager.Instance.oresList)
+        // Process items that are tagged as Ore
+        int miningDrillLevel = GetDictionaryValue(skillLevels, "Mining Drill");
+        foreach (ItemData ore in ItemManager.Instance.itemList.Where(item => item.tags.Contains(ItemTag.Ore)))
         {
-            oreMasteryLevel.Add(ore.displayName, 1);
-            oreMasteryXP.Add(ore.displayName, 0f);
-
-           
-            oreVeinMax.Add(ore.displayName, 6);
-            
-            if (GetDictionaryIntValue(skillLevels, "Mining Drill") >= ore.unlockLevel)
-            {
-                oreUnlocks.Add(ore.displayName, true);
-            }
-            else
-            {
-                oreUnlocks.Add(ore.displayName, false);
-            }
+            oreMasteryLevel.TryAdd(ore.displayName, 1);
+            oreMasteryXP.TryAdd(ore.displayName, 0f);
+            oreVeinMax.TryAdd(ore.displayName, 6);
+            oreUnlocks[ore.displayName] = miningDrillLevel >= ore.unlockLevel;
         }
     }
 
@@ -61,64 +52,38 @@ public class SkillManager : MonoBehaviour
 
 #region Dictionary Functions
 
-    public int GetDictionaryIntValue(Dictionary<string, int> dictionary, string name)
+
+    // Get dictionary values
+    public T GetDictionaryValue<T>(Dictionary<string, T> dictionary, string name, T defaultValue = default)
+    {
+        if (dictionary.TryGetValue(name, out T value))
+        {
+            return value;
+        }
+        return defaultValue;
+    }
+
+
+    //Modify dictionary values
+    public void ModifyDictionaryValue<T>(Dictionary<string, T> dictionary, string name, T amount, bool isAdd = false)
     {
         if (dictionary.ContainsKey(name))
         {
-            return dictionary[name];
+            T currentValue = dictionary[name];
+            dictionary[name] = typeof(T) switch
+            {
+                var t when t == typeof(int) => (T)(object)(isAdd ? Convert.ToInt32(currentValue) + Convert.ToInt32(amount) : amount),
+                var t when t == typeof(float) => (T)(object)(isAdd ? Convert.ToSingle(currentValue) + Convert.ToSingle(amount) : amount),
+                var t when t == typeof(bool) => amount,
+                _ => currentValue
+            };
         }
-        return 0;
     }
 
-    public bool GetDictionaryBoolValue(Dictionary<string, bool> dictionary, string name)
-    {
-        if (dictionary.ContainsKey(name))
-        {
-            return dictionary[name];
-        }
-        return false;
-    }
-
-    public float GetDictionaryFloatValue(Dictionary<string, float> dictionary, string name)
-    {
-        if (dictionary.ContainsKey(name))
-        {
-            return dictionary[name];
-        }
-        return 0;
-        
-    }
-
+    // Specific method to add XP
     public void AddXP(Dictionary<string, float> dictionary, string name, float amount)
     {
-        if (dictionary.ContainsKey(name))
-        {
-            dictionary[name] += amount;
-        }
-    }
-
-    public void SetDictionaryIntValue(Dictionary<string, int> dictionary, string name, int amount)
-    {
-        if (dictionary.ContainsKey(name))
-        {
-            dictionary[name] = amount;
-        }
-    }
-
-    public void SetDictionaryFloatValue(Dictionary<string, float> dictionary, string name, float amount)
-    {
-        if (dictionary.ContainsKey(name))
-        {
-            dictionary[name] = amount;
-        }
-    }
-
-    public void ChangeDictionaryIntValue(Dictionary<string, int> dictionary, string name, int amount)
-    {
-        if (dictionary.ContainsKey(name))
-        {
-            dictionary[name] += amount;
-        }
+        ModifyDictionaryValue(dictionary, name, amount, true);
     }
 
 #endregion
@@ -137,7 +102,7 @@ public class SkillManager : MonoBehaviour
             }
         }
 
-        int currentLevel = GetDictionaryIntValue(oreMasteryLevel, oreName);
+        int currentLevel = GetDictionaryValue(oreMasteryLevel, oreName);
 
         float result = (float)(((unlockedOres * oreMasteryLevel.Values.Sum() / (oreMasteryLevel.Count * 99)) + (currentLevel * oreMasteryLevel.Count / 10) * 1.5)); //actionTime * 0.5 * (1 + bonus);
         return result;           
@@ -162,6 +127,29 @@ public class SkillManager : MonoBehaviour
     {
         return CalculateGivenOreMasteryXP(oreName) / 4;
         
+    }
+
+    public void UnlockNewOreCheck()
+    {
+        var oreUnlocksByLevel = new Dictionary<int, string>
+        {
+            { 15, "Iron Ore" },
+            { 25, "Coal" },
+            { 30, "Silver Ore" },
+            { 40, "Gold Ore" },
+            { 50, "Titanium Ore" },
+            { 65, "Uranium Ore" },
+            { 75, "Magicite Ore" },
+            { 85, "Moltenite Ore" },
+            { 95, "Nebulite Ore" }
+        };
+
+        int miningLevel = GetDictionaryValue(skillLevels, "Mining Drill");
+        
+        if (oreUnlocksByLevel.TryGetValue(miningLevel, out string oreName))
+        {
+            oreUnlocks[oreName] = true;
+        }
     }
 
 #endregion

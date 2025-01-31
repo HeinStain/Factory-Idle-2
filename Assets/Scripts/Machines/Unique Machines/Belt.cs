@@ -6,87 +6,58 @@ using UnityEngine;
 public class Belt : Machine
 {
     
-    [Header("References")]
+    [Header("Grid")]
     private Grid<GridMap.GridTile> gridArray;
-    private LineRenderer lineRenderer;
+
 
     [Header("Neighbours")]
-    private GridMap.GridTile nextAvailableTile;
-    private GridMap.GridTile rearTile;
-    private GridMap.GridTile rightTile;
-    private GridMap.GridTile leftTile;
+    private GridMap.GridTile nextAvailableTile, rearTile, rightTile, leftTile;
+    [SerializeField] private Belt nextAvailableBelt, rearBelt, rightBelt, leftBelt;
 
-    [SerializeField] private Belt nextAvailableBelt;
-    [SerializeField] private Belt rearBelt;
-    [SerializeField] private Belt rightBelt;
-    [SerializeField] private Belt leftBelt;
 
     [Header("Item Spots")]
-    [SerializeField] private Transform frontSpot;
-    [SerializeField] private Transform middleSpot;
-    [SerializeField] private Transform rearSpot;
-    [SerializeField] private Transform rightSpot;
-    [SerializeField] private Transform leftSpot;
+    [SerializeField] private Transform frontSpot, rearSpot, rightSpot, leftSpot;
 
-    [Header("Data")]
-    private int timeTonextAvailableTile = 3;
-    private bool occupiedByItem;
-    private ItemData item;
 
     [Header("Visual")]
     [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] Sprite straight;
-    [SerializeField] Sprite rightTurn;
-    [SerializeField] Sprite leftTurn;
-    [SerializeField] Sprite straightWithRight;
-    [SerializeField] Sprite straightWithLeft;
-    [SerializeField] Sprite bothSides;
-    [SerializeField] Sprite straightWithSides;
-    [SerializeField] Sprite end;
-    [SerializeField] Sprite none;
-    [SerializeField] Sprite start;
+    [SerializeField] Sprite straight, rightTurn, leftTurn, straightWithRight, straightWithLeft, bothSides, straightWithSides, end, none, start;
 
+
+    [Header("Data")]
+    private int timeTonNextAvailableTile = 3;
+    private bool occupiedByItem;
+    private ItemData item;
+
+
+    [Header("State")]
     private BeltVisualState visualState;
-    private enum BeltVisualState
-    {
-        Straight,
-        RightTurn,
-        LeftTurn,
-        StraightWithRight,
-        StraightWithLeft,
-        BothSides,
-        StraightWithSides,
-        End,
-        None,
-        Start,
-    }
+    private enum BeltVisualState { Straight, RightTurn, LeftTurn, StraightWithRight, StraightWithLeft, BothSides, StraightWithSides, End, None, Start, }
+
+
 #region Main
 
     // Called on creation
     protected override void MachineSetup()
     {
+        //References
         gridArray = GameManager.Instance.GetGrid();
-        lineRenderer = GetComponentInChildren<LineRenderer>();
 
-        Transform visuals = this.transform.Find("Visual");
-        if (visuals != null)
+        // Set all layers to Belt layer
+        int beltLayer = LayerMask.NameToLayer("Belts");
+        SetLayerRecursive(this.gameObject, beltLayer);
+        void SetLayerRecursive(GameObject targetObj, int layer)
         {
-            SpriteRenderer[] spriteRenderers = visuals.GetComponentsInChildren<SpriteRenderer>();
-
-            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+            targetObj.layer = layer;
+            foreach (Transform child in targetObj.transform)
             {
-                spriteRenderer.sortingLayerName = "Belts";
+                SetLayerRecursive(child.gameObject, layer);
             }
-        }
+        }  
 
-
+        //Update Path
         GetNeighbours();
         BeltManager.Instance.UpdateBeltPath(this);
-    }
-
-    private void Update()
-    {
-       
     }
 
 #endregion
@@ -167,33 +138,45 @@ public class Belt : Machine
         IEnumerator Execute()
         {
             yield return new WaitForEndOfFrame();
-            if      (!NextAvailable() && !RearInput() && !RightInput() && !LeftInput()) { visualState = BeltVisualState.None; }
-            else if ( NextAvailable() && !RearInput() && !RightInput() && !LeftInput()) { visualState = BeltVisualState.Start; }
-            else if (!NextAvailable() &&  RearInput() && !RightInput() && !LeftInput()) { visualState = BeltVisualState.End; }
-            else if (!NextAvailable() && !RearInput() &&  RightInput() && !LeftInput()) { visualState = BeltVisualState.RightTurn; }
-            else if (!NextAvailable() && !RearInput() && !RightInput() &&  LeftInput()) { visualState = BeltVisualState.LeftTurn; }
-            else if ( NextAvailable() &&  RearInput() && !RightInput() && !LeftInput()) { visualState = BeltVisualState.Straight; }
-            else if ( NextAvailable() && !RearInput() &&  RightInput() && !LeftInput()) { visualState = BeltVisualState.RightTurn; }
-            else if ( NextAvailable() && !RearInput() && !RightInput() &&  LeftInput()) { visualState = BeltVisualState.LeftTurn; }
-            else if (!NextAvailable() &&  RearInput() &&  RightInput() && !LeftInput()) { visualState = BeltVisualState.StraightWithRight; }
-            else if (!NextAvailable() &&  RearInput() && !RightInput() &&  LeftInput()) { visualState = BeltVisualState.StraightWithLeft; }
-            else if (!NextAvailable() && !RearInput() &&  RightInput() &&  LeftInput()) { visualState = BeltVisualState.BothSides; }
-            else if ( NextAvailable() &&  RearInput() &&  RightInput() && !LeftInput()) { visualState = BeltVisualState.StraightWithRight; }
-            else if ( NextAvailable() &&  RearInput() && !RightInput() &&  LeftInput()) { visualState = BeltVisualState.StraightWithLeft; }
-            else if ( NextAvailable() && !RearInput() &&  RightInput() &&  LeftInput()) { visualState = BeltVisualState.BothSides; }
-            else if (!NextAvailable() &&  RearInput() &&  RightInput() &&  LeftInput()) { visualState = BeltVisualState.StraightWithSides; }
-            else if ( NextAvailable() &&  RearInput() &&  RightInput() &&  LeftInput()) { visualState = BeltVisualState.StraightWithSides; }
 
-            if      (visualState == BeltVisualState.Straight)          { spriteRenderer.sprite = straight; }
-            else if (visualState == BeltVisualState.RightTurn)         { spriteRenderer.sprite = rightTurn; }
-            else if (visualState == BeltVisualState.LeftTurn)          { spriteRenderer.sprite = leftTurn; }
-            else if (visualState == BeltVisualState.StraightWithRight) { spriteRenderer.sprite = straightWithRight; }
-            else if (visualState == BeltVisualState.StraightWithLeft)  { spriteRenderer.sprite = straightWithLeft; }
-            else if (visualState == BeltVisualState.BothSides)         { spriteRenderer.sprite = bothSides; }
-            else if (visualState == BeltVisualState.StraightWithSides) { spriteRenderer.sprite = straightWithSides; }
-            else if (visualState == BeltVisualState.End)               { spriteRenderer.sprite = end; }
-            else if (visualState == BeltVisualState.None)              { spriteRenderer.sprite = none; }
-            else if (visualState == BeltVisualState.Start)             { spriteRenderer.sprite = start; }
+            int stateKey = (NextAvailable() ? 1 : 0) << 3 |
+                           (    RearInput() ? 1 : 0) << 2 |
+                           (   RightInput() ? 1 : 0) << 1 |
+                           (    LeftInput() ? 1 : 0);
+
+            switch (stateKey)
+            {
+                case 0b0000: visualState = BeltVisualState.None;               break;
+                case 0b1000: visualState = BeltVisualState.Start;              break;
+                case 0b0100: visualState = BeltVisualState.End;                break;
+                case 0b0010: visualState = BeltVisualState.RightTurn;          break;
+                case 0b0001: visualState = BeltVisualState.LeftTurn;           break;
+                case 0b1100: visualState = BeltVisualState.Straight;           break;
+                case 0b1010: visualState = BeltVisualState.RightTurn;          break;
+                case 0b1001: visualState = BeltVisualState.LeftTurn;           break;
+                case 0b0110: visualState = BeltVisualState.StraightWithRight;  break;
+                case 0b0101: visualState = BeltVisualState.StraightWithLeft;   break;
+                case 0b0011: visualState = BeltVisualState.BothSides;          break;
+                case 0b1110: visualState = BeltVisualState.StraightWithRight;  break;
+                case 0b1101: visualState = BeltVisualState.StraightWithLeft;   break;
+                case 0b1011: visualState = BeltVisualState.BothSides;          break;
+                case 0b0111: visualState = BeltVisualState.StraightWithSides;  break;
+                case 0b1111: visualState = BeltVisualState.StraightWithSides;  break;
+            }
+
+            switch (visualState)
+            {
+                case BeltVisualState.Straight:           spriteRenderer.sprite = straight;           break;
+                case BeltVisualState.RightTurn:          spriteRenderer.sprite = rightTurn;          break;
+                case BeltVisualState.LeftTurn:           spriteRenderer.sprite = leftTurn;           break;
+                case BeltVisualState.StraightWithRight:  spriteRenderer.sprite = straightWithRight;  break;
+                case BeltVisualState.StraightWithLeft:   spriteRenderer.sprite = straightWithLeft;   break;
+                case BeltVisualState.BothSides:          spriteRenderer.sprite = bothSides;          break;
+                case BeltVisualState.StraightWithSides:  spriteRenderer.sprite = straightWithSides;  break;
+                case BeltVisualState.End:                spriteRenderer.sprite = end;                break;
+                case BeltVisualState.None:               spriteRenderer.sprite = none;               break;
+                case BeltVisualState.Start:              spriteRenderer.sprite = start;              break;
+            }
         }
     }
 
@@ -218,42 +201,39 @@ public class Belt : Machine
         else { return belt.GetDirection(); }
     }
     
-    //Inputs
-    public MachineData.Direction GetCorrectRightInputDirection(Belt belt)
-    {
-        if (belt.GetDirection() == MachineData.Direction.Up) { return MachineData.Direction.Left; }
-        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Up; } 
-        else if (belt.GetDirection() == MachineData.Direction.Down) { return MachineData.Direction.Right; }
-        else if (belt.GetDirection() == MachineData.Direction.Left) { return MachineData.Direction.Down; }
-        else { return belt.GetDirection(); }
-    }
-    public MachineData.Direction GetCorrectLeftInputDirection(Belt belt)
-    {
-        if (belt.GetDirection() == MachineData.Direction.Up) { return MachineData.Direction.Right; }
-        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Down; } 
-        else if (belt.GetDirection() == MachineData.Direction.Down) { return MachineData.Direction.Left; }
-        else if (belt.GetDirection() == MachineData.Direction.Left) { return MachineData.Direction.Up; }
-        else { return belt.GetDirection(); }
-    }
-
-    //Item Spots
+    /*
+    // Item Spots   --->   ...
     public Transform GetFrontSpot()  { return frontSpot;  }  
     public Transform GetRearSpot()   { return rearSpot;   }
     public Transform GetLeftSpot()   { return leftSpot;   }
     public Transform GetRightSpot()  { return rightSpot;  }
     public Transform GetMiddleSpot() { return middleSpot; }
+    */
 
-    //Neighbour Directions
-    public MachineData.Direction GetNextBeltDirection()  { return GetNextBelt()?.GetDirection()  ?? default(MachineData.Direction); }
-    public MachineData.Direction GetRearBeltDirection()  { return GetRearBelt()?.GetDirection()  ?? default(MachineData.Direction); }
-    public MachineData.Direction GetRightBeltDirection() { return GetRightBelt()?.GetDirection() ?? default(MachineData.Direction); }
-    public MachineData.Direction GetLeftBeltDirection()  { return GetLeftBelt()?.GetDirection()  ?? default(MachineData.Direction); }
+    //Inputs   --->   Return Belt if facing correct direction
+    public bool NextAvailable() { return GetNextBelt()  != null && (GetNextBelt()?.GetDirection())  != GetNegativeDirection(this) ? true : false; }
+    public bool RearInput()     { return GetRearBelt()  != null && (GetRearBelt()?.GetDirection())  == GetDirection() ? true : false; }
+    public bool RightInput()    { return GetRightBelt() != null && (GetRightBelt()?.GetDirection()) == Check_Correct_Input_Direction_From_Right(this) ? true : false; }
+    public bool LeftInput()     { return GetLeftBelt()  != null && (GetLeftBelt()?.GetDirection())  == Check_Correct_Input_Direction_From_Left(this) ? true : false; }
 
-    //Inputs
-    public bool NextAvailable() { return GetNextBelt() != null && GetNextBeltDirection() != GetNegativeDirection(this) ? true : false; }
-    public bool RearInput() { return GetRearBelt() != null && GetRearBeltDirection() == GetDirection() ? true : false; }
-    public bool RightInput() { return GetRightBelt() != null && GetRightBeltDirection() == GetCorrectRightInputDirection(this) ? true : false; }
-    public bool LeftInput() { return GetLeftBelt() != null && GetLeftBeltDirection() == GetCorrectLeftInputDirection(this) ? true : false; }
+    public MachineData.Direction Check_Correct_Input_Direction_From_Right(Belt belt)
+    {
+             if (belt.GetDirection() == MachineData.Direction.Up)    { return MachineData.Direction.Left;  }
+        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Up;    } 
+        else if (belt.GetDirection() == MachineData.Direction.Down)  { return MachineData.Direction.Right; }
+        else if (belt.GetDirection() == MachineData.Direction.Left)  { return MachineData.Direction.Down;  }
+        else { return belt.GetDirection(); }
+    }
+    public MachineData.Direction Check_Correct_Input_Direction_From_Left(Belt belt)
+    {
+             if (belt.GetDirection() == MachineData.Direction.Up)    { return MachineData.Direction.Right; }
+        else if (belt.GetDirection() == MachineData.Direction.Right) { return MachineData.Direction.Down;  } 
+        else if (belt.GetDirection() == MachineData.Direction.Down)  { return MachineData.Direction.Left;  }
+        else if (belt.GetDirection() == MachineData.Direction.Left)  { return MachineData.Direction.Up;    }
+        else { return belt.GetDirection(); }
+    }
+
+
 
 #endregion
     
