@@ -65,4 +65,17 @@ public class Machine : MonoBehaviour
     }
 
     protected virtual void ClearMachine() {}
+
+    public void DispenseUpdateCycle()
+    {
+        //Get output belt
+        GetDispenseTile();
+        GetDispenseBelt();
+    }
+
+    protected virtual void GetDispenseTile() {}
+    
+    protected virtual void GetDispenseBelt() {}
+
+    public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
 }

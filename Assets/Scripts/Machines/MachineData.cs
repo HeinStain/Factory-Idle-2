@@ -11,6 +11,7 @@ public class MachineData : ScriptableObject
     public Transform visual;
     public int width;
     public int height;
+    public bool hasDispenseBelt;
 
     public enum Direction
     {

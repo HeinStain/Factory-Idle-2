@@ -59,7 +59,7 @@ public class MiningDrillVisual : MonoBehaviour
     [SerializeField] private Sprite redProgressBar;
     [SerializeField] private Sprite greenProgressBar;
 
-    [SerializeField] private MiningDrill miningDrill;
+    [SerializeField] public MiningDrill miningDrill;
 
     private bool placed;
     [SerializeField] private Animator anim;
@@ -73,22 +73,35 @@ public class MiningDrillVisual : MonoBehaviour
         BuildManager.Instance.OnMachinePlaced += HandlePlacement;
         
     }
+
+    private void OnDestroy() 
+    {
+        GameManager.Instance.OnMenuTriggered -= HandleMenuTriggered;
+        BuildManager.Instance.OnMachinePlaced -= HandlePlacement;
+    }
+
     private void HandlePlacement(Machine machine)
     {
-        MiningDrill m = machine as MiningDrill;
-         
-        if (transform.parent != null && transform.parent.GetComponent<MiningDrill>() != null)
+        if (!placed)
         {
-            miningDrill = m;
-            anim = transform.parent.GetComponent<Animator>();
-            placed = true;
+            MiningDrill m = machine as MiningDrill;
+            
+            if (transform.parent != null)
+            {
+                if (transform.parent.GetComponent<MiningDrill>() != null)
+                {
+                    miningDrill = m;
+                    anim = transform.parent.GetComponent<Animator>();
+                    placed = true;
+                }
+            }
         }
+        
     }
 
     private void HandleMenuTriggered(bool status)
     {   
         menuOpen = status;
-
         if (miningDrill != null && menuOpen)
         {
             GenerateItemsList();
@@ -141,18 +154,15 @@ public class MiningDrillVisual : MonoBehaviour
 
     private void GenerateItemsList()
     {
-        Debug.Log("Generating Items");
         // Clear Item List
         foreach (Transform child in oresFolder.transform) { Destroy(child.gameObject); }
     
         // Filter items with "Ore" tag, and order by value
         var sortedOres = ItemManager.Instance.itemList.Where(ore => ore.tags.Contains(ItemTag.Ore)).OrderBy(ore => ore.value).ToList();
 
-        Debug.Log(sortedOres);
         // Instantiate and set ores
         foreach (ItemData ore in sortedOres)
         {
-            Debug.Log("Spleee");
             GameObject oreBlock = Instantiate(menuItemPrefab, oresFolder.transform);
 
             // Get the OreSelectBlock component once for reuse
@@ -168,39 +178,35 @@ public class MiningDrillVisual : MonoBehaviour
         if (ItemManager.Instance.itemList.Contains(ore))
         {
             selectedOre = ore;
+            miningDrill.selectedOre = ore;
             miningDrill.mining = false;
             miningDrill.respawningVein = false;
+
+            craftButton.onClick.RemoveAllListeners();
+            craftButton.onClick.AddListener(() => miningDrill.StartCrafting());
+            craftButton.onClick.AddListener(() => ButtonSwitch());
+            craftButton.transform.GetComponentInChildren<TextMeshProUGUI>().text = "CRAFT";
         }
     }
 
-    public void StartButton()
+    public void ButtonSwitch()
     {
         // Check for output belt
-        //if (miningDrill.outputBelt != null)
-        //{
-            // Start Mining
-            miningDrill.oreToCraft = selectedOre;
-            miningDrill.tickTimer = 0;
-            miningDrill.mining = true;
-            // Change to stop button
+        if (miningDrill.mining)
+        {
+            //Change to stop button
             craftButton.onClick.RemoveAllListeners();
-            craftButton.onClick.AddListener(() => StopButton());
-        //}
-        //else
-        //{
-        //    NotificationManager.Instance.DisplayNotification("No Output Belt");
-        //}
-    }
-
-    public void StopButton()
-    {
-        // Stop Mining
-        miningDrill.oreToCraft = null;
-        miningDrill.tickTimer = 0;
-        miningDrill.mining = false;
-        // Change to start button
-        craftButton.onClick.RemoveAllListeners();
-        craftButton.onClick.AddListener(() => StartButton());
+            craftButton.onClick.AddListener(() => miningDrill.StopCrafting());
+            craftButton.onClick.AddListener(() => ButtonSwitch());
+            craftButton.transform.GetComponentInChildren<TextMeshProUGUI>().text = "STOP";
+        }
+        else
+        {
+            craftButton.onClick.RemoveAllListeners();
+            craftButton.onClick.AddListener(() => miningDrill.StartCrafting());
+            craftButton.onClick.AddListener(() => ButtonSwitch());
+            craftButton.transform.GetComponentInChildren<TextMeshProUGUI>().text = "CRAFT";
+        }
     }
 
 #endregion
@@ -230,15 +236,13 @@ public class MiningDrillVisual : MonoBehaviour
             masteryXPText.text = ((int)(SkillManager.Instance.CalculateGivenOreMasteryXP(selectedOre.displayName))).ToString();
             masteryPoolXPText.text = ((int)(SkillManager.Instance.CalculateGivenMasteryPoolXP(selectedOre.displayName))).ToString();
             
+
             // Ore Mastery
             float currentMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, selectedOre.displayName);
             
             float p1 = Mathf.Clamp01(currentMasteryXP / SkillManager.Instance.CalculateOreMasteryXPToNextLevel(oreMasteryLevel));
             oreMasteryProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p1);
             oreMasteryProgressText.text = (int)currentMasteryXP + " / " + SkillManager.Instance.CalculateOreMasteryXPToNextLevel(oreMasteryLevel).ToString();
-
-            craftButton.onClick.RemoveAllListeners();
-            craftButton.onClick.AddListener(() => StartButton());
 
             OreSelectBlock[] oreBlocks = FindObjectsOfType<OreSelectBlock>();
             foreach (OreSelectBlock oreBlock in oreBlocks)

@@ -72,6 +72,7 @@ public class OreSelectBlock : MonoBehaviour
 
     public void UpdateBlock(MiningDrillVisual miningDrill)
     {
+        thisMiningDrill = miningDrill.miningDrill;
         titleText.text = ore.displayName;
         oreIcon.sprite = ore.icon;
         oreIcon.SetNativeSize();

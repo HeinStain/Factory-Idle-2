@@ -12,7 +12,7 @@ public class GridMap
         gridArray = new Grid<GridTile>(width, height, cellSize, origin, (Grid<GridTile> tile, int x, int y) => new GridTile(tile, x, y)); 
     }
 
-    #region Get/Set Tile State
+#region Get/Set Tile State
 
     public void SetTileState(Vector2 position, GridTile.TileState tileState)
     {
@@ -60,18 +60,18 @@ public class GridMap
         }
     }
     
-    #endregion
-    
-    #region Set Game Manager
+#endregion
+
+#region Set Game Manager
 
     public void SetGameManager(GameManager gameManager)
     {
         gameManager.SetGrid(gridArray);
     }
     
-    #endregion
+#endregion
 
-    #region Tile Functions
+#region Tile Functions
 
     public void SetUnlockCost(int i1, int i2, int cost)
     {
@@ -82,9 +82,9 @@ public class GridMap
         }
     }
     
-    #endregion
+#endregion
 
-    #region >>> Grid Tile Class
+#region >>> Grid Tile Class
 
     public class GridTile
     {
@@ -95,6 +95,7 @@ public class GridMap
             Open,
             Locked
         }
+
 
         private Grid<GridTile> gridArray;
         private int x;
@@ -112,6 +113,15 @@ public class GridMap
         }
 
         ///////////////////////////
+       
+
+        public Vector2Int GetTileXY()
+        {
+            return new Vector2Int(x,y);
+        }
+
+
+        /// ///////////////////////
 
         public void SetTileState(TileState tileState)
         {
@@ -142,7 +152,7 @@ public class GridMap
         {
             return gridArray.GetTileCentrePosition(this.x, this.y);
         }
-
+        
         ///////////////////////////
 
         public void SetMachine(Machine machine)
@@ -186,10 +196,11 @@ public class GridMap
         public override string ToString()
         {
             //return tileState.ToString() + "\n" + unlockCost;
-            return x + "," + y + "\n" + tileState.ToString() + "\n" + unlockCost + "\n" + machine;
+            //return x + "," + y + "\n" + tileState.ToString() + "\n" + unlockCost + "\n" + machine;
+            return x + "," + y + "\n" + machine;
         }
     }
 
-    #endregion
+#endregion
     
 }

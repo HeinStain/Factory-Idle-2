@@ -17,3 +17,4 @@ MonoBehaviour:
   visual: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}
   width: 2
   height: 2
+  hasDispenseBelt: 1

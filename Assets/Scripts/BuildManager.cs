@@ -20,6 +20,7 @@ public class BuildManager : MonoBehaviour
 
     private bool buildMode;
 
+
     private void Awake()
     {
         Instance = this;
@@ -45,6 +46,7 @@ public class BuildManager : MonoBehaviour
 
             if (Input.GetMouseButtonDown(1))
             {
+                
                 ClearMachine();
             }
 
@@ -88,17 +90,51 @@ public class BuildManager : MonoBehaviour
             if (canBuild)
             {
                 Vector2Int rotationOffset = heldMachine.GetRotationOffset(direction);
+                
                 Vector2 machineWorldPosition = gridArray.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
-                Debug.Log(rotationOffset);
-
                 Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
-                
-                // Tell all tiles they're occupied
-                foreach(Vector2Int position in gridPositionList)
+
+                if (heldMachine.hasDispenseBelt)
                 {
-                    gridArray.GetGridTile(position.x, position.y).SetMachine(machine);
+
+                    Vector2Int dispensePos = machine.GetDispenseTileIndexOffset();
+                    Vector2 beltWorldPosition = gridArray.GetTileOriginPosition(dispensePos.x, dispensePos.y) + new Vector2Int(rotationOffset.x, rotationOffset.y);
+                     
+                    Vector2Int poo =  direction switch
+                    {
+                        MachineData.Direction.Up    =>   new Vector2Int(dispensePos.x += 0, dispensePos.y += 0),
+                        MachineData.Direction.Right =>   new Vector2Int(dispensePos.x += 0, dispensePos.y += 1),
+                        MachineData.Direction.Down  =>   new Vector2Int(dispensePos.x += 1, dispensePos.y += 1), 
+                        MachineData.Direction.Left  =>   new Vector2Int(dispensePos.x += 1, dispensePos.y += 0), 
+                        _ => new Vector2Int(dispensePos.x += 0, dispensePos.y += 0)
+                    };
+
+                    Machine belt = Machine.Create(beltWorldPosition, new Vector2Int(poo.x, poo.y), direction, machineList[0]);
+
+                    // Tell all tiles they're occupied
+                    foreach(Vector2Int tileXY in gridPositionList)
+                    {
+                        if (tileXY == poo)
+                        {
+                            gridArray.GetGridTile(tileXY.x, tileXY.y).SetMachine(belt);
+                            machine.DispenseUpdateCycle();
+                            
+                        }
+                        else
+                        {
+                            gridArray.GetGridTile(tileXY.x, tileXY.y).SetMachine(machine);
+                        }
+                    }
                 }
-                
+                else
+                {
+                    // Tell all tiles they're occupied
+                    foreach(Vector2Int position in gridPositionList)
+                    {
+                        gridArray.GetGridTile(position.x, position.y).SetMachine(machine);
+                    }
+                }
+
                 OnMachinePlaced?.Invoke(machine); 
                 
             } 
@@ -114,15 +150,20 @@ public class BuildManager : MonoBehaviour
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GridMap.GridTile gridTile = gridArray.GetGridTile(mousePosition);
         Machine machine = gridTile.GetMachine();
+        
         if (machine != null)
         {
-            machine.DestroySelf();
-        
             List<Vector2Int> gridPositionList = machine.GetGridPositionList();
 
             foreach(Vector2Int position in gridPositionList)
             {
-                gridArray.GetGridTile(position.x, position.y).ClearMachine();
+                GridMap.GridTile tile = gridArray.GetGridTile(position.x, position.y);
+
+                if (tile.GetMachine() != null)
+                {
+                    tile.GetMachine().DestroySelf();
+                    tile.ClearMachine();
+                }
             }
         }
     }

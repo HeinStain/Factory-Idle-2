@@ -154,6 +154,17 @@ public class BeltManager : MonoBehaviour
         return null;
     }
 
+    public Vector2 GetBeltCentreOffset(Belt belt)
+    {
+        Vector2 offset = new Vector2(0,0);
+        if (belt.GetDirection() == MachineData.Direction.Up)    { offset = new Vector2(0.5f, 0.5f);   }
+        if (belt.GetDirection() == MachineData.Direction.Right) { offset = new Vector2(0.5f, -0.5f);  }
+        if (belt.GetDirection() == MachineData.Direction.Down)  { offset = new Vector2(-0.5f, -0.5f); }
+        if (belt.GetDirection() == MachineData.Direction.Left)  { offset = new Vector2(-0.5f, 0.5f);  }
+        
+        return offset;
+    }
+
 #endregion
 
 #region Debug Visuals
@@ -220,6 +231,9 @@ public class BeltManager : MonoBehaviour
             } 
         }
     }
+
+    
+
 
 #endregion
 }

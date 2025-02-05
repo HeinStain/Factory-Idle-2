@@ -34,6 +34,10 @@ public class Belt : Machine
     private BeltVisualState visualState;
     private enum BeltVisualState { Straight, RightTurn, LeftTurn, StraightWithRight, StraightWithLeft, BothSides, StraightWithSides, End, None, Start, }
 
+    public override string ToString()
+    {
+        return "Belt";
+    }
 
 #region Main
 
@@ -44,8 +48,7 @@ public class Belt : Machine
         gridArray = GameManager.Instance.GetGrid();
 
         // Set all layers to Belt layer
-        int beltLayer = LayerMask.NameToLayer("Belts");
-        SetLayerRecursive(this.gameObject, beltLayer);
+        SetLayerRecursive(this.gameObject, 3);
         void SetLayerRecursive(GameObject targetObj, int layer)
         {
             targetObj.layer = layer;
@@ -78,8 +81,16 @@ public class Belt : Machine
             if (rearBelt != null)  { rearBelt.GetNeighbourBelts();  }
             if (rightBelt != null) { rightBelt.GetNeighbourBelts(); }
             if (leftBelt != null)  { leftBelt.GetNeighbourBelts();  }
+
+            // if check for neighbours is a machine but not a belt
+            // tell it to update
+           // if (nextAvailableTile != null) { if(nextAvailableTile.GetMachine() != null && nextAvailableTile.GetMachine().GetMachineName() != "Belt") { nextAvailableTile.GetMachine().DispenseUpdateCycle(); }}
+           // if (rearTile != null)          { if(rearTile.GetMachine() != null && rearTile.GetMachine().GetMachineName() != "Belt") { rearTile.GetMachine().DispenseUpdateCycle(); }}
+           // if (rightTile != null)         { if(rightTile.GetMachine() != null && rightTile.GetMachine().GetMachineName() != "Belt") { rightTile.GetMachine().DispenseUpdateCycle(); }}
+            //if (leftTile != null)          { if(leftTile.GetMachine() != null && leftTile.GetMachine().GetMachineName() != "Belt") { leftTile.GetMachine().DispenseUpdateCycle(); }}
         }
     }
+
 
     // Get and Set surrounding tiles internally 
     private void GetNeighbourTiles()

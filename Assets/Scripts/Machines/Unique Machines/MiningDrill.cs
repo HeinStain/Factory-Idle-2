@@ -3,6 +3,7 @@ using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 
+
 public class MiningDrill : Machine
 {
 
@@ -25,6 +26,15 @@ public class MiningDrill : Machine
     [Header("Visuals")]
     [SerializeField] private GameObject menuCanvas;
 
+    [SerializeField] private MachineData belt;
+
+    public override string ToString()
+    {
+        return "Mining";
+    }
+
+
+
 #region Main
 
     protected override void MachineSetup()
@@ -38,9 +48,8 @@ public class MiningDrill : Machine
             oreVeinCounts.Add(ore.displayName, SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, ore.displayName));
         }
         
-        //Get output belt
-        outputTile = GetOutputTile();
-        outputBelt = GetOutputBelt();
+        DispenseUpdateCycle();
+
     }
 
     private void Update()
@@ -48,55 +57,64 @@ public class MiningDrill : Machine
         if (mining)   { CraftingCycle();     } // Crafting
     }
 
+
+    
+    
+
 #endregion
-
-
 
 #region Get Output Belt
 
-    private GridMap.GridTile GetOutputTile()  
+    protected override void GetDispenseTile()  
     {
+        // Calculate tile Position
         // Get machine origin
         Vector2Int tileXY = originXY;
 
-        // Calculate tile Position
         switch (direction)
         {
-            case MachineData.Direction.Up:     tileXY.x += 1; tileXY.y += 2;  break;
-            case MachineData.Direction.Right:  tileXY.x += 2;                 break;
-            case MachineData.Direction.Down:                  tileXY.y -= 1;  break;
-            case MachineData.Direction.Left:   tileXY.x -= 1; tileXY.y += 1;  break;
+            case MachineData.Direction.Up:     tileXY.x += 1; tileXY.y += 1;  break;
+            case MachineData.Direction.Right:  tileXY.x += 1; tileXY.y += 0;  break;
+            case MachineData.Direction.Down:   tileXY.x += 0; tileXY.y += 0;  break;
+            case MachineData.Direction.Left:   tileXY.x += 0; tileXY.y += 1;  break;
         }
 
         // Return the tile
-        return gridArray.ValidateGridPosition(tileXY) ? gridArray.GetGridTile(tileXY.x, tileXY.y) : null;
+        outputTile = gridArray.ValidateGridPosition(tileXY) ? gridArray.GetGridTile(tileXY.x, tileXY.y) : null;
     }
 
-    private Belt GetOutputBelt()
+    protected override void GetDispenseBelt()
     {
         // Check for Output Tile, Open state, and machine type of Belt
         if (outputTile == null || 
             outputTile.GetTileState() != GridMap.GridTile.TileState.Open || 
             outputTile.GetMachine()?.GetMachineName() != "Belt")
         {
-            return null;
+            outputBelt = null; return;
         }
 
         // Get Belt
         Belt belt = outputTile.GetMachine() as Belt;
-        if (belt == null) return null;
-
-        // Check belt direction does not oppose this machine's direction
-        return direction switch
-        {
-            MachineData.Direction.Up    => belt.direction != MachineData.Direction.Down  ? belt : null,
-            MachineData.Direction.Right => belt.direction != MachineData.Direction.Left  ? belt : null,
-            MachineData.Direction.Down  => belt.direction != MachineData.Direction.Up    ? belt : null,
-            MachineData.Direction.Left  => belt.direction != MachineData.Direction.Right ? belt : null,
-            _ => null
-        };    
+        outputBelt = belt;
     }
 
+  
+    public override Vector2Int GetDispenseTileIndexOffset()
+    {
+        Vector2Int tileXY = originXY;
+        tileXY = direction switch
+        {
+            MachineData.Direction.Up     =>   new Vector2Int(tileXY.x += 1, tileXY.y += 1),   
+            MachineData.Direction.Right  =>   new Vector2Int(tileXY.x += 1, tileXY.y -= 1),
+            MachineData.Direction.Down   =>   new Vector2Int(tileXY.x -= 1, tileXY.y -= 1),  
+            MachineData.Direction.Left   =>   new Vector2Int(tileXY.x -= 1, tileXY.y += 1),
+            _ => tileXY
+            
+        };
+
+        return tileXY;       
+    }
+    
 #endregion
 
 
@@ -111,9 +129,16 @@ public class MiningDrill : Machine
         {
             // Timer
             tickTimer = 0;
+
+            // Get output belt path
+            List<Belt> outputBeltPath = BeltManager.Instance.GetBeltPath(outputBelt);
+            // Get rotation offset
+            Vector2 offset = BeltManager.Instance.GetBeltCentreOffset(outputBeltPath[0]);
+            // Set output position
+            Vector3 outputPos = new Vector3(outputBeltPath[0].transform.position.x + offset.x, outputBeltPath[0].transform.position.y + offset.y, outputBelt.transform.position.z);
             
-            // Spawn object                                                      <      POS       >
-            ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, new Vector3(0,0,0), Quaternion.identity);
+            // Spawn object                                                     <   POS   >
+            ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, outputPos, Quaternion.identity);
             
             // Subtract from Vein Count
             SkillManager.Instance.ModifyDictionaryValue(oreVeinCounts, oreToCraft.displayName, -1, true);
@@ -229,5 +254,31 @@ public class MiningDrill : Machine
     }
 
 #endregion
+
+
+public void StartCrafting()
+    {
+        // Check for output belt
+        if (outputBelt != null)
+        {
+            // Start Mining
+            oreToCraft = selectedOre;
+            tickTimer = 0;
+            mining = true;
+        }
+        else
+        {
+            NotificationManager.Instance.DisplayNotification("No Output Belt");
+        }
+    }
+
+    public void StopCrafting()
+    {
+        // Stop Mining
+        oreToCraft = null;
+        tickTimer = 0;
+        mining = false;
+    }
+
 
 }

@@ -124,6 +124,7 @@ MonoBehaviour:
   timeToCraft: 60
   timeToVeinRespawn: 100
   menuCanvas: {fileID: 5397272109034386433}
+  belt: {fileID: 11400000, guid: 7ee9f917a3e4d7b4cbb38896ab1176fc, type: 2}
 --- !u!1001 &3323636264782701844
 PrefabInstance:
   m_ObjectHideFlags: 0
