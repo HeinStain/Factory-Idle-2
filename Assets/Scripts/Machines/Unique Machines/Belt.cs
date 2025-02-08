@@ -24,15 +24,10 @@ public class Belt : Machine
     [SerializeField] Sprite straight, rightTurn, leftTurn, straightWithRight, straightWithLeft, bothSides, straightWithSides, end, none, start;
 
 
-    [Header("Data")]
-    private int timeTonNextAvailableTile = 3;
-    private bool occupiedByItem;
-    private ItemData item;
-
-
     [Header("State")]
     private BeltVisualState visualState;
     private enum BeltVisualState { Straight, RightTurn, LeftTurn, StraightWithRight, StraightWithLeft, BothSides, StraightWithSides, End, None, Start, }
+    
 
     public override string ToString()
     {
@@ -62,6 +57,7 @@ public class Belt : Machine
         GetNeighbours();
         BeltManager.Instance.UpdateBeltPath(this);
     }
+
 
 #endregion
 
@@ -201,6 +197,7 @@ public class Belt : Machine
     public Belt GetRightBelt() { return rightBelt != null ? rightBelt : null; }
     public Belt GetLeftBelt()  { return leftBelt != null ? leftBelt : null; }
 
+
     //Directions
     public MachineData.Direction GetDirection() { return direction; }
     public MachineData.Direction GetNegativeDirection(Belt belt) 
@@ -211,15 +208,7 @@ public class Belt : Machine
         else if (belt.GetDirection() == MachineData.Direction.Left) { return MachineData.Direction.Right; }
         else { return belt.GetDirection(); }
     }
-    
-    /*
-    // Item Spots   --->   ...
-    public Transform GetFrontSpot()  { return frontSpot;  }  
-    public Transform GetRearSpot()   { return rearSpot;   }
-    public Transform GetLeftSpot()   { return leftSpot;   }
-    public Transform GetRightSpot()  { return rightSpot;  }
-    public Transform GetMiddleSpot() { return middleSpot; }
-    */
+
 
     //Inputs   --->   Return Belt if facing correct direction
     public bool NextAvailable() { return GetNextBelt()  != null && (GetNextBelt()?.GetDirection())  != GetNegativeDirection(this) ? true : false; }
@@ -244,7 +233,20 @@ public class Belt : Machine
         else { return belt.GetDirection(); }
     }
 
-
+    public Vector3 GetBeltCentre()
+    {
+        Vector3 skibidi = new Vector3(transform.position.x, transform.position.y, 0);
+        skibidi = direction switch
+        {
+            MachineData.Direction.Up     =>   new Vector3(skibidi.x += 0.5f, skibidi.y += 0.5f),   
+            MachineData.Direction.Right  =>   new Vector3(skibidi.x += 0.5f, skibidi.y -= 0.5f),
+            MachineData.Direction.Down   =>   new Vector3(skibidi.x -= 0.5f, skibidi.y -= 0.5f),  
+            MachineData.Direction.Left   =>   new Vector3(skibidi.x -= 0.5f, skibidi.y += 0.5f),
+            _ => skibidi
+            
+        };
+        return skibidi;
+    }
 
 #endregion
     
@@ -256,5 +258,6 @@ public class Belt : Machine
         BeltManager.Instance.UpdateDebugVisual();
         Debug.Log("Cleared Belt at " + originXY);
     }
+
 #endregion
 }

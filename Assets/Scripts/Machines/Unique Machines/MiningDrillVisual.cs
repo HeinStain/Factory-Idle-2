@@ -231,7 +231,7 @@ public class MiningDrillVisual : MonoBehaviour
             veinCountText.text = SkillManager.Instance.GetDictionaryValue(miningDrill.oreVeinCounts, selectedOre.displayName) + "/" + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, selectedOre.displayName);
             oreValueText.text = selectedOre.value.ToString();
 
-            timeToCraftText.text = (miningDrill.timeToCraft / 20).ToString("F2");
+            timeToCraftText.text = (miningDrill.timeToCraft / 30).ToString("F2");
             xpText.text = selectedOre.XP.ToString();
             masteryXPText.text = ((int)(SkillManager.Instance.CalculateGivenOreMasteryXP(selectedOre.displayName))).ToString();
             masteryPoolXPText.text = ((int)(SkillManager.Instance.CalculateGivenMasteryPoolXP(selectedOre.displayName))).ToString();

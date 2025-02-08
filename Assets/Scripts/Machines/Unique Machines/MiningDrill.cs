@@ -22,11 +22,14 @@ public class MiningDrill : Machine
     public int timeToCraft = 60;
     public int timeToVeinRespawn = 100;
     public Dictionary<string, int> oreVeinCounts = new Dictionary<string, int>();
+    
 
     [Header("Visuals")]
     [SerializeField] private GameObject menuCanvas;
 
     [SerializeField] private MachineData belt;
+
+
 
     public override string ToString()
     {
@@ -51,6 +54,7 @@ public class MiningDrill : Machine
         DispenseUpdateCycle();
 
     }
+    
 
     private void Update()
     {
@@ -123,7 +127,7 @@ public class MiningDrill : Machine
 
     private void CraftingCycle()
     {
-        
+
         // Mine Ore
         if (tickTimer >= timeToCraft && !respawningVein)
         {
@@ -138,7 +142,7 @@ public class MiningDrill : Machine
             Vector3 outputPos = new Vector3(outputBeltPath[0].transform.position.x + offset.x, outputBeltPath[0].transform.position.y + offset.y, outputBelt.transform.position.z);
             
             // Spawn object                                                     <   POS   >
-            ItemManager.SpawnObject(ItemManager.Instance.itemPrefab, oreToCraft, outputPos, Quaternion.identity);
+            ItemManager.SpawnObject(outputBelt, ItemManager.Instance.itemPrefab, oreToCraft, outputPos, Quaternion.identity);
             
             // Subtract from Vein Count
             SkillManager.Instance.ModifyDictionaryValue(oreVeinCounts, oreToCraft.displayName, -1, true);

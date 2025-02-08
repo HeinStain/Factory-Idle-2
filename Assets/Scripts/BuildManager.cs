@@ -111,6 +111,12 @@ public class BuildManager : MonoBehaviour
 
                     Machine belt = Machine.Create(beltWorldPosition, new Vector2Int(poo.x, poo.y), direction, machineList[0]);
 
+                    List<Machine> machines = new List<Machine> { machine };
+                    belt.AssignAssociatedMachines(machines);
+
+                    List<Machine> belts = new List<Machine> { belt };
+                    machine.AssignAssociatedMachines(belts);
+
                     // Tell all tiles they're occupied
                     foreach(Vector2Int tileXY in gridPositionList)
                     {
@@ -145,28 +151,41 @@ public class BuildManager : MonoBehaviour
         }
     }
 
+   
     private void ClearMachine()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GridMap.GridTile gridTile = gridArray.GetGridTile(mousePosition);
         Machine machine = gridTile.GetMachine();
-        
-        if (machine != null)
-        {
-            List<Vector2Int> gridPositionList = machine.GetGridPositionList();
 
-            foreach(Vector2Int position in gridPositionList)
+        if (machine == null) return; // Exit if no machine is found
+
+        // Destroy associated machines
+        DestroyMachinesAtPositions(machine.associatedMachines);
+
+        // Destroy the main machine
+        DestroyMachinesAtPositions(new List<Machine> { machine });
+    }
+
+
+    private void DestroyMachinesAtPositions(List<Machine> machines)
+    {
+        foreach (Machine m in machines)
+        {
+            foreach (Vector2Int position in m.GetGridPositionList())
             {
                 GridMap.GridTile tile = gridArray.GetGridTile(position.x, position.y);
+                Machine tileMachine = tile.GetMachine();
 
-                if (tile.GetMachine() != null)
+                if (tileMachine != null)
                 {
-                    tile.GetMachine().DestroySelf();
+                    tileMachine.DestroySelf();
                     tile.ClearMachine();
                 }
             }
         }
     }
+
 
     private void RotateHeldMachine()
     {

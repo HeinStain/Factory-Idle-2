@@ -12,7 +12,11 @@ public class TickManager : MonoBehaviour
     }
     public static event EventHandler<OnTickEventArgs> OnTick;
 
-    private const float tickTimerMax = .05f;
+
+    // 1 / 0.05 = 20 t/s
+    private const float tickTimerMax = 1f/30f;
+
+
     private int tick;
     private float tickTimer;
 

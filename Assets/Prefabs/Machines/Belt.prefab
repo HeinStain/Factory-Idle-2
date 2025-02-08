@@ -512,12 +512,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   originXY: {x: 0, y: 0}
+  direction: 0
+  associatedMachines: []
+  tickTimer: 0
   nextAvailableBelt: {fileID: 0}
   rearBelt: {fileID: 0}
   rightBelt: {fileID: 0}
   leftBelt: {fileID: 0}
   frontSpot: {fileID: 2635475949200867484}
-  middleSpot: {fileID: 3283952148428888036}
   rearSpot: {fileID: 6845569800487059292}
   rightSpot: {fileID: 5236879978970192075}
   leftSpot: {fileID: 2224984266966329322}

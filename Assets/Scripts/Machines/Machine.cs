@@ -8,7 +8,7 @@ public class Machine : MonoBehaviour
     private MachineData machineData;
     [SerializeField] protected Vector2Int originXY;
     public MachineData.Direction direction;
-
+    public List<Machine> associatedMachines;
     public int tickTimer;
 
     private void Start()
@@ -78,4 +78,10 @@ public class Machine : MonoBehaviour
     protected virtual void GetDispenseBelt() {}
 
     public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
+    
+    public void AssignAssociatedMachines(List<Machine> machines)
+    {   
+        associatedMachines = machines;
+    }
+
 }

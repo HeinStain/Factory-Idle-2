@@ -115,13 +115,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originXY: {x: 0, y: 0}
   direction: 0
+  associatedMachines: []
   tickTimer: 0
   outputBelt: {fileID: 0}
   selectedOre: {fileID: 0}
   oreToCraft: {fileID: 0}
   mining: 0
   respawningVein: 0
-  timeToCraft: 60
+  timeToCraft: 90
   timeToVeinRespawn: 100
   menuCanvas: {fileID: 5397272109034386433}
   belt: {fileID: 11400000, guid: 7ee9f917a3e4d7b4cbb38896ab1176fc, type: 2}

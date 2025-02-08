@@ -165,6 +165,26 @@ public class BeltManager : MonoBehaviour
         return offset;
     }
 
+    public Belt GetNextBeltPath(Belt belt)
+    {
+        // Check if the last belt has a next belt
+        if (belt.NextAvailable())
+        {
+            Belt nextBelt = belt.GetNextBelt();
+
+            // Check if the next belt is part of another path
+            List<Belt> nextBeltPath = GetBeltPath(nextBelt);
+            if (nextBeltPath != null && nextBeltPath.Count > 0)
+            {
+                // Return the first belt of the next path
+                return nextBeltPath[0];
+            }
+        }
+
+        // No next belt path found
+        return null;
+    }
+
 #endregion
 
 #region Debug Visuals

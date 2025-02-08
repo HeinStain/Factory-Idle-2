@@ -24,7 +24,7 @@ public class ItemManager : MonoBehaviour
 
     public static List<ObjectPool> objectPools = new List<ObjectPool>();
 
-    public static GameObject SpawnObject(GameObject itemPrefab, ItemData itemData, Vector3 spawnPosition, Quaternion spawnRotation)
+    public static GameObject SpawnObject(Belt spawnBelt, GameObject itemPrefab, ItemData itemData, Vector3 spawnPosition, Quaternion spawnRotation)
     {
         // Look for the object pool of this item type
         ObjectPool pool = null;
@@ -59,7 +59,7 @@ public class ItemManager : MonoBehaviour
         {
             // If there are no inactive objects, create a new one, and set it up
             spawnObj = Instantiate(itemPrefab, spawnPosition, spawnRotation);
-            spawnObj.GetComponent<Item>().ItemSetup(itemData);
+            spawnObj.GetComponent<Item>().ItemSetup(itemData, spawnBelt);
         }
         else
         {
