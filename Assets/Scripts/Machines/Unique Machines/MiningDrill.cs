@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
+using System.Linq;
 
 
 public class MiningDrill : Machine
@@ -19,9 +20,9 @@ public class MiningDrill : Machine
     [Header("Data")]
     public bool mining = false;
     public bool respawningVein;
-    public int timeToCraft = 60;
     public int timeToVeinRespawn = 100;
     public Dictionary<string, int> oreVeinCounts = new Dictionary<string, int>();
+    public Dictionary<string, int> oreVeinMax = new Dictionary<string, int>();
     
 
     [Header("Visuals")]
@@ -46,9 +47,10 @@ public class MiningDrill : Machine
         gridArray = GameManager.Instance.GetGrid();
 
         // Create Ore Vein Dictionary
-        foreach (ItemData ore in ItemManager.Instance.itemList)
+        foreach (ItemData item in ItemManager.Instance.itemList.Where(item => item.tags.Contains(ItemTag.Mining)))
         {
-            oreVeinCounts.Add(ore.displayName, SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, ore.displayName));
+            oreVeinMax.Add(item.displayName, SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, item.displayName) + 5);
+            oreVeinCounts.Add(item.displayName, SkillManager.Instance.GetDictionaryValue(oreVeinMax, item.displayName));
         }
         
         DispenseUpdateCycle();
@@ -129,7 +131,7 @@ public class MiningDrill : Machine
     {
 
         // Mine Ore
-        if (tickTimer >= timeToCraft && !respawningVein)
+        if (tickTimer >= machineData.defaultCraftingInterval && !respawningVein)
         {
             // Timer
             tickTimer = 0;
@@ -163,7 +165,7 @@ public class MiningDrill : Machine
                 // Timer
                 tickTimer = 0;
                 // Set vein to max
-                int maxVeinCount = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, oreToCraft.displayName);
+                int maxVeinCount = SkillManager.Instance.GetDictionaryValue(oreVeinMax, oreToCraft.displayName);
                 SkillManager.Instance.ModifyDictionaryValue(oreVeinCounts, oreToCraft.displayName, maxVeinCount, false);
                 // Reset
                 respawningVein = false;
@@ -179,63 +181,56 @@ public class MiningDrill : Machine
     private void HandleXPDistribution()
     {
 
-        string machineName = GetMachineName();
+        string skillName = machineData.skillName;
         string oreName = oreToCraft.displayName;
         
-        // Add Level, Mastery Pool and Mastery XP
-        AddSkillXP(SkillManager.Instance.skillXP, machineName, oreToCraft.XP);
-        AddSkillXP(SkillManager.Instance.skillMasteryPoolXP, machineName, SkillManager.Instance.CalculateGivenMasteryPoolXP(oreName));
-        AddSkillXP(SkillManager.Instance.oreMasteryXP, oreName, SkillManager.Instance.CalculateGivenOreMasteryXP(oreName));
-
+        // Add Skill XP
+        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillName, oreToCraft.XP, true);
+        // Add Mastery and Mastery Pool XP
+        float givenMasteryXP = SkillManager.Instance.Calculate_GivenItemMasteryXP(oreName, ItemTag.Mining);
+        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, skillName, givenMasteryXP/4, true);
+        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryXPCount, oreName, givenMasteryXP, true);
+        
+        //
+        //
         // Handle Ore Mastery Level Up
-        HandleOreMasteryLevelUp(oreName);
-
-        // Handle Skill Level Up
-        HandleSkillLevelUp(machineName);
-    }
-    
-    private void AddSkillXP(Dictionary<string, float> xpPool, string key, float xpAmount)
-    {
-        SkillManager.Instance.AddXP(xpPool, key, xpAmount);
-    }
-
-    private void HandleOreMasteryLevelUp(string oreName)
-    {
-        int currentOreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryLevel, oreName);
-        float currentOreMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, oreName);
-        float masteryLevelXPReq = SkillManager.Instance.CalculateOreMasteryXPToNextLevel(currentOreMasteryLevel);
+        int currentOreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, oreName);
+        float currentOreMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, oreName);
+        float masteryLevelXPReq = SkillManager.Instance.Calculate_XPToNextLevel(currentOreMasteryLevel);
 
         if (currentOreMasteryXP >= masteryLevelXPReq)
         {
             // Level up and update XP
             float leftOverMasteryXP = currentOreMasteryXP - masteryLevelXPReq;
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreMasteryLevel, oreName, currentOreMasteryLevel + 1, false);
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreMasteryXP, oreName, leftOverMasteryXP, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryLevels, oreName, currentOreMasteryLevel + 1, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryXPCount, oreName, leftOverMasteryXP, false);
 
             // Update max vein and notify
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreVeinMax, oreName, SkillManager.Instance.CalculateVeinMax(currentOreMasteryLevel + 1), false);
+            SkillManager.Instance.ModifyDictionaryValue(oreVeinMax, oreName, currentOreMasteryLevel + 1 + 5, false);
             NotificationManager.Instance.DisplayNotification($"{oreName} Mastery Level {currentOreMasteryLevel + 1}!");
         }
-    }
 
-    private void HandleSkillLevelUp(string machineName)
-    {
-        int currentMiningLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, machineName);
-        float currentMiningXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, machineName);
-        float levelXPReq = SkillManager.Instance.CalculateXPToNextLevel(currentMiningLevel);
+        //
+        //
+        // Handle Skill Level Up
+        int currentMiningLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, skillName);
+        float currentMiningXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, skillName);
+        float levelXPReq = SkillManager.Instance.Calculate_XPToNextLevel(currentMiningLevel);
 
         if (currentMiningXP >= levelXPReq)
         {
             // Level up and update XP
             float leftOverXP = currentMiningXP - levelXPReq;
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillLevels, machineName, currentMiningLevel + 1, false);
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, machineName, leftOverXP, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillLevels, skillName, currentMiningLevel + 1, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillName, leftOverXP, false);
 
             // Notify level up and check to unlock new ore
-            NotificationManager.Instance.DisplayNotification($"{machineName} Level {currentMiningLevel + 1}!");
+            NotificationManager.Instance.DisplayNotification($"{skillName} Level {currentMiningLevel + 1}!");
             SkillManager.Instance.UnlockNewOreCheck();
         }
     }
+    
+
 
 #endregion
 

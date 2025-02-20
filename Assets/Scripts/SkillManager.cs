@@ -5,6 +5,8 @@ using System.Linq;
 using System;
 using Unity.VisualScripting;
 using UnityEngine.Animations;
+using UnityEditor.Tilemaps;
+using UnityEngine.Pool;
 
 public class SkillManager : MonoBehaviour
 {
@@ -21,10 +23,14 @@ public class SkillManager : MonoBehaviour
     public Dictionary<string, float> skillMasteryPoolXP = new Dictionary<string, float>();
 
 
-    public Dictionary<string, int> oreMasteryLevel = new Dictionary<string, int>();
-    public Dictionary<string, float> oreMasteryXP = new Dictionary<string, float>();
-    public Dictionary<string, bool> oreUnlocks = new Dictionary<string, bool>();
-    public Dictionary<string, int> oreVeinMax = new Dictionary<string, int>();
+
+    public Dictionary<string, bool> itemUnlockedStatus = new Dictionary<string, bool>();
+    public Dictionary<string, int> itemMasteryLevels = new Dictionary<string, int>();
+    public Dictionary<string, float> itemMasteryXPCount = new Dictionary<string, float>();
+
+    ///  This should probably be moved to be local to the Mining Drill
+
+    //////////////////////////////////////////////////////////////////
 
 #region Setup
 
@@ -32,13 +38,52 @@ public class SkillManager : MonoBehaviour
     {
         foreach (MachineData machine in BuildManager.Instance.machineList)
         {
-            skillLevels.TryAdd(machine.machineName, 1);
-            skillXP.TryAdd(machine.machineName, 0);
-            skillMasteryPoolXP.TryAdd(machine.machineName, 0);
+            skillLevels.TryAdd(machine.skillName, 1);
+            skillXP.TryAdd(machine.skillName, 0);
+            skillMasteryPoolXP.TryAdd(machine.skillName, 0);
         }
 
+        foreach (ItemData item in ItemManager.Instance.itemList)
+        {
+            itemMasteryLevels.TryAdd(item.displayName, 1);
+            itemMasteryXPCount.TryAdd(item.displayName, 0f);
+
+            //if item is associated to a skill
+            if (GetAssociatedSkillLevel(item) != 6969)
+            {   
+                //check if its unlocked yet and set it
+                itemUnlockedStatus[item.displayName] = GetAssociatedSkillLevel(item) >= item.unlockLevel;
+            }
+            //if item has no skill
+            else
+            {
+                //set the item to unlocked
+                itemUnlockedStatus[item.displayName] = true;
+            }
+        }
+
+        int GetAssociatedSkillLevel(ItemData item)
+        {
+            var skillTags = new[]
+            {
+                ItemTag.Mining,
+                ItemTag.Timberforging,
+                ItemTag.Aquaforming,
+                ItemTag.Smelting,
+                ItemTag.Refining,
+                ItemTag.Crafting,
+                ItemTag.Assembly,
+                ItemTag.Printing,
+                ItemTag.Robocraft,
+                ItemTag.Alchemy
+            };
+
+            var matchingTag = skillTags.FirstOrDefault(tag => item.tags.Contains(tag));
+            return matchingTag != default ? GetDictionaryValue(skillLevels, matchingTag.ToString()) : 6969;
+        }
+        /*
+
         // Process items that are tagged as Ore
-        int miningDrillLevel = GetDictionaryValue(skillLevels, "Mining Drill");
         foreach (ItemData ore in ItemManager.Instance.itemList.Where(item => item.tags.Contains(ItemTag.Ore)))
         {
             oreMasteryLevel.TryAdd(ore.displayName, 1);
@@ -46,8 +91,12 @@ public class SkillManager : MonoBehaviour
             oreVeinMax.TryAdd(ore.displayName, 6);
             oreUnlocks[ore.displayName] = miningDrillLevel >= ore.unlockLevel;
         }
+
+        */
+
     }
 
+    
 #endregion
 
 #region Dictionary Functions
@@ -80,54 +129,74 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    // Specific method to add XP
-    public void AddXP(Dictionary<string, float> dictionary, string name, float amount)
-    {
-        ModifyDictionaryValue(dictionary, name, amount, true);
-    }
-
 #endregion
 
-#region Ore Calculations
 
-    public float CalculateGivenOreMasteryXP(string oreName)
+#region XP Algorithms
+
+
+    // Used for Skill XP and Item Mastery XP
+    public int Calculate_XPToNextLevel(int skillLevel) 
     {
-        int unlockedOres = 0;
+        float scalingFactor = GetScalingFactor(skillLevel);
         
-        if (oreUnlocks.ContainsKey(oreName))
+        return Mathf.RoundToInt(83 * Mathf.Pow(1.104027812f, skillLevel - 1) * scalingFactor);
+    }
+
+    
+    public float Calculate_GivenItemMasteryXP(string itemName, ItemTag skillTag)
+    {   
+        var relevantItemUnlockedStatus = new Dictionary<string, bool>();
+        var relevantItemMasteryLevels = new Dictionary<string, int>();
+        
+        // Filter items based on their tags
+        foreach (KeyValuePair<string, bool> item in itemUnlockedStatus)
         {
-            if (oreUnlocks[oreName] == true)
+            ItemData itemData = GetItemDataFromName(item.Key); 
+            if (itemData.tags.Contains(skillTag))
             {
-                unlockedOres++;
+                relevantItemUnlockedStatus[item.Key] = item.Value;
             }
         }
 
-        int currentLevel = GetDictionaryValue(oreMasteryLevel, oreName);
+        foreach (KeyValuePair<string, int> item in itemMasteryLevels)
+        {
+            ItemData itemData = GetItemDataFromName(item.Key); 
+            if (itemData.tags.Contains(skillTag))
+            {
+                relevantItemMasteryLevels[item.Key] = item.Value;
+            }
+        }
 
-        float result = (float)(((unlockedOres * oreMasteryLevel.Values.Sum() / (oreMasteryLevel.Count * 99)) + (currentLevel * oreMasteryLevel.Count / 10) * 1.5)); //actionTime * 0.5 * (1 + bonus);
-        return result;           
-    }
+        int unlockedActions = relevantItemUnlockedStatus.Count(i => i.Value == true);
 
-    public int CalculateOreMasteryXPToNextLevel(int currentLevel)
-    {
-        return Mathf.RoundToInt(83 * Mathf.Pow(1.104027812f, (currentLevel - 1)));
-    }
+        int itemMasteryLevel = GetDictionaryValue(relevantItemMasteryLevels, itemName);
 
-    public int CalculateXPToNextLevel(int currentLevel)
-    {
-        return Mathf.FloorToInt((1f / 4f) * (currentLevel + 300 * Mathf.Pow(2, currentLevel / 7f)));
-    }
+        int playerTotalMasteryForSkill = relevantItemMasteryLevels.Values.Sum();
 
-    public int CalculateVeinMax(int currentLevel)
-    {
-        return currentLevel + 5;
-    }
+        int totalMasteryForSkill = relevantItemMasteryLevels.Count * 99;
 
-    public float CalculateGivenMasteryPoolXP(string oreName)
-    {
-        return CalculateGivenOreMasteryXP(oreName) / 4;
+        int totalItemsInSkill = relevantItemMasteryLevels.Count;
         
+        /////////////////
+
+        float baseXP = (unlockedActions * playerTotalMasteryForSkill / totalMasteryForSkill) + (itemMasteryLevel * totalItemsInSkill / 10);
+
+        float levelScaling = GetScalingFactor(itemMasteryLevel);
+
+        return baseXP * levelScaling;
     }
+
+    private float GetScalingFactor(int currentLevel)
+    {
+        return currentLevel <= 30 ? 1f : 1f + (0.5f * Mathf.Pow((currentLevel - 30) / 69f, 1.3f));
+    }
+
+
+#endregion
+
+#region Unlock Checks
+
 
     public void UnlockNewOreCheck()
     {
@@ -144,14 +213,36 @@ public class SkillManager : MonoBehaviour
             { 95, "Nebulite Ore" }
         };
 
-        int miningLevel = GetDictionaryValue(skillLevels, "Mining Drill");
+        int miningLevel = GetDictionaryValue(skillLevels, ItemTag.Mining.ToString());
         
         if (oreUnlocksByLevel.TryGetValue(miningLevel, out string oreName))
         {
-            oreUnlocks[oreName] = true;
+            itemUnlockedStatus[oreName] = true;
         }
     }
 
+
 #endregion
 
+#region Tools
+
+
+    private ItemData GetItemDataFromName(string itemName)
+    {
+        ItemData dsds = null;
+        foreach (ItemData item in ItemManager.Instance.itemList)
+        {
+            if (item.displayName == itemName)
+            {
+                dsds = item;
+            }  
+        }
+
+        return dsds;
+    }
+
+    
+#endregion
 }
+
+

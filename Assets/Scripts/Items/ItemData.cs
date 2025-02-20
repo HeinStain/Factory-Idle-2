@@ -17,6 +17,24 @@ public class ItemData : ScriptableObject
 
 public enum ItemTag
 {
+    //Skill Tags
+    Mining,
+    Timberforging,
+    Aquaforming,
+    Smelting,
+    Refining,
+    Crafting,
+    Assembly,
+    Printing,
+    Robocraft,
+    Alchemy,
+
+    Fuel,
+    Sand,
+
+
+    //Item Tags
     Ore,
     Gem,
+
 }

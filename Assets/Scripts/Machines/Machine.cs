@@ -5,7 +5,7 @@ using UnityEngine;
 public class Machine : MonoBehaviour
 {
     
-    private MachineData machineData;
+    protected MachineData machineData;
     [SerializeField] protected Vector2Int originXY;
     public MachineData.Direction direction;
     public List<Machine> associatedMachines;
@@ -53,6 +53,13 @@ public class Machine : MonoBehaviour
     {
         return machineData.machineName;
     }
+
+    public MachineData GetMachineData()
+    {
+        return machineData;
+    }
+
+
     public Vector2Int GetMachineOrigin()
     {
         return originXY;

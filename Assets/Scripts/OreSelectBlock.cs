@@ -43,19 +43,19 @@ public class OreSelectBlock : MonoBehaviour
 
     public void UpgradeOre()
     {
-        int currentOreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryLevel, titleText.text);
-        float currentOreMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, titleText.text);
-        float xpToNextMasteryLevel = SkillManager.Instance.CalculateOreMasteryXPToNextLevel(currentOreMasteryLevel) - currentOreMasteryXP;
+        int currentOreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, titleText.text);
+        float currentOreMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, titleText.text);
+        float xpToNextMasteryLevel = SkillManager.Instance.Calculate_XPToNextLevel(currentOreMasteryLevel) - currentOreMasteryXP;
         float masteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, thisMiningDrill.GetMachineName());
         
         if (masteryPoolXP >= xpToNextMasteryLevel)
         {
             // Ore Mastery Level Up
-            SkillManager.Instance.AddXP(SkillManager.Instance.skillMasteryPoolXP, thisMiningDrill.GetMachineName(), -xpToNextMasteryLevel);
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreMasteryLevel, titleText.text, currentOreMasteryLevel + 1, false);
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreMasteryXP, titleText.text, 0, false);
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.oreVeinMax, titleText.text, SkillManager.Instance.CalculateVeinMax(currentOreMasteryLevel +1), false);
-            NotificationManager.Instance.DisplayNotification(titleText.text + " Mastery Level " + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryLevel, titleText.text).ToString() + "!");
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, thisMiningDrill.GetMachineName(), -xpToNextMasteryLevel, true);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryLevels, titleText.text, currentOreMasteryLevel + 1, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryXPCount, titleText.text, 0, false);
+            SkillManager.Instance.ModifyDictionaryValue(thisMiningDrill.oreVeinMax, titleText.text, currentOreMasteryLevel + 1 + 5, false);
+            NotificationManager.Instance.DisplayNotification(titleText.text + " Mastery Level " + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, titleText.text).ToString() + "!");
 
         }
         else
@@ -76,14 +76,14 @@ public class OreSelectBlock : MonoBehaviour
         titleText.text = ore.displayName;
         oreIcon.sprite = ore.icon;
         oreIcon.SetNativeSize();
-        int masteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryLevel, ore.displayName);
+        int masteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, ore.displayName);
         masteryLevelText.text = masteryLevel.ToString();
         
-        masteryUpgradeText.text = ((int)((SkillManager.Instance.CalculateOreMasteryXPToNextLevel(masteryLevel) - SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, ore.displayName)))).ToString() + "xp for +1 lvls";
-        float p = Mathf.Clamp01(SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, ore.displayName) / SkillManager.Instance.CalculateOreMasteryXPToNextLevel(masteryLevel));
+        masteryUpgradeText.text = ((int)(SkillManager.Instance.Calculate_XPToNextLevel(masteryLevel)) - SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, ore.displayName)).ToString() + "xp for +1 lvls";
+        float p = Mathf.Clamp01(SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, ore.displayName) / SkillManager.Instance.Calculate_XPToNextLevel(masteryLevel));
         progressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p);
 
-        if (SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreUnlocks, ore.displayName) == true)
+        if (SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemUnlockedStatus, ore.displayName) == true)
         {
             notUnlockedBlock.SetActive(false);
             selectButton.onClick.AddListener(() => miningDrill.SelectOre(ore));

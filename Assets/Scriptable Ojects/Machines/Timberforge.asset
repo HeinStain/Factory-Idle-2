@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda049340ecf0ef46b097422de5102d2, type: 3}
+  m_Name: Timberforge
+  m_EditorClassIdentifier: 
+  machineName: Timberforge
+  skillName: Timberforging
+  prefab: {fileID: 0}
+  visual: {fileID: 0}
+  width: 2
+  height: 2
+  hasDispenseBelt: 1
+  hasIntakeBelt: 0
+  energyCost: 500
+  defaultCraftingInterval: 90

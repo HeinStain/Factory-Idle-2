@@ -130,20 +130,20 @@ public class MiningDrillVisual : MonoBehaviour
                     progressBarDisplay.GetComponent<SpriteRenderer>().sprite = whiteProgressBar;
 
                     float t = Mathf.Clamp01((float)miningDrill.tickTimer / (float)miningDrill.timeToVeinRespawn);
-                    progressBarDisplay.transform.localScale = new Vector2(t,1f);
+                    progressBarDisplay.transform.localScale = new Vector3(t,1f,1f);
                     
                 }
                 else
                 {
                     progressBarDisplay.GetComponent<SpriteRenderer>().sprite = greenProgressBar;
     
-                    float t = Mathf.Clamp01((float)miningDrill.tickTimer / (float)miningDrill.timeToCraft);
-                    progressBarDisplay.transform.localScale = new Vector2(t,1f);
+                    float t = Mathf.Clamp01((float)miningDrill.tickTimer / (float)miningDrill.GetMachineData().defaultCraftingInterval);
+                    progressBarDisplay.transform.localScale = new Vector3(t,1f,1f);
                 }
             }
             else
             {
-                progressBarDisplay.transform.localScale = new Vector2(0f,1f);
+                progressBarDisplay.transform.localScale = new Vector3(0f,1f,1f);
             }
         }
         
@@ -154,15 +154,16 @@ public class MiningDrillVisual : MonoBehaviour
 
     private void GenerateItemsList()
     {
+        Debug.Log("Poo");
         // Clear Item List
         foreach (Transform child in oresFolder.transform) { Destroy(child.gameObject); }
     
         // Filter items with "Ore" tag, and order by value
-        var sortedOres = ItemManager.Instance.itemList.Where(ore => ore.tags.Contains(ItemTag.Ore)).OrderBy(ore => ore.value).ToList();
+        var sortedOres = ItemManager.Instance.itemList.Where(item => item.tags.Contains(ItemTag.Mining)).OrderBy(item => item.unlockLevel).ToList();
 
         // Instantiate and set ores
         foreach (ItemData ore in sortedOres)
-        {
+        {Debug.Log("Poo2");
             GameObject oreBlock = Instantiate(menuItemPrefab, oresFolder.transform);
 
             // Get the OreSelectBlock component once for reuse
@@ -219,7 +220,7 @@ public class MiningDrillVisual : MonoBehaviour
         {
             noOreSelectedFrame.SetActive(false);
 
-            int oreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryLevel, selectedOre.displayName);
+            int oreMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, selectedOre.displayName);
             
             icon.gameObject.SetActive(true);
             icon.sprite = selectedOre.icon;
@@ -228,21 +229,22 @@ public class MiningDrillVisual : MonoBehaviour
             titleText.text = selectedOre.displayName;
             oreMasteryLevelText.text = oreMasteryLevel.ToString();
             
-            veinCountText.text = SkillManager.Instance.GetDictionaryValue(miningDrill.oreVeinCounts, selectedOre.displayName) + "/" + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreVeinMax, selectedOre.displayName);
+            veinCountText.text = SkillManager.Instance.GetDictionaryValue(miningDrill.oreVeinCounts, selectedOre.displayName) + "/" + SkillManager.Instance.GetDictionaryValue(miningDrill.oreVeinMax, selectedOre.displayName);
             oreValueText.text = selectedOre.value.ToString();
 
-            timeToCraftText.text = (miningDrill.timeToCraft / 30).ToString("F2");
+            timeToCraftText.text = (miningDrill.GetMachineData().defaultCraftingInterval / 30).ToString("F2");
             xpText.text = selectedOre.XP.ToString();
-            masteryXPText.text = ((int)(SkillManager.Instance.CalculateGivenOreMasteryXP(selectedOre.displayName))).ToString();
-            masteryPoolXPText.text = ((int)(SkillManager.Instance.CalculateGivenMasteryPoolXP(selectedOre.displayName))).ToString();
+            int givenMasteryXP = (int)SkillManager.Instance.Calculate_GivenItemMasteryXP(selectedOre.displayName, ItemTag.Mining);
+            masteryXPText.text = givenMasteryXP.ToString();
+            masteryPoolXPText.text = ((int)(givenMasteryXP / 4)).ToString();
             
 
             // Ore Mastery
-            float currentMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.oreMasteryXP, selectedOre.displayName);
+            float currentMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, selectedOre.displayName);
             
-            float p1 = Mathf.Clamp01(currentMasteryXP / SkillManager.Instance.CalculateOreMasteryXPToNextLevel(oreMasteryLevel));
+            float p1 = Mathf.Clamp01(currentMasteryXP / SkillManager.Instance.Calculate_XPToNextLevel(oreMasteryLevel));
             oreMasteryProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p1);
-            oreMasteryProgressText.text = (int)currentMasteryXP + " / " + SkillManager.Instance.CalculateOreMasteryXPToNextLevel(oreMasteryLevel).ToString();
+            oreMasteryProgressText.text = (int)currentMasteryXP + " / " + SkillManager.Instance.Calculate_XPToNextLevel(oreMasteryLevel).ToString();
 
             OreSelectBlock[] oreBlocks = FindObjectsOfType<OreSelectBlock>();
             foreach (OreSelectBlock oreBlock in oreBlocks)
@@ -280,9 +282,9 @@ public class MiningDrillVisual : MonoBehaviour
         int currentMiningLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, miningDrill.GetMachineName());
         float currentMiningXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, miningDrill.GetMachineName());
         
-        float p2 = Mathf.Clamp01(currentMiningXP / SkillManager.Instance.CalculateXPToNextLevel(currentMiningLevel));
+        float p2 = Mathf.Clamp01(currentMiningXP / SkillManager.Instance.Calculate_XPToNextLevel(currentMiningLevel));
         miningLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p2);
-        miningLevelProgressText.text  =  (int)currentMiningXP + " / " + SkillManager.Instance.CalculateXPToNextLevel(currentMiningLevel).ToString();
+        miningLevelProgressText.text  =  (int)currentMiningXP + " / " + SkillManager.Instance.Calculate_XPToNextLevel(currentMiningLevel).ToString();
 
         // Mastery Pool 
         float currentMasteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, miningDrill.GetMachineName());
@@ -301,22 +303,22 @@ public class MiningDrillVisual : MonoBehaviour
                 progressPercentText.text = ((float)miningDrill.tickTimer / (float)miningDrill.timeToVeinRespawn * 100).ToString("F0") + "%";
 
                 float t = Mathf.Clamp01((float)miningDrill.tickTimer / (float)miningDrill.timeToVeinRespawn);
-                progressBar.transform.localScale = new Vector2(t,1f);
+                progressBar.transform.localScale = new Vector3(t,1f,1f);
                 
             }
             else
             {
                 progressBar.GetComponent<Image>().sprite = redProgressBar;
-                progressPercentText.text = (((float)miningDrill.tickTimer / (float)miningDrill.timeToCraft) * 100).ToString("F0") + "%";
+                progressPercentText.text = (((float)miningDrill.tickTimer / (float)miningDrill.GetMachineData().defaultCraftingInterval) * 100).ToString("F0") + "%";
 
-                float t = Mathf.Clamp01((float)miningDrill.tickTimer / (float)miningDrill.timeToCraft);
-                progressBar.transform.localScale = new Vector2(t,1f);
+                float t = Mathf.Clamp01((float)miningDrill.tickTimer / (float)miningDrill.GetMachineData().defaultCraftingInterval);
+                progressBar.transform.localScale = new Vector3(t,1f,1f);
             }
         }
         else
         {
             progressPercentText.text = "0%";
-            progressBar.transform.localScale = new Vector2(0f,2.5f);
+            progressBar.transform.localScale = new Vector3(0f,2.5f,1f);
         }
     }
 }

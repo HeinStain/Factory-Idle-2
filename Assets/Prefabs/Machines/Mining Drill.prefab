@@ -122,7 +122,6 @@ MonoBehaviour:
   oreToCraft: {fileID: 0}
   mining: 0
   respawningVein: 0
-  timeToCraft: 90
   timeToVeinRespawn: 100
   menuCanvas: {fileID: 5397272109034386433}
   belt: {fileID: 11400000, guid: 7ee9f917a3e4d7b4cbb38896ab1176fc, type: 2}
@@ -138,14 +137,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Visual
       objectReference: {fileID: 0}
+    - target: {fileID: 1466785700717879711, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3361233295073502319, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: anim
       value: 
       objectReference: {fileID: 2058119018101852988}
+    - target: {fileID: 4287127185855575643, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4287127185855575643, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6860196260949812734, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 4090373347275339066}
+    - target: {fileID: 7275877398449787157, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
