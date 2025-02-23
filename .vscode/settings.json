@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Grid Testing.sln"
+    "dotnet.defaultSolution": "Factory-Idle-2.sln"
 }

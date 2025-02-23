@@ -31,10 +31,12 @@ public enum ItemTag
 
     Fuel,
     Sand,
-
+    Reagent,
+    Misc,
 
     //Item Tags
     Ore,
     Gem,
+    Log,
 
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   machineName: Timberforge
   skillName: Timberforging
-  prefab: {fileID: 0}
+  prefab: {fileID: 4491798940824302409, guid: 9ef02de2a8185c043b796c5737ab640b, type: 3}
   visual: {fileID: 0}
   width: 2
   height: 2

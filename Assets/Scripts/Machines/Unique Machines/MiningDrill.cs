@@ -31,14 +31,6 @@ public class MiningDrill : Machine
     [SerializeField] private MachineData belt;
 
 
-
-    public override string ToString()
-    {
-        return "Mining";
-    }
-
-
-
 #region Main
 
     protected override void MachineSetup()
