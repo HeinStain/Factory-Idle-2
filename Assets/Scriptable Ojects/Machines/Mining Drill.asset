@@ -22,3 +22,4 @@ MonoBehaviour:
   hasIntakeBelt: 0
   energyCost: 500
   defaultCraftingInterval: 90
+  masteryPoolSize: 27500000

@@ -15,6 +15,6 @@ MonoBehaviour:
   displayName: Starwood Log
   icon: {fileID: 8526504876651036621, guid: be3515eb5161fc34d8a0659f724164de, type: 3}
   value: 185
-  unlockLevel: 95
+  unlockLevel: 0
   XP: 112
   tags: 010000000a0000000e000000

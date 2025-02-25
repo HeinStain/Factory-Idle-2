@@ -107,11 +107,6 @@ public class MouseManager : MonoBehaviour
         else if (menuOpen)
         {
             SetMouseIcon(Icon.DEFAULT);
-            ///
-            ///
-            //Logic for interacting with UI buttons goes here
-            ///
-            ///
         }
     }
 

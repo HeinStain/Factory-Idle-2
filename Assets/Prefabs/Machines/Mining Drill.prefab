@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6136277925444215783}
   - component: {fileID: 4184894340097357753}
   - component: {fileID: 2058119018101852988}
-  - component: {fileID: 4090373347275339066}
+  - component: {fileID: 7651154511321310354}
   m_Layer: 6
   m_Name: Mining Drill
   m_TagString: Interactable
@@ -103,7 +103,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4090373347275339066
+--- !u!114 &7651154511321310354
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,21 +112,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2767692903474052443}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9bd0d36db9bc8d4b916fd98864ce8c1, type: 3}
+  m_Script: {fileID: 11500000, guid: f40480ae725d16842a3caab4a43ed26c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   originXY: {x: 0, y: 0}
   direction: 0
   associatedMachines: []
   tickTimer: 0
+  functioning: 0
+  skillTag: 0
   outputBelt: {fileID: 0}
-  selectedOre: {fileID: 0}
-  oreToCraft: {fileID: 0}
-  mining: 0
-  respawningVein: 0
-  timeToVeinRespawn: 100
+  selectedRecipe: {fileID: 0}
+  itemToCraft: {fileID: 0}
+  respawningReservoir: 0
+  timeToReservoirRespawn: 100
   menuCanvas: {fileID: 5397272109034386433}
-  belt: {fileID: 11400000, guid: 7ee9f917a3e4d7b4cbb38896ab1176fc, type: 2}
 --- !u!1001 &3323636264782701844
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -143,21 +143,9 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 3361233295073502319, guid: 743edf86e6f8db84383476388ed04713, type: 3}
-      propertyPath: anim
-      value: 
-      objectReference: {fileID: 2058119018101852988}
-    - target: {fileID: 3499203401529267159, guid: 743edf86e6f8db84383476388ed04713, type: 3}
-      propertyPath: m_LocalRotation.w
+    - target: {fileID: 2371365844290084498, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_Value
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3499203401529267159, guid: 743edf86e6f8db84383476388ed04713, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3499203401529267159, guid: 743edf86e6f8db84383476388ed04713, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4287127185855575643, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_AnchorMax.x
@@ -170,11 +158,27 @@ PrefabInstance:
     - target: {fileID: 6860196260949812734, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 4090373347275339066}
+      objectReference: {fileID: 7651154511321310354}
+    - target: {fileID: 6860196260949812734, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CloseMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 6860196260949812734, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Machine_Producer, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 7275877398449787157, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7609776882283872324, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: anim
+      value: 
+      objectReference: {fileID: 2058119018101852988}
+    - target: {fileID: 7609776882283872324, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: producer
+      value: 
+      objectReference: {fileID: 7651154511321310354}
     - target: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

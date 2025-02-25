@@ -10,6 +10,11 @@ public class Machine : MonoBehaviour
     public MachineData.Direction direction;
     public List<Machine> associatedMachines;
     public int tickTimer;
+    public bool functioning = false;
+
+    [SerializeField] protected ItemTag skillTag;
+    public ItemTag SkillTag => skillTag;  // Read-only property
+
 
     private void Start()
     {

@@ -16,6 +16,7 @@ public class MachineData : ScriptableObject
     public bool hasIntakeBelt;
     public int energyCost;
     public int defaultCraftingInterval;
+    public int masteryPoolSize;
 
     public enum Direction
     {
