@@ -29,6 +29,8 @@ public enum ItemTag
     Robocraft,
     Alchemy,
 
+
+    Liquid,
     Fuel,
     Sand,
     Reagent,
