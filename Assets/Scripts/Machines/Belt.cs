@@ -7,7 +7,7 @@ public class Belt : Machine
 {
     
     [Header("Grid")]
-    private Grid<GridMap.GridTile> gridArray;
+    private GridMap gridMap;
 
 
     [Header("Neighbours")]
@@ -40,7 +40,7 @@ public class Belt : Machine
     protected override void MachineSetup()
     {
         //References
-        gridArray = GameManager.Instance.GetGrid();
+        gridMap = GameManager.Instance.GetGrid();
 
         // Set all layers to Belt layer
         SetLayerRecursive(this.gameObject, 3);
@@ -97,11 +97,11 @@ public class Belt : Machine
         rightTile = GetTile(originXY + MachineData.GetRightTileXY(direction));
         leftTile  = GetTile(originXY + MachineData.GetRightTileXY(direction) * -1);
 
-        // Access gridArray and validate tile exists
+        // Access gridMap and validate tile exists
         GridMap.GridTile GetTile(Vector2Int neighbourXY)
         {
             // Return the tile
-            return gridArray.ValidateGridPosition(neighbourXY) ? gridArray.GetGridTile(neighbourXY.x, neighbourXY.y) : null; 
+            return gridMap.GetGridObject(neighbourXY.x, neighbourXY.y); 
        }
     }
 

@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GridPrefabVisual gridPrefabVisual;
     
     private GridMap gridMap;
-    private Grid<GridMap.GridTile> gridArray;
 
     [Header("Grid Size")]
     [SerializeField] int gridSizeX = 12;
@@ -25,15 +24,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] int highY = 5;
 
     //Returned from GridMap.cs
-    public void SetGrid(Grid<GridMap.GridTile> gridArray)
+    public void SetGrid(GridMap grid)
     {
-        this.gridArray = gridArray;
+        this.gridMap = grid;
     }
 
     //Called by other managers
-    public Grid<GridMap.GridTile> GetGrid()
+    public GridMap GetGrid()
     {
-        return gridArray;
+        return gridMap;
     }
 
     private void Awake()
@@ -45,10 +44,10 @@ public class GameManager : MonoBehaviour
     {   
         //Create Grid
         gridMap = new GridMap(gridSizeX, gridSizeY, 1f, new Vector2 (-(gridSizeX/2f),-(gridSizeY/2f)));
-        gridMap.SetGameManager(this);
+        gridMap.Setup(this);
 
         SetBeginningGridStates();
-        gridPrefabVisual.Setup(gridArray);
+        gridPrefabVisual.Setup(gridMap);
         
         MoneyManager.Instance.IncreaseMoney(1000000);
     }
@@ -65,12 +64,12 @@ public class GameManager : MonoBehaviour
             {
                 if (x >= lowX && x <= highX && y >= lowY && y <= highY) 
                 {
-                    gridMap.SetTileState(x, y, GridMap.GridTile.TileState.Open);
+                    gridMap.SetTileVisualState(x, y, GridMap.GridTile.TileVisualState.Open);
                     gridMap.SetUnlockCost(x, y, 0);
                 } 
                 else 
                 {
-                    gridMap.SetTileState(x, y, GridMap.GridTile.TileState.Locked);
+                    gridMap.SetTileVisualState(x, y, GridMap.GridTile.TileVisualState.Locked);
                     gridMap.SetUnlockCost(x, y, baseCost);
                 }
             }

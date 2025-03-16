@@ -10,7 +10,7 @@ public class GridBuyManager : MonoBehaviour
     
     public event Action<bool> OnBuyModeChanged;
 
-    private Grid<GridMap.GridTile> gridArray;
+    private GridMap gridMap;
 
     private bool buyMode;
     
@@ -29,14 +29,14 @@ public class GridBuyManager : MonoBehaviour
 
     private void Start()
     {
-        gridArray = GameManager.Instance.GetGrid();
+        gridMap = GameManager.Instance.GetGrid();
 
         UpdateWallTiles();
 
-        gridArray.OnGridValueChanged += Grid_OnGridValueChanged;
+        gridMap.OnGridValueChanged += Grid_OnGridValueChanged;
     }
 
-    private void Grid_OnGridValueChanged(object sender, Grid<GridMap.GridTile>.OnGridValueChangedEventArgs e)
+    private void Grid_OnGridValueChanged(object sender, GridMap.OnGridValueChangedEventArgs e)
     {
         UpdateWallTiles();
     }
@@ -48,7 +48,7 @@ public class GridBuyManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                gridArray.GetXY(mousePosition, out int x, out int y);
+                gridMap.GetXY(mousePosition, out int x, out int y);
                 TryToPurchase(x,y);
             }
         }
@@ -56,22 +56,22 @@ public class GridBuyManager : MonoBehaviour
     
     private void TryToPurchase(int x, int y)
     {
-        if (gridArray.ValidateGridPosition(new Vector2Int(x,y)))
+        if (gridMap.GetGridObject(x,y) != null)
         {
-            if (gridArray.GetGridTile(x, y).GetTileState() == GridMap.GridTile.TileState.CanBuy)
+            if (gridMap.GetGridObject(x, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy)
             {
                 //Try to purchase
                 if (MoneyManager.Instance.CheckIfEnoughMoney(tileCost))
                 {   
-                    gridArray.GetGridTile(x, y).SetTileState(GridMap.GridTile.TileState.Open); 
+                    gridMap.GetGridObject(x, y).SetTileVisualState(GridMap.GridTile.TileVisualState.Open); 
                     MoneyManager.Instance.DecreaseMoney(tileCost);
                     tilesBought++;
                     tileCost = (int)CalculateIncrease(tilesBought);
-                    for (int w = 0; w < gridArray.GetWidth(); w++) 
+                    for (int w = 0; w < gridMap.GetWidth(); w++) 
                     {
-                        for (int h = 0; h < gridArray.GetHeight(); h++) 
+                        for (int h = 0; h < gridMap.GetHeight(); h++) 
                         {
-                            gridArray.GetGridTile(w, h).SetUnlockCost(tileCost);
+                            gridMap.GetGridObject(w, h).SetUnlockCost(tileCost);
                         }
                     }
                     UpdateWallTiles(); 
@@ -103,41 +103,41 @@ public class GridBuyManager : MonoBehaviour
     public void UpdateWallTiles()
     {
         // Set Wall Tiles
-        for (int x = 0; x < gridArray.GetWidth(); x++) 
+        for (int x = 0; x < gridMap.GetWidth(); x++) 
         {
-            for (int y = 0; y < gridArray.GetHeight(); y++) 
+            for (int y = 0; y < gridMap.GetHeight(); y++) 
             {
-                if (gridArray.GetGridTile(x, y).GetTileState() == GridMap.GridTile.TileState.Locked || gridArray.GetGridTile(x, y).GetTileState() == GridMap.GridTile.TileState.Corner)
+                if (gridMap.GetGridObject(x, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.Locked || gridMap.GetGridObject(x, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.Corner)
                 {
-                    if (x > 0 && gridArray.GetGridTile(x - 1, y).GetTileState() == GridMap.GridTile.TileState.Open)                       { gridArray.GetGridTile(x,y).SetTileState(GridMap.GridTile.TileState.CanBuy); }
-                    if (x < gridArray.GetWidth() -1 && gridArray.GetGridTile(x + 1, y).GetTileState() == GridMap.GridTile.TileState.Open)   { gridArray.GetGridTile(x,y).SetTileState(GridMap.GridTile.TileState.CanBuy); }
-                    if (y > 0 && gridArray.GetGridTile(x, y - 1).GetTileState() == GridMap.GridTile.TileState.Open)                        { gridArray.GetGridTile(x,y).SetTileState(GridMap.GridTile.TileState.CanBuy); }
-                    if (y < gridArray.GetHeight() -1 && gridArray.GetGridTile(x, y + 1).GetTileState() == GridMap.GridTile.TileState.Open)  { gridArray.GetGridTile(x,y).SetTileState(GridMap.GridTile.TileState.CanBuy); }
+                    if (x > 0 && gridMap.GetGridObject(x - 1, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)                       { gridMap.GetGridObject(x,y).SetTileVisualState(GridMap.GridTile.TileVisualState.CanBuy); }
+                    if (x < gridMap.GetWidth() -1 && gridMap.GetGridObject(x + 1, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)   { gridMap.GetGridObject(x,y).SetTileVisualState(GridMap.GridTile.TileVisualState.CanBuy); }
+                    if (y > 0 && gridMap.GetGridObject(x, y - 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)                        { gridMap.GetGridObject(x,y).SetTileVisualState(GridMap.GridTile.TileVisualState.CanBuy); }
+                    if (y < gridMap.GetHeight() -1 && gridMap.GetGridObject(x, y + 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)  { gridMap.GetGridObject(x,y).SetTileVisualState(GridMap.GridTile.TileVisualState.CanBuy); }
                 }
             }
         }
         // Set Corner Tiles
-        for (int x = 0; x < gridArray.GetWidth(); x++) 
+        for (int x = 0; x < gridMap.GetWidth(); x++) 
         {
-            for (int y = 0; y < gridArray.GetHeight(); y++) 
+            for (int y = 0; y < gridMap.GetHeight(); y++) 
             {
-                if (gridArray.GetGridTile(x, y).GetTileState() == GridMap.GridTile.TileState.Locked)
+                if (gridMap.GetGridObject(x, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.Locked)
                 {
-                    if (x > 0 && gridArray.GetGridTile(x - 1, y).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && y > 0 && gridArray.GetGridTile(x, y - 1).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && gridArray.GetGridTile(x - 1, y - 1).GetTileState() == GridMap.GridTile.TileState.Open)  { gridArray.GetGridTile(x, y).SetTileState(GridMap.GridTile.TileState.Corner); }
+                    if (x > 0 && gridMap.GetGridObject(x - 1, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && y > 0 && gridMap.GetGridObject(x, y - 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && gridMap.GetGridObject(x - 1, y - 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)  { gridMap.GetGridObject(x, y).SetTileVisualState(GridMap.GridTile.TileVisualState.Corner); }
 
-                    if (x > 0 && gridArray.GetGridTile(x - 1, y).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && y < gridArray.GetHeight() -1 && gridArray.GetGridTile(x, y + 1).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && gridArray.GetGridTile(x - 1, y + 1).GetTileState() == GridMap.GridTile.TileState.Open)  { gridArray.GetGridTile(x, y).SetTileState(GridMap.GridTile.TileState.Corner); }
+                    if (x > 0 && gridMap.GetGridObject(x - 1, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && y < gridMap.GetHeight() -1 && gridMap.GetGridObject(x, y + 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && gridMap.GetGridObject(x - 1, y + 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)  { gridMap.GetGridObject(x, y).SetTileVisualState(GridMap.GridTile.TileVisualState.Corner); }
 
-                    if (x < gridArray.GetWidth() -1 && gridArray.GetGridTile(x + 1, y).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && y < gridArray.GetHeight() -1 && gridArray.GetGridTile(x, y + 1).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && gridArray.GetGridTile(x + 1, y + 1).GetTileState() == GridMap.GridTile.TileState.Open)  { gridArray.GetGridTile(x, y).SetTileState(GridMap.GridTile.TileState.Corner); }
+                    if (x < gridMap.GetWidth() -1 && gridMap.GetGridObject(x + 1, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && y < gridMap.GetHeight() -1 && gridMap.GetGridObject(x, y + 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && gridMap.GetGridObject(x + 1, y + 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)  { gridMap.GetGridObject(x, y).SetTileVisualState(GridMap.GridTile.TileVisualState.Corner); }
 
-                    if (x < gridArray.GetWidth() -1 && gridArray.GetGridTile(x + 1, y).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        &&  y > 0 && gridArray.GetGridTile(x, y - 1).GetTileState() == GridMap.GridTile.TileState.CanBuy 
-                        && gridArray.GetGridTile(x + 1, y - 1).GetTileState() == GridMap.GridTile.TileState.Open)  { gridArray.GetGridTile(x, y).SetTileState(GridMap.GridTile.TileState.Corner); }
+                    if (x < gridMap.GetWidth() -1 && gridMap.GetGridObject(x + 1, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        &&  y > 0 && gridMap.GetGridObject(x, y - 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy 
+                        && gridMap.GetGridObject(x + 1, y - 1).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open)  { gridMap.GetGridObject(x, y).SetTileVisualState(GridMap.GridTile.TileVisualState.Corner); }
 
                 }
             }

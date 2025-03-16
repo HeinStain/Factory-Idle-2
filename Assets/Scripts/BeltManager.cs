@@ -10,8 +10,6 @@ public class BeltManager : MonoBehaviour
 {
 
     public static BeltManager Instance { get; private set; }
-    
-    private Grid<GridMap.GridTile> gridArray;
 
     private List<List<Belt>> pathList = new List<List<Belt>>();
 
@@ -20,11 +18,6 @@ public class BeltManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
-
-    private void Start()
-    {
-        gridArray = GameManager.Instance.GetGrid();
     }
 
 #region Main

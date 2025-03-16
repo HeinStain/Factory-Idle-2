@@ -12,7 +12,7 @@ public class BuildManager : MonoBehaviour
     public event Action<Machine> OnMachinePlaced;
     public event Action<bool> OnBuildModeChanged;
 
-    private Grid<GridMap.GridTile> gridArray;
+    private GridMap gridMap;
     
     [SerializeField] public List<MachineData> machineList;
     private MachineData heldMachine;
@@ -32,7 +32,7 @@ public class BuildManager : MonoBehaviour
 
     private void Start()
     {
-        gridArray = GameManager.Instance.GetGrid();
+        gridMap = GameManager.Instance.GetGrid();
     }
 
     private void Update()
@@ -64,9 +64,9 @@ public class BuildManager : MonoBehaviour
     private void PlaceMachine()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        gridArray.GetXY(mousePosition, out int x, out int y);
+        gridMap.GetXY(mousePosition, out int x, out int y);
         
-        if (gridArray.ValidateGridPosition(new Vector2Int(x,y)))
+        if (gridMap.GetGridObject(x,y) != null)
         {
             List<Vector2Int> gridPositionList = heldMachine.GetGridPositionList(new Vector2Int(x,y), direction);
         
@@ -74,12 +74,12 @@ public class BuildManager : MonoBehaviour
             bool canBuild = true;
             foreach (Vector2Int position in gridPositionList)
             {
-                if (gridArray.ValidateGridPosition(position) == false)
+                if (gridMap.GetGridObject(position.x, position.y) == null)
                 {
                     canBuild = false;
                     break;
                 }
-                else if (gridArray.GetGridTile(position.x, position.y).CanBuild() == false)
+                else if (gridMap.GetGridObject(position.x, position.y).CanBuild() == false)
                 {
                     canBuild = false;
                     break;
@@ -91,14 +91,14 @@ public class BuildManager : MonoBehaviour
             {
                 Vector2Int rotationOffset = heldMachine.GetRotationOffset(direction);
                 
-                Vector2 machineWorldPosition = gridArray.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
+                Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
                 Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
 
                 if (heldMachine.hasDispenseBelt)
                 {
 
                     Vector2Int dispensePos = machine.GetDispenseTileIndexOffset();
-                    Vector2 beltWorldPosition = gridArray.GetTileOriginPosition(dispensePos.x, dispensePos.y) + new Vector2Int(rotationOffset.x, rotationOffset.y);
+                    Vector2 beltWorldPosition = gridMap.GetTileOriginPosition(dispensePos.x, dispensePos.y) + new Vector2Int(rotationOffset.x, rotationOffset.y);
                      
                     Vector2Int poo =  direction switch
                     {
@@ -122,13 +122,13 @@ public class BuildManager : MonoBehaviour
                     {
                         if (tileXY == poo)
                         {
-                            gridArray.GetGridTile(tileXY.x, tileXY.y).SetMachine(belt);
+                            gridMap.GetGridObject(tileXY.x, tileXY.y).SetMachine(belt);
                             machine.DispenseUpdateCycle();
                             
                         }
                         else
                         {
-                            gridArray.GetGridTile(tileXY.x, tileXY.y).SetMachine(machine);
+                            gridMap.GetGridObject(tileXY.x, tileXY.y).SetMachine(machine);
                         }
                     }
                 }
@@ -137,7 +137,7 @@ public class BuildManager : MonoBehaviour
                     // Tell all tiles they're occupied
                     foreach(Vector2Int position in gridPositionList)
                     {
-                        gridArray.GetGridTile(position.x, position.y).SetMachine(machine);
+                        gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
                     }
                 }
 
@@ -155,7 +155,7 @@ public class BuildManager : MonoBehaviour
     private void ClearMachine()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        GridMap.GridTile gridTile = gridArray.GetGridTile(mousePosition);
+        GridMap.GridTile gridTile = gridMap.GetGridObject(mousePosition);
         Machine machine = gridTile.GetMachine();
 
         if (machine == null) return; // Exit if no machine is found
@@ -174,7 +174,7 @@ public class BuildManager : MonoBehaviour
         {
             foreach (Vector2Int position in m.GetGridPositionList())
             {
-                GridMap.GridTile tile = gridArray.GetGridTile(position.x, position.y);
+                GridMap.GridTile tile = gridMap.GetGridObject(position.x, position.y);
                 Machine tileMachine = tile.GetMachine();
 
                 if (tileMachine != null)
@@ -240,12 +240,12 @@ public class BuildManager : MonoBehaviour
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        gridArray.GetXY(mousePosition, out int x, out int y);
+        gridMap.GetXY(mousePosition, out int x, out int y);
 
         if(heldMachine != null)
         {
             Vector2Int rotationOffset = heldMachine.GetRotationOffset(direction);
-            Vector2 machineWorldPosition = gridArray.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
+            Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
             return machineWorldPosition;
         }
         else
@@ -274,9 +274,9 @@ public class BuildManager : MonoBehaviour
     }
 
     // Used by Grabber.cs
-    public GridMap.GridTile GetGridTile(Vector2 pos)
+    public GridMap.GridTile GetGridObject(Vector2 pos)
     {
-        return gridArray.GetGridTile(pos);
+        return gridMap.GetGridObject(pos);
     }
 #endregion
 

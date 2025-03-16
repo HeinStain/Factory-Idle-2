@@ -6,21 +6,16 @@ using TMPro;
 
 public class Grid <TGridObject>
 {
-
     public event EventHandler<OnGridValueChangedEventArgs> OnGridValueChanged;
-    public class OnGridValueChangedEventArgs : EventArgs 
-    {
-        public int x;
-        public int y;
-    }
+    public class OnGridValueChangedEventArgs : EventArgs { public int x, y; }
 
-    private int width;
-    private int height;
+    private int width, height;
     private float cellSize;
     private Vector2 originPosition;
     private TGridObject[,] gridArray;
 
-    // Generate a grid
+#region Grid
+
     public Grid(int width, int height, float cellSize, Vector2 originPosition, Func<Grid<TGridObject>, int, int, TGridObject> createGridObject) 
     {
         this.width = width;
@@ -30,158 +25,80 @@ public class Grid <TGridObject>
 
         gridArray = new TGridObject[width, height];
 
-        for (int x = 0; x < gridArray.GetLength(0); x ++) 
+        for (int x = 0; x < width; x ++) 
         {
-            for (int y = 0; y < gridArray.GetLength(1); y++) 
+            for (int y = 0; y < height; y++) 
             {
                 gridArray[x, y] = createGridObject(this, x, y);
             }
         }
-
-
-
-        bool showDebug =  false;
-        if (showDebug) 
-        { 
-            ShowDebugVisuals(); 
-        } 
     }
-
-    ///////////////////////////////////////////////////////////////////////
     
-    private void ShowDebugVisuals()
+#endregion
+
+#region Grid Access
+
+    // Notify subscribers that a grid cell has changed
+    public void TriggerGridObjectChanged(int x, int y) 
     {
-        GameObject canvasObject;
-        TextMeshProUGUI[,] debugTextArray = new TextMeshProUGUI[width, height];
-
-        canvasObject = new GameObject ("Canvas", typeof(Canvas));
-        Canvas canvas = canvasObject.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.sortingLayerName = "Build Ghost";
-
-        for (int x = 0; x < gridArray.GetLength(0); x ++) 
-        {
-            for (int y = 0; y < gridArray.GetLength(1); y++) 
-            {
-                debugTextArray[x,y] = CreateDebugText(gridArray[x,y]?.ToString(), canvasObject.transform, GetTileOriginPosition(x,y) + new Vector2(cellSize, cellSize) * .5f, cellSize/4, TextAlignmentOptions.Center);
-                Debug.DrawLine(GetTileOriginPosition(x, y), GetTileOriginPosition(x, y + 1), Color.white, 1000f);
-                Debug.DrawLine(GetTileOriginPosition(x, y), GetTileOriginPosition(x + 1, y), Color.white, 1000f);
-                
-            }
-        }
-        Debug.DrawLine(GetTileOriginPosition(0, height), GetTileOriginPosition(width, height), Color.white, 1000f);
-        Debug.DrawLine(GetTileOriginPosition(width, 0), GetTileOriginPosition(width, height), Color.white, 1000f);
-        OnGridValueChanged += (object sender, OnGridValueChangedEventArgs eventArgs) => { debugTextArray[eventArgs.x, eventArgs.y].text = gridArray[eventArgs.x, eventArgs.y]?.ToString(); };
+        OnGridValueChanged?.Invoke(this, new OnGridValueChangedEventArgs { x = x, y = y });
     }
 
-    // Create Text in the World
-    private TextMeshProUGUI CreateDebugText(string text, Transform parent = null, Vector2 localPosition = default(Vector2), float fontSize = 40, TextAlignmentOptions textAlignment = TextAlignmentOptions.Left) 
-    {
-        GameObject gameObject = new GameObject("World_Text", typeof(TextMeshProUGUI));
-        Transform transform = gameObject.transform;
-        transform.SetParent(parent, false);
-        transform.localPosition = localPosition;
-        
-        TextMeshProUGUI textMesh = gameObject.GetComponent<TextMeshProUGUI>();
-        textMesh.alignment = textAlignment;
-        textMesh.text = text;
-        textMesh.fontSize = fontSize;
-
-        return textMesh;
-    }
-
-    ///////////////////////////////////////////////////////////////////////
+    // Basic grid property accessors
+    public int GetWidth() => width;
+    public int GetHeight() => height;
+    public float GetCellSize() => cellSize;
 
 
-    public int GetWidth()
-    {
-        return width;
-    }
+    public Vector2 GetTileOriginPosition(int x, int y) { return new Vector2(x, y) * cellSize + originPosition; }
+    public Vector2 GetTileCentrePosition(int x, int y) { return new Vector2(x + cellSize/2, y + cellSize/2) * cellSize + originPosition; }
 
-    public int GetHeight()
-    {
-        return height;
-    }
 
-    // Get world position from grid position
-    public Vector2 GetTileOriginPosition(int x, int y) 
-    {
-        return new Vector2(x, y) * cellSize + originPosition;
-    }
-
-    public Vector2 GetTileCentrePosition(int x, int y) 
-    {
-        return new Vector2(x + cellSize/2, y + cellSize/2) * cellSize + originPosition;
-    }
-
-    // Get grid position from world position
+    // Convert world position to grid coordinates
     public void GetXY(Vector2 worldPosition, out int x, out int y)
     {
         x = Mathf.FloorToInt((worldPosition - originPosition).x / cellSize);
         y = Mathf.FloorToInt((worldPosition - originPosition).y / cellSize);
     }
 
-    ///////////////////////////////////////////////////////////////////////
-
-    /*
-    // Convert world position to grid position and set gridTile
-    public void SetGridTile(Vector2 worldPosition, TGridObject gridTile)
+    // Check if coordinates are within grid bounds
+    public bool IsValidPosition(int x, int y)
     {
-        int x, y;
-        GetXY(worldPosition, out x, out y);
-        SetGridTile(x, y, gridTile);
+        return x >= 0 && y >= 0 && x < width && y < height;
     }
 
-    // Set Value
-    public void SetGridTile(int x, int y, TGridObject gridTile)
+    // Get grid object at world position
+    public TGridObject GetGridObject(Vector2 worldPosition) 
     {
-        if (x >= 0 && y >= 0 && x < width && y < height)
+        GetXY(worldPosition, out int x, out int y);
+        return GetGridObject(x, y);
+    }
+
+    // Get grid object at grid coordinates
+    public TGridObject GetGridObject(int x, int y)
+    {
+        return IsValidPosition(x, y) ? gridArray[x,y] : default;
+    }
+
+    // Set grid object at grid coordinates
+    public void SetGridObject(int x, int y, TGridObject value)
+    {
+        if (IsValidPosition(x, y))
         {
-            gridArray[x, y] = gridTile;
-            if (OnGridValueChanged != null) OnGridValueChanged(this, new OnGridValueChangedEventArgs { x = x, y = y });
+            gridArray[x, y] = value;
+            TriggerGridObjectChanged(x, y);
         }
     }
 
-    */
-    public void TriggerGridObjectChanged(int x, int y) 
+    // Set grid object at world position
+    public void SetGridObject(Vector2 worldPosition, TGridObject value)
     {
-        if (OnGridValueChanged != null) OnGridValueChanged(this, new OnGridValueChangedEventArgs { x = x, y = y });
-    }
-    
-    ///////////////////////////////////////////////////////////////////////
-
-    // Convert world position to grid position and get gridTile
-    public TGridObject GetGridTile(Vector2 worldPosition) 
-    {
-        int x, y;
-        GetXY(worldPosition, out x , out y);
-        return GetGridTile(x, y);
+        GetXY(worldPosition, out int x, out int y);
+        SetGridObject(x, y, value);
     }
 
-    // Get Value
-    public TGridObject GetGridTile(int x, int y)
-    {
-        if (x >= 0 && y >= 0 && x < width && y < height) 
-        {
-            return gridArray[x, y];
-        } else {
-            return default(TGridObject);
-        }
-    }
-    
-    ///////////////////////////////////////////////////////////////////////
+#endregion
 
-    public bool ValidateGridPosition(Vector2Int gridPosition) 
-    {
-        if ((gridPosition.x >= 0 && gridPosition.x <= width - 1) && (gridPosition.y >= 0 && gridPosition.y <= height - 1))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-        
-    }
+
 
 }

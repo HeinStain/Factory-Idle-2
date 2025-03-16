@@ -8,7 +8,7 @@ public class Machine_Producer : Machine
 
 
     [Header("Grid")]
-    private Grid<GridMap.GridTile> gridArray;
+    private GridMap gridMap;
     private GridMap.GridTile outputTile;
     public Belt outputBelt;
 
@@ -35,7 +35,7 @@ public class Machine_Producer : Machine
     protected override void MachineSetup()
     {
         // Get grid first
-        gridArray = GameManager.Instance.GetGrid();
+        gridMap = GameManager.Instance.GetGrid();
 
         // Set skill tag from machine data
         skillTag = (ItemTag)System.Enum.Parse(typeof(ItemTag), machineData.skillName);
@@ -85,14 +85,14 @@ public class Machine_Producer : Machine
         }
 
         // Return the tile
-        outputTile = gridArray.ValidateGridPosition(tileXY) ? gridArray.GetGridTile(tileXY.x, tileXY.y) : null;
+        outputTile = gridMap.GetGridObject(tileXY.x, tileXY.y);
     }
 
     protected override void GetDispenseBelt()
     {
         // Check for Output Tile, Open state, and machine type of Belt
         if (outputTile == null || 
-            outputTile.GetTileState() != GridMap.GridTile.TileState.Open || 
+            outputTile.GetTileVisualState() != GridMap.GridTile.TileVisualState.Open || 
             outputTile.GetMachine()?.GetMachineName() != "Belt")
         {
             outputBelt = null; return;
