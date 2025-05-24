@@ -135,12 +135,8 @@ public class Machine_Producer : Machine
             tickTimer = 0;
 
             // Get output belt path
-            List<Belt> outputBeltPath = BeltManager.Instance.GetBeltPath(outputBelt);
-            // Get rotation offset
-            Vector2 offset = BeltManager.Instance.GetBeltCentreOffset(outputBeltPath[0]);
-            // Set output position
-            Vector3 outputPos = new Vector3(outputBeltPath[0].transform.position.x + offset.x, outputBeltPath[0].transform.position.y + offset.y, outputBelt.transform.position.z);
-            
+            Vector3 outputPos = outputBelt.GetBeltCentre();
+
             // Spawn object                                                     <   POS   >
             ItemManager.SpawnObject(outputBelt, ItemManager.Instance.itemPrefab, itemToCraft, outputPos, Quaternion.identity);
             

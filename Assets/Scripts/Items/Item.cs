@@ -1,26 +1,26 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-
+    private bool hasTransferredThisCycle;
     public SpriteRenderer spriteRenderer;
     public ItemData itemData;
 
+    public enum BeltItemState
+    {
+        IdleOnSlot,
+        MovingToExitSlot,
+        MovingToNextBeltSlot
+    }
+
+    public BeltItemState state;
 
     private Belt currentBelt;
-    List<Belt> currentBeltPath;
-    private int currentBeltIndex;
-    private float positionAlongBelt;
-
-    private float moveSpeed = 0.5f/30f; // Tiles per Ticks
-
-    private bool transitioningToNextPath = false;
-    private Vector3 transitionStart;
-    private Vector3 transitionEnd;
-    private float transitionProgress = 0f;
-
+    private Transform targetSlot;
+    private Vector3 movementStart;
+    private float transitionProgress;
+    private float transitionSpeed = 2f / 60f; // 2 seconds per belt
 
     private void Start()
     {
@@ -29,114 +29,116 @@ public class Item : MonoBehaviour
 
     public void ItemSetup(ItemData data, Belt spawnBelt)
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        // Set up item
         itemData = data;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sortingLayerName = "Items";
         spriteRenderer.sprite = itemData.icon;
-    
-        currentBelt = spawnBelt;
-        currentBeltPath = BeltManager.Instance.GetBeltPath(spawnBelt);
-        
-        for (int i = 0; i < currentBeltPath.Count; i++)
-        {
-            if (currentBeltPath[i] == spawnBelt)
-            {
-                currentBeltIndex = i;
-            }
-        }
 
-        positionAlongBelt = 0f;
+        // Set start belt
+        currentBelt = spawnBelt;
+        currentBelt.TryAddItem(this, null);
+
+        // Set movement 
+        movementStart = transform.position;
+        targetSlot = currentBelt.rearSlot; 
+        state = BeltItemState.MovingToNextBeltSlot;
+        transitionProgress = 0f;
     }
 
-    
     private void MoveItem(object sender, TickManager.OnTickEventArgs e)
     {
-        if (currentBelt == null) return;
+        if (currentBelt == null || targetSlot == null) return;
 
-        // Handle smooth transition between belt paths
-        if (transitioningToNextPath)
+        if (state == BeltItemState.MovingToExitSlot || state == BeltItemState.MovingToNextBeltSlot)
         {
-            transitionProgress += moveSpeed;
-            transform.position = Vector3.Lerp(transitionStart, transitionEnd, transitionProgress);
-
+            transitionProgress += transitionSpeed;
+            transform.position = Vector3.Lerp(movementStart, targetSlot.position, transitionProgress);
+            
             if (transitionProgress >= 1f)
             {
-                transitioningToNextPath = false;
+                transitionProgress = 0f;
 
-                // Carry over excess movement progress to the next belt
-                float excessProgress = transitionProgress - 1f;
-                positionAlongBelt = excessProgress;
+                if (state == BeltItemState.MovingToExitSlot)
+                {
+                    if (!hasTransferredThisCycle)
+                    {
+                        TryStartTransfer();
+                        // ✅ Only transfer once per cycle — moved to when item actually starts moving forward
+                    }
+                }
+                else if (state == BeltItemState.MovingToNextBeltSlot)
+                {
+                    bool frontOccupied = currentBelt.GetItemsOnBelt().Exists(i => i.GetCurrentSlot() == currentBelt.frontSlot);
+                    
+                    if (!frontOccupied)
+                    {
+                        movementStart = transform.position;
+                        targetSlot = currentBelt.frontSlot;
+                        state = BeltItemState.MovingToExitSlot;
+                    }
+                    else
+                    {
+                        state = BeltItemState.IdleOnSlot;
+                    }
 
-                // Update the belt path and index
-                currentBeltPath = BeltManager.Instance.GetBeltPath(currentBelt);
-                currentBeltIndex = 0;
-
-                // Immediately move the item along the new path
-                MoveAlongCurrentPath();
+                    hasTransferredThisCycle = false;
+                }
             }
-            return;
         }
 
-        // Move forward along the belt
-        positionAlongBelt += moveSpeed;
-
-        // Handle movement along the current belt path
-        if (positionAlongBelt >= 1f)
+        if (state == BeltItemState.IdleOnSlot)
         {
-            // Calculate excess movement progress
-            float excessProgress = positionAlongBelt - 1f;
+            bool frontOccupied = currentBelt.GetItemsOnBelt().Exists(i => i.GetCurrentSlot() == currentBelt.frontSlot);
 
-            // Move to the next belt in the path
-            currentBeltIndex++;
-            if (currentBeltIndex >= currentBeltPath.Count - 1)
+            if (!frontOccupied)
             {
-                // Prepare for a seamless transition to the next path
-                Belt nextBelt = BeltManager.Instance.GetNextBeltPath(currentBeltPath[currentBeltIndex]);
-                if (nextBelt != null)
-                {
-                    // Immediately start transitioning to the next belt
-                    transitioningToNextPath = true;
-                    transitionStart = currentBeltPath[currentBeltIndex].GetBeltCentre();
-                    transitionEnd = nextBelt.GetBeltCentre();
-                    transitionProgress = excessProgress; // Carry over excess movement progress
+                movementStart = transform.position;
+                targetSlot = currentBelt.frontSlot;
+                state = BeltItemState.MovingToExitSlot;
+                transitionProgress = 0f;
+                hasTransferredThisCycle = false; 
+            }
+            else if (!hasTransferredThisCycle)
+            {
+                TryStartTransfer(); 
+            }
+        }
+    }
 
-                    currentBelt = nextBelt;
-                    // Call MoveItem recursively to continue movement without waiting for the next tick
-                    MoveItem(sender, e);
-                    return;
-                }
-                else
-                {
-                    // No more belts to move to
-                    currentBelt = null;
-                    return;
-                }
+    private void TryStartTransfer()
+    {
+        Belt nextBelt = currentBelt.GetNextBelt();
+        if (nextBelt != null && nextBelt.HasSpace())
+        {
+            Belt oldBelt = currentBelt;
+
+            if (nextBelt.TryAddItem(this, currentBelt))
+            {
+                currentBelt.RemoveItem(this);
+                currentBelt = nextBelt;
+
+                movementStart = transform.position;
+                currentBelt.GetNeighbours();
+                targetSlot = currentBelt.GetInputSlot(oldBelt);
+                state = BeltItemState.MovingToNextBeltSlot;
+                hasTransferredThisCycle = true;
+                transitionProgress = 0f;
             }
             else
             {
-                // Move to the next belt in the current path
-                currentBelt = currentBeltPath[currentBeltIndex];
-                positionAlongBelt = excessProgress; // Carry over excess movement progress
+                state = BeltItemState.IdleOnSlot;
+                transitionProgress = 0f;
             }
-        }
-
-        // Move the item along the current belt path
-        MoveAlongCurrentPath();
-    }
-
-    private void MoveAlongCurrentPath()
-    {
-        if (currentBeltPath == null || currentBeltIndex >= currentBeltPath.Count - 1)
-        {
-            // If this is the only belt in the path or at the last belt, stay at its position
-            transform.position = currentBelt.GetBeltCentre();
         }
         else
         {
-            // Interpolate between the current belt and the next belt
-            Vector3 startPos = currentBelt.GetBeltCentre();
-            Vector3 endPos = currentBeltPath[currentBeltIndex + 1].GetBeltCentre();
-            transform.position = Vector3.Lerp(startPos, endPos, positionAlongBelt);
+            state = BeltItemState.IdleOnSlot;
+            transitionProgress = 0f;
         }
     }
-}
 
+    public void AssignSlot(Transform slot) => targetSlot = slot;
+    public Transform GetCurrentSlot() => targetSlot;
+
+}
