@@ -17,6 +17,7 @@ public class Machine_Producer : Machine
     public ItemData selectedRecipe;
     public ItemData itemToCraft;
 
+    private bool holdingCraftedItem = false;
 
     [Header("Data")]
     public bool respawningReservoir;
@@ -128,27 +129,32 @@ public class Machine_Producer : Machine
     private void CraftingCycle()
     {
 
-        // Craft
+        // Handle pending item
+        if (holdingCraftedItem)
+        {
+            //Debug.Log("function 1");
+            if (outputBelt != null && outputBelt.RearSlotAvailable()) 
+            { 
+                holdingCraftedItem = false;
+                ProduceItem(); 
+            }
+            return; // Don’t progress crafting until item is placed
+        }
+
+
+        // Normal crafting
         if (tickTimer >= machineData.defaultCraftingInterval && !respawningReservoir)
         {
-            // Timer
-            tickTimer = 0;
-
-            // Get output belt path
-            Vector3 outputPos = outputBelt.GetBeltCentre();
-
-            // Spawn object                                                     <   POS   >
-            ItemManager.SpawnObject(outputBelt, ItemManager.Instance.itemPrefab, itemToCraft, outputPos, Quaternion.identity);
-            
-            // Subtract from Reservoir Count
-            SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, itemToCraft.displayName, -1, true);
-
-            // Distribute XP
-            HandleXPDistribution();
-
-            // Check for last Reservoir Node
-            int currentNodeCount = SkillManager.Instance.GetDictionaryValue(reservoirNodeCounts, itemToCraft.displayName);
-            if (currentNodeCount < 1) { respawningReservoir = true; }   
+            if (outputBelt != null && outputBelt.RearSlotAvailable())
+            {
+                ProduceItem();
+                Debug.Log("function 2");
+            }
+            else
+            {
+                Debug.Log("function 1");
+                holdingCraftedItem = true;
+            }
         }
         
         // Respawn Reservoir
@@ -156,15 +162,42 @@ public class Machine_Producer : Machine
         {
             if (tickTimer >= timeToReservoirRespawn)
             {
-                // Timer
-                tickTimer = 0;
                 // Set Reservoir to max
                 int reservoirMax = SkillManager.Instance.GetDictionaryValue(reservoirMaxes, itemToCraft.displayName);
                 SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, itemToCraft.displayName, reservoirMax, false);
                 // Reset
                 respawningReservoir = false;
+                // Timer
+                tickTimer = 0;
             }
         }
+    }
+
+    private void ProduceItem()
+    {
+        Debug.Log("Main Function");
+        Vector3 outputPos = outputBelt.rearSlot.position;
+        GameObject obj = ItemManager.SpawnObject(outputBelt, ItemManager.Instance.itemPrefab, itemToCraft, outputPos, Quaternion.identity);
+        Item item = obj.GetComponent<Item>();
+
+        if (!outputBelt.GetItemsOnBelt().Contains(item))
+        {
+            GameObject.Destroy(obj);
+            holdingCraftedItem = true;
+            return;
+        }
+
+        if (!holdingCraftedItem) { tickTimer = 0; }
+
+        // Subtract from Reservoir Count
+        SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, itemToCraft.displayName, -1, true);
+
+        // Distribute XP
+        HandleXPDistribution();
+
+        // Check for last Reservoir Node
+        int currentNodeCount = SkillManager.Instance.GetDictionaryValue(reservoirNodeCounts, itemToCraft.displayName);
+        if (currentNodeCount < 1) { respawningReservoir = true; } 
     }
 
 #endregion

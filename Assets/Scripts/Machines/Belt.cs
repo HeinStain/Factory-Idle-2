@@ -154,8 +154,12 @@ public class Belt : Machine
     public bool HasSpace()
     {
         return !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rearSlot) ||
-            !itemsOnBelt.Exists(i => i.GetCurrentSlot() == leftSlot) ||
-            !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rightSlot);
+               !itemsOnBelt.Exists(i => i.GetCurrentSlot() == leftSlot) ||
+              !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rightSlot);
+    }
+    public bool RearSlotAvailable()
+    {
+        return !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rearSlot);
     }
     public bool TryAddItem(Item item, Belt source)
     {

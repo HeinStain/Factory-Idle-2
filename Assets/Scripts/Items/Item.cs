@@ -32,7 +32,7 @@ public class Item : MonoBehaviour
         // Set up item
         itemData = data;
         spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sortingLayerName = "Items";
+        //spriteRenderer.sortingLayerName = "Items";
         spriteRenderer.sprite = itemData.icon;
 
         // Set start belt
@@ -40,7 +40,7 @@ public class Item : MonoBehaviour
         currentBelt.TryAddItem(this, null);
 
         // Set movement 
-        movementStart = transform.position;
+        movementStart = currentBelt.rearSlot.position;
         targetSlot = currentBelt.rearSlot; 
         state = BeltItemState.MovingToNextBeltSlot;
         transitionProgress = 0f;
