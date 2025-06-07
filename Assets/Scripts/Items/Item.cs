@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using System.Linq;
 
 public class Item : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class Item : MonoBehaviour
     private float transitionProgress;
     private float transitionSpeed = 2f / 60f; // 2 seconds per belt
 
+    private int arrivalTick;
+
     private void Start()
     {
         TickManager.OnTick += MoveItem;
@@ -29,6 +32,7 @@ public class Item : MonoBehaviour
 
     public void ItemSetup(ItemData data, Belt spawnBelt)
     {
+        arrivalTick = TickManager.Instance.GetCurrentTick();
         // Set up item
         itemData = data;
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -93,13 +97,22 @@ public class Item : MonoBehaviour
 
             if (!frontOccupied)
             {
-                movementStart = transform.position;
-                targetSlot = currentBelt.frontSlot;
-                state = BeltItemState.MovingToExitSlot;
-                transitionProgress = 0f;
-                hasTransferredThisCycle = false; 
+                var items = currentBelt.GetItemsOnBelt();
+                bool iAmOldest = items
+                    // Get the other items idling on the belt
+                    .Where(i => i != this && i.state == BeltItemState.IdleOnSlot)
+                    // Return true if they arrived after this item
+                    .All(i => i.GetArrivalTick() > this.arrivalTick);
+                if (iAmOldest)
+                {
+                    movementStart = transform.position;
+                    targetSlot = currentBelt.frontSlot;
+                    state = BeltItemState.MovingToExitSlot;
+                    transitionProgress = 0f;
+                    hasTransferredThisCycle = false; 
+                }
             }
-            else if (!hasTransferredThisCycle)
+            else if (!hasTransferredThisCycle && targetSlot == currentBelt.frontSlot)
             {
                 TryStartTransfer(); 
             }
@@ -133,6 +146,7 @@ public class Item : MonoBehaviour
         }
         else
         {
+            arrivalTick = TickManager.Instance.GetCurrentTick();
             state = BeltItemState.IdleOnSlot;
             transitionProgress = 0f;
         }
@@ -140,5 +154,11 @@ public class Item : MonoBehaviour
 
     public void AssignSlot(Transform slot) => targetSlot = slot;
     public Transform GetCurrentSlot() => targetSlot;
+    
+    public int GetArrivalTick() => arrivalTick;
+
+
+    ////////////////////////////
+    
 
 }

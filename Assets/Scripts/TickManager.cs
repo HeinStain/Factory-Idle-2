@@ -22,6 +22,7 @@ public class TickManager : MonoBehaviour
 
     private void Awake()
     {  
+        Instance = this;
         tick = 0;
     }
     
@@ -37,4 +38,15 @@ public class TickManager : MonoBehaviour
             
         }
     }
+
+    //////////
+    ///
+    
+    public static TickManager Instance { get; private set; }
+
+    public int GetCurrentTick()
+    {
+        return tick;
+    }
+
 }
