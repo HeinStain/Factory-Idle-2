@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 
 public class Item : MonoBehaviour
 {
@@ -58,6 +59,7 @@ public class Item : MonoBehaviour
         {
             transitionProgress += transitionSpeed;
             transform.position = Vector3.Lerp(movementStart, targetSlot.position, transitionProgress);
+            UpdateSortingOrder();
             
             if (transitionProgress >= 1f)
             {
@@ -159,6 +161,24 @@ public class Item : MonoBehaviour
 
 
     ////////////////////////////
-    
+        
+    private void UpdateSortingOrder()
+    {
+        if (spriteRenderer == null || currentBelt == null) return;
 
+        int baseOrder = Mathf.RoundToInt(-transform.position.y * 100f);
+        int offset = 0;
+
+        switch (currentBelt.direction)
+        {
+            case MachineData.Direction.Right:
+                offset = Mathf.RoundToInt(-transform.position.x * 10f);
+                break;
+            case MachineData.Direction.Left:
+                offset = Mathf.RoundToInt(transform.position.x * 10f);
+                break;
+        }
+
+        spriteRenderer.sortingOrder = baseOrder + offset;
+    }
 }
