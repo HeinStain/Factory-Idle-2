@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public class BuildManager : MonoBehaviour
@@ -52,119 +53,120 @@ public class BuildManager : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.R))
             {
-                RotateHeldMachine();
+                direction = MachineData.GetNextRotationDirection(direction);
             }
 
             HandleMachineSelection();
         }
     }
 
-#region Controls
+#region Machine Placement
 
     private void PlaceMachine()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         gridMap.GetXY(mousePosition, out int x, out int y);
-        
+
         if (gridMap.GetGridObject(x,y) != null)
         {
             List<Vector2Int> gridPositionList = heldMachine.GetGridPositionList(new Vector2Int(x,y), direction);
-        
-            // Check if can build
-            bool canBuild = true;
-            foreach (Vector2Int position in gridPositionList)
-            {
-                if (gridMap.GetGridObject(position.x, position.y) == null)
-                {
-                    canBuild = false;
-                    break;
-                }
-                else if (gridMap.GetGridObject(position.x, position.y).CanBuild() == false)
-                {
-                    canBuild = false;
-                    break;
-                }
-            }
-
-            //Build
-            if (canBuild)
-            {
-                Vector2Int rotationOffset = heldMachine.GetRotationOffset(direction);
-                
-                Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
-                Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
-
-                if (heldMachine.hasDispenseBelt)
-                {
-
-                    Vector2Int dispensePos = machine.GetDispenseTileIndexOffset();
-                    Vector2 beltWorldPosition = gridMap.GetTileOriginPosition(dispensePos.x, dispensePos.y) + new Vector2Int(rotationOffset.x, rotationOffset.y);
-                     
-                    Vector2Int poo =  direction switch
-                    {
-                        MachineData.Direction.Up    =>   new Vector2Int(dispensePos.x += 0, dispensePos.y += 0),
-                        MachineData.Direction.Right =>   new Vector2Int(dispensePos.x += 0, dispensePos.y += 1),
-                        MachineData.Direction.Down  =>   new Vector2Int(dispensePos.x += 1, dispensePos.y += 1), 
-                        MachineData.Direction.Left  =>   new Vector2Int(dispensePos.x += 1, dispensePos.y += 0), 
-                        _ => new Vector2Int(dispensePos.x += 0, dispensePos.y += 0)
-                    };
-
-                    Machine belt = Machine.Create(beltWorldPosition, new Vector2Int(poo.x, poo.y), direction, machineList[0]);
-
-                    List<Machine> machines = new List<Machine> { machine };
-                    belt.AssignAssociatedMachines(machines);
-
-                    List<Machine> belts = new List<Machine> { belt };
-                    machine.AssignAssociatedMachines(belts);
-
-                    // Tell all tiles they're occupied
-                    foreach(Vector2Int tileXY in gridPositionList)
-                    {
-                        if (tileXY == poo)
-                        {
-                            gridMap.GetGridObject(tileXY.x, tileXY.y).SetMachine(belt);
-                            machine.DispenseUpdateCycle();
-                            
-                        }
-                        else
-                        {
-                            gridMap.GetGridObject(tileXY.x, tileXY.y).SetMachine(machine);
-                        }
-                    }
-                }
-                else
-                {
-                    // Tell all tiles they're occupied
-                    foreach(Vector2Int position in gridPositionList)
-                    {
-                        gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
-                    }
-                }
-
-                OnMachinePlaced?.Invoke(machine); 
-                
-            } 
-            else
-            {
-                Debug.Log("Cannot build here!");
-            }
+            
+            if (CanBuild(gridPositionList)) BuildMachine(gridPositionList, x, y);
+            else NotificationManager.Instance.DisplayNotification("Cannot build here!");
         }
     }
 
-   
+    private bool CanBuild(List<Vector2Int> gridPositionList)
+    {
+        int clearedCount = 0;
+
+        foreach (Vector2Int position in gridPositionList)
+        {
+            GridMap.GridTile tile = gridMap.GetGridObject(position.x, position.y);
+
+            if (tile != null && tile.CanBuild() == true) clearedCount++;
+        }
+
+        if (clearedCount == gridPositionList.Count) return true;
+        else return false;
+    }   
+
+    private void BuildMachine(List<Vector2Int> gridPositionList, int x, int y)
+    {
+        // Get Machine positioning
+        Vector2Int rotationOffset = heldMachine.GetRotationOffset(direction);
+        Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
+
+        // Create Machine
+        Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
+
+        if (heldMachine.hasDispenseBelt)
+        {
+            // Get Belt positioning
+            Vector2Int dispensePos = machine.GetDispenseTileIndexOffset();
+            Vector2Int beltRotationOffset = machineList[0].GetRotationOffset(direction);
+            Vector2 beltWorldPosition = gridMap.GetTileOriginPosition(dispensePos.x, dispensePos.y) + new Vector2Int(beltRotationOffset.x, beltRotationOffset.y);
+
+            // Create Belt
+            Machine belt = Machine.Create(beltWorldPosition, dispensePos, direction, machineList[0]);
+
+            // Assign associations
+            List<Machine> machines = new List<Machine> { machine };
+            belt.AssignAssociatedMachines(machines);
+            List<Machine> belts = new List<Machine> { belt };
+            machine.AssignAssociatedMachines(belts);
+
+            // Tell all tiles they're occupied
+            foreach(Vector2Int position in gridPositionList)
+            {
+                if (position == dispensePos)
+                {
+                    gridMap.GetGridObject(position.x, position.y).SetMachine(belt);
+                }
+                gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
+            }
+        }
+        else
+        {
+            // Tell all tiles they're occupied
+            foreach(Vector2Int position in gridPositionList)
+            {
+                gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
+            }
+        }
+
+        machine.DispenseUpdateCycle();
+        OnMachinePlaced?.Invoke(machine); 
+    }
+
+#endregion
+
+#region Machine Deletion
+
     private void ClearMachine()
     {
+        //CHEKK TILE IS VALIS 
+
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GridMap.GridTile gridTile = gridMap.GetGridObject(mousePosition);
+
+
         Machine machine = gridTile.GetMachine();
+        Belt belt = gridTile.GetBelt();
+                
+        if (belt != null)
+        {
+            DestroyMachinesAtPositions(new List<Machine> { belt });
+        }
+        
+        if (machine != null)
+        {
+            // Destroy associated machines
+            DestroyMachinesAtPositions(machine.GetAssociatedMachines());
+            // Destroy the main machine
+            DestroyMachinesAtPositions(new List<Machine> { machine });
+        }
 
-        if (machine == null) return; // Exit if no machine is found
-
-        // Destroy associated machines
-        DestroyMachinesAtPositions(machine.associatedMachines);
-
-        // Destroy the main machine
-        DestroyMachinesAtPositions(new List<Machine> { machine });
     }
 
 
@@ -175,22 +177,16 @@ public class BuildManager : MonoBehaviour
             foreach (Vector2Int position in m.GetGridPositionList())
             {
                 GridMap.GridTile tile = gridMap.GetGridObject(position.x, position.y);
-                Machine tileMachine = tile.GetMachine();
-
-                if (tileMachine != null)
+                if (tile != null)
                 {
-                    tileMachine.DestroySelf();
+                    tile.GetMachine()?.DestroySelf();
+                    tile.GetBelt()?.DestroySelf();
                     tile.ClearMachine();
                 }
             }
         }
     }
 
-
-    private void RotateHeldMachine()
-    {
-        direction = MachineData.GetNextRotationDirection(direction);
-    }
 #endregion
 
 #region Machine Selection

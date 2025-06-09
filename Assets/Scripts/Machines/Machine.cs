@@ -8,7 +8,7 @@ public class Machine : MonoBehaviour
     protected MachineData machineData;
     [SerializeField] protected Vector2Int originXY;
     public MachineData.Direction direction;
-    public List<Machine> associatedMachines;
+    private List<Machine> associatedMachines;
     public int tickTimer;
     public bool functioning = false;
 
@@ -94,6 +94,11 @@ public class Machine : MonoBehaviour
     public void AssignAssociatedMachines(List<Machine> machines)
     {   
         associatedMachines = machines;
+    }
+
+    public List<Machine> GetAssociatedMachines()
+    {
+        return associatedMachines;
     }
 
 }

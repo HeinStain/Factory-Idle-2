@@ -50,8 +50,8 @@ public class Belt : Machine
         }
         itemsOnBelt.Clear();
 
-        // Remove self from grid before updating neighbors
-        gridMap.GetGridObject(originXY.x, originXY.y)?.ClearMachine();
+        gridMap.GetGridObject(originXY.x, originXY.y)?.ClearBelt();
+
         RefreshSurroundingBelts();
     }
 
@@ -73,15 +73,16 @@ public class Belt : Machine
 
     public void GetNeighbourBelts()
     {
-        Belt candidate = GetBelt(nextAvailableTile);
-        nextAvailableBelt = candidate != null && candidate.direction != GetNegativeDirection(this) ? candidate : null;
-        rearBelt = GetBelt(rearTile);
-        rightBelt = GetBelt(rightTile);
-        leftBelt = GetBelt(leftTile);
+        Belt candidate = GetBeltFromTile(nextAvailableTile);
+        nextAvailableBelt = candidate != null && nextAvailableTile.GetMachine() == null && candidate.direction != GetNegativeDirection(this) ? candidate : null;
 
-        Belt GetBelt(GridMap.GridTile tile)
+        rearBelt = GetBeltFromTile(rearTile);
+        rightBelt = GetBeltFromTile(rightTile);
+        leftBelt = GetBeltFromTile(leftTile);
+
+        Belt GetBeltFromTile(GridMap.GridTile tile)
         {
-            return tile != null && tile.GetMachine() is Belt b ? b : null;
+            return tile?.GetBelt();
         }
     }
 

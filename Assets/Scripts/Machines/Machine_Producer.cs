@@ -6,6 +6,7 @@ using System.Linq;
 public class Machine_Producer : Machine
 {
 
+    public override string ToString() => "Producer";
 
     [Header("Grid")]
     private GridMap gridMap;
@@ -54,8 +55,6 @@ public class Machine_Producer : Machine
                     SkillManager.Instance.GetDictionaryValue(reservoirMaxes, item.displayName));
             }
         }
-
-        DispenseUpdateCycle();
     }
 
 
@@ -76,6 +75,7 @@ public class Machine_Producer : Machine
         // Get machine origin
         Vector2Int tileXY = originXY;
         
+        Debug.Log(originXY);
         // Calculate tile Position
         switch (direction)
         {
@@ -94,13 +94,13 @@ public class Machine_Producer : Machine
         // Check for Output Tile, Open state, and machine type of Belt
         if (outputTile == null || 
             outputTile.GetTileVisualState() != GridMap.GridTile.TileVisualState.Open || 
-            outputTile.GetMachine()?.GetMachineName() != "Belt")
+            outputTile.GetBelt() == null)
         {
             outputBelt = null; return;
         }
 
         // Get Belt
-        Belt belt = outputTile.GetMachine() as Belt;
+        Belt belt = outputTile.GetBelt();
         outputBelt = belt;
     }
 
@@ -111,9 +111,9 @@ public class Machine_Producer : Machine
         tileXY = direction switch
         {
             MachineData.Direction.Up     =>   new Vector2Int(tileXY.x += 1, tileXY.y += 1),   
-            MachineData.Direction.Right  =>   new Vector2Int(tileXY.x += 1, tileXY.y -= 1),
-            MachineData.Direction.Down   =>   new Vector2Int(tileXY.x -= 1, tileXY.y -= 1),  
-            MachineData.Direction.Left   =>   new Vector2Int(tileXY.x -= 1, tileXY.y += 1),
+            MachineData.Direction.Right  =>   new Vector2Int(tileXY.x += 1, tileXY.y += 0),
+            MachineData.Direction.Down   =>   new Vector2Int(tileXY.x += 0, tileXY.y += 0),  
+            MachineData.Direction.Left   =>   new Vector2Int(tileXY.x += 0, tileXY.y += 1),
             _ => tileXY
             
         };

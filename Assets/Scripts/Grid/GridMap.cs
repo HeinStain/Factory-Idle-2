@@ -54,7 +54,8 @@ public class GridMap : Grid<GridMap.GridTile>
         private GridMap grid;
         private readonly int x, y;
         private TileVisualState tileVisualState;
-        private Machine machine;
+        private Machine placedMachine;
+        private Belt placedBelt;
         private int unlockCost;
 
 
@@ -65,19 +66,14 @@ public class GridMap : Grid<GridMap.GridTile>
             this.y = y;
         }
 
-        public bool CanBuild() => tileVisualState == TileVisualState.Open && machine == null;
-        public Machine GetMachine() => machine;
+        public bool CanBuild() => tileVisualState == TileVisualState.Open && placedMachine == null && placedBelt == null;
+        public Machine GetMachine() => placedMachine;
+        public Belt GetBelt() => placedBelt;
         public TileVisualState GetTileVisualState() => tileVisualState;
         public int GetUnlockCost() => unlockCost;
         public Vector2 GetTileCentrePosition() => grid.GetTileCentrePosition(x, y);
         public Vector2Int GetTileXY() => new Vector2Int(x, y);
     
-
-
-
-
-
-
         public void SetTileVisualState(TileVisualState tileVisualState)
         {
             this.tileVisualState = tileVisualState;
@@ -92,13 +88,26 @@ public class GridMap : Grid<GridMap.GridTile>
 
         public void SetMachine(Machine machine)
         {
-            this.machine = machine;
+            if (machine is Belt belt)
+            {
+                placedBelt = belt;
+            }
+            else
+            {
+                placedMachine = machine;
+            }
+            grid.TriggerGridObjectChanged(x, y);
+        }
+        public void ClearBelt()
+        {
+            placedBelt = null;
             grid.TriggerGridObjectChanged(x,y);
         }
 
         public void ClearMachine()
         {
-            machine = null;
+            placedBelt = null;
+            placedMachine = null;
             grid.TriggerGridObjectChanged(x,y);
         }
 
@@ -107,7 +116,7 @@ public class GridMap : Grid<GridMap.GridTile>
 
         public override string ToString()
         {
-            return $"{x},{y}\n{machine}";
+            return $"{x},{y}\n{placedMachine}\n{placedBelt}";
         }
     }
 
