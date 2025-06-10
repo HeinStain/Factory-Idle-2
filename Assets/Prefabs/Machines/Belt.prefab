@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4246399917962311415
 Transform:
   m_ObjectHideFlags: 0
@@ -286,6 +286,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3473014918671703096}
   - component: {fileID: -1700730806921815329}
+  - component: {fileID: 1074970226333127544}
   m_Layer: 0
   m_Name: Belt
   m_TagString: Untagged
@@ -325,7 +326,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originXY: {x: 0, y: 0}
   direction: 0
-  associatedMachines: []
   tickTimer: 0
   functioning: 0
   skillTag: 0
@@ -349,6 +349,29 @@ MonoBehaviour:
   end: {fileID: 1184773433, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
   none: {fileID: 2085357177, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
   start: {fileID: 31753576, guid: 1d52b78c4ef07734a8d45fd4ebd47400, type: 3}
+  animator: {fileID: 1074970226333127544}
+--- !u!95 &1074970226333127544
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7670415803589043410}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3dbbf2ea77c2c64408f73222dd3f62c8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7905587890285003829
 GameObject:
   m_ObjectHideFlags: 0

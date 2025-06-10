@@ -33,6 +33,9 @@ public class Belt : Machine
     private BeltVisualState visualState;
     private enum BeltVisualState { Straight, RightTurn, LeftTurn, StraightWithRight, StraightWithLeft, BothSides, StraightWithSides, End, None, Start, }
     
+    [SerializeField] private Animator animator;
+    private int animState;
+
     protected override void MachineSetup()
     {
         gridMap = GameManager.Instance.GetGrid();
@@ -53,6 +56,11 @@ public class Belt : Machine
         gridMap.GetGridObject(originXY.x, originXY.y)?.ClearBelt();
 
         RefreshSurroundingBelts();
+    }
+    private void Update()
+    {    
+        float normalizedTime = (BeltSync.sharedTimer * TickManager.beltsPerSecond) % 1f;
+        animator.Play(visualState.ToString(), 0, normalizedTime);
     }
 
     public void GetNeighbours()
@@ -131,21 +139,7 @@ public class Belt : Machine
                 _      => BeltVisualState.None
             };
 
-            spriteRenderer.sprite = visualState switch
-            {
-                BeltVisualState.Straight           => straight,
-                BeltVisualState.RightTurn          => rightTurn,
-                BeltVisualState.LeftTurn           => leftTurn,
-                BeltVisualState.StraightWithRight  => straightWithRight,
-                BeltVisualState.StraightWithLeft   => straightWithLeft,
-                BeltVisualState.BothSides          => bothSides,
-                BeltVisualState.StraightWithSides  => straightWithSides,
-                BeltVisualState.End                => end,
-                BeltVisualState.Start              => start,
-                _                                  => none
-            };
-            
-            spriteRenderer.sortingLayerName = "Items";
+            spriteRenderer.sortingLayerName = "Belts";
         }
     }
 
@@ -156,7 +150,7 @@ public class Belt : Machine
     {
         return !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rearSlot) ||
                !itemsOnBelt.Exists(i => i.GetCurrentSlot() == leftSlot) ||
-              !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rightSlot);
+               !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rightSlot);
     }
     public bool RearSlotAvailable()
     {

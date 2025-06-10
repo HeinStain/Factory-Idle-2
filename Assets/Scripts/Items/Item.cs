@@ -22,7 +22,9 @@ public class Item : MonoBehaviour
     private Transform targetSlot;
     private Vector3 movementStart;
     private float transitionProgress;
-    private float transitionSpeed = 2f / 60f; // 2 seconds per belt
+
+    private float transitionSpeed = 2 * (TickManager.beltsPerSecond / TickManager.ticksPer); 
+
 
     private int arrivalTick;
 
@@ -53,6 +55,7 @@ public class Item : MonoBehaviour
 
     private void MoveItem(object sender, TickManager.OnTickEventArgs e)
     {
+        
         if (currentBelt == null || targetSlot == null) return;
 
         if (state == BeltItemState.MovingToExitSlot || state == BeltItemState.MovingToNextBeltSlot)

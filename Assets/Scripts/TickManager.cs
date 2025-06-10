@@ -6,15 +6,17 @@ using TMPro;
 
 public class TickManager : MonoBehaviour
 {
+    public static TickManager Instance { get; private set; }
+
     public class OnTickEventArgs : EventArgs
     {
         public int tick;
     }
     public static event EventHandler<OnTickEventArgs> OnTick;
 
-    // 1 / 0.05 = 20 t/s
-    private const float tickTimerMax = 1f/30f;
-
+    public static float beltsPerSecond =  1f;
+    public static float ticksPer = 60f;
+    public static float tickTimerMax => 1f / ticksPer;
 
     private int tick;
     private float tickTimer;
@@ -26,7 +28,6 @@ public class TickManager : MonoBehaviour
         tick = 0;
     }
     
-    // Update is called once per frame
     void Update()
     {
         tickTimer += Time.deltaTime;
@@ -38,11 +39,6 @@ public class TickManager : MonoBehaviour
             
         }
     }
-
-    //////////
-    ///
-    
-    public static TickManager Instance { get; private set; }
 
     public int GetCurrentTick()
     {
