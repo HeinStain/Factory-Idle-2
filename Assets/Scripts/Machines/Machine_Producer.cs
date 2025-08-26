@@ -132,7 +132,6 @@ public class Machine_Producer : Machine
         // Handle pending item
         if (holdingCraftedItem)
         {
-            //Debug.Log("function 1");
             if (outputBelt != null && outputBelt.RearSlotAvailable()) 
             { 
                 holdingCraftedItem = false;
@@ -148,11 +147,9 @@ public class Machine_Producer : Machine
             if (outputBelt != null && outputBelt.RearSlotAvailable())
             {
                 ProduceItem();
-                Debug.Log("function 2");
             }
             else
             {
-                Debug.Log("function 1");
                 holdingCraftedItem = true;
             }
         }
@@ -175,7 +172,6 @@ public class Machine_Producer : Machine
 
     private void ProduceItem()
     {
-        Debug.Log("Main Function");
         Vector3 outputPos = outputBelt.rearSlot.position;
         GameObject obj = ItemManager.SpawnObject(outputBelt, ItemManager.Instance.itemPrefab, itemToCraft, outputPos, Quaternion.identity);
         Item item = obj.GetComponent<Item>();

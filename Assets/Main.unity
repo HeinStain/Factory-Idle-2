@@ -1582,6 +1582,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0df94d6630a9a4b419521034351082cc, type: 2}
   - {fileID: 11400000, guid: 6e30fd5439fb1dc4e8ed5316ccf06769, type: 2}
   - {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
+  heldMachine: {fileID: 0}
+  draggingBelt: 0
 --- !u!4 &616188007
 Transform:
   m_ObjectHideFlags: 0
@@ -1610,7 +1612,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f98dbaf741554e4f82b712068603087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sharedTimer: 0
 --- !u!1 &626607156
 GameObject:
   m_ObjectHideFlags: 0
@@ -2699,6 +2700,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f41256f0bbcf0b4c83fbed93aaf1675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  beltGhostPrefab: {fileID: 5566520565227596504, guid: dd6026fc66580074db2493e5372f1bf1, type: 3}
+  visuals: {fileID: 11400000, guid: 6804f59078fe5e546b70de0de1cc5d59, type: 2}
 --- !u!4 &1312024858
 Transform:
   m_ObjectHideFlags: 0

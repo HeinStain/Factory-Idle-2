@@ -27,14 +27,15 @@ public class Belt : Machine
 
     [Header("Visual")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private Sprite straight, rightTurn, leftTurn, straightWithRight, straightWithLeft, bothSides, straightWithSides, end, none, start;
+    [SerializeField] private Animator animator;
+
+
+    [Header("Shared Visual Library")]
+    [SerializeField] private BeltVisualLibrary visuals;   // <-- new
 
 
     private BeltVisualState visualState;
-    private enum BeltVisualState { Straight, RightTurn, LeftTurn, StraightWithRight, StraightWithLeft, BothSides, StraightWithSides, End, None, Start, }
     
-    [SerializeField] private Animator animator;
-    private int animState;
 
     protected override void MachineSetup()
     {
@@ -54,7 +55,6 @@ public class Belt : Machine
         itemsOnBelt.Clear();
 
         gridMap.GetGridObject(originXY.x, originXY.y)?.ClearBelt();
-
         RefreshSurroundingBelts();
     }
     private void Update()

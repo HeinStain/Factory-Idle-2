@@ -111,6 +111,12 @@ public class GridMap : Grid<GridMap.GridTile>
             grid.TriggerGridObjectChanged(x,y);
         }
 
+        public bool IsBlockedForBelt(bool allowOverwriteBelts)
+        {
+            if (placedMachine != null) return true;                 // machine present => blocked
+            if (!allowOverwriteBelts && placedBelt != null) return true;
+            return tileVisualState != TileVisualState.Open;         // optional extra checks
+        }
         
         ///////////////////////////
 
