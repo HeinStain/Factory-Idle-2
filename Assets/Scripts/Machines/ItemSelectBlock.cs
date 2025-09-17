@@ -44,12 +44,12 @@ public class ItemSelectBlock : MonoBehaviour
         int currentitemMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, titleText.text);
         float currentitemMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, titleText.text);
         float xpToNextMasteryLevel = SkillManager.Instance.Calculate_XPToNextLevel(currentitemMasteryLevel) - currentitemMasteryXP;
-        float masteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineName());
+        float masteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineData().machineName);
         
         if (masteryPoolXP >= xpToNextMasteryLevel)
         {
             // item Mastery Level Up
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineName(), -xpToNextMasteryLevel, true);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineData().machineName, -xpToNextMasteryLevel, true);
             SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryLevels, titleText.text, currentitemMasteryLevel + 1, false);
             SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryXPCount, titleText.text, 0, false);
             SkillManager.Instance.ModifyDictionaryValue(producer.reservoirMaxes, titleText.text, currentitemMasteryLevel + 1 + 5, false);

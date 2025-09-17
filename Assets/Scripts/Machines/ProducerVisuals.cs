@@ -128,13 +128,13 @@ public class ProducerVisuals : MonoBehaviour
         if (placed)
         {
             if (menuOpen) { UpdateMenuVisuals(); }     // Visuals
-            anim.SetBool("IsActive", producer.functioning);      // producer Animation
+            anim.SetBool("IsActive", producer.turnedOn);      // producer Animation
         }
 
         // Progress Bar
         if (producer != null)
         {
-            if (producer.functioning)
+            if (producer.turnedOn)
             {
                 if (producer.respawningReservoir)
                 {
@@ -147,7 +147,7 @@ public class ProducerVisuals : MonoBehaviour
                 {
                     machineProgressBar.GetComponent<SpriteRenderer>().sprite = greenProgressBar;
     
-                    float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.GetMachineData().defaultCraftingInterval);
+                    float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.GetMachineData().skill.defaultCraftingInterval);
                     machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
                 }
             }
@@ -205,7 +205,7 @@ public class ProducerVisuals : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Selecting item: {item.displayName} for {producer.GetMachineData().skillName}");
+        Debug.Log($"Selecting item: {item.displayName} for {producer.GetMachineData().skill.skillName}");
         
         if (ItemManager.Instance.itemList.Contains(item))
         {
@@ -214,7 +214,7 @@ public class ProducerVisuals : MonoBehaviour
                 selectedRecipe = item;
                 producer.selectedRecipe = item;
                 producer.respawningReservoir = false;
-                producer.functioning = false;
+                producer.turnedOn = false;
 
                 UpdateSelectedItemVisuals(item);
                 SetCraftButton();
@@ -237,7 +237,7 @@ public class ProducerVisuals : MonoBehaviour
 
     public void ButtonSwitch()
     {
-        if (producer.functioning)
+        if (producer.turnedOn)
         {
             SetStopButton();
         }
@@ -295,7 +295,7 @@ public class ProducerVisuals : MonoBehaviour
 
             // Cache dictionary lookups to avoid multiple calls
             string itemName = selectedRecipe.displayName;
-            string skillName = producer.GetMachineData().skillName;
+            string skill = producer.GetMachineData().skill.skillName;
 
             // Verify all required dictionary entries exist
             if (!SkillManager.Instance.itemMasteryLevels.ContainsKey(itemName) ||
@@ -303,7 +303,7 @@ public class ProducerVisuals : MonoBehaviour
                 !producer.reservoirNodeCounts.ContainsKey(itemName) ||
                 !producer.reservoirMaxes.ContainsKey(itemName))
             {
-                Debug.LogError($"Missing dictionary entries for {itemName} in {skillName}");
+                Debug.LogError($"Missing dictionary entries for {itemName} in {skill}");
                 return;
             }
 
@@ -319,7 +319,7 @@ public class ProducerVisuals : MonoBehaviour
             
             veinCountText.text = SkillManager.Instance.GetDictionaryValue(producer.reservoirNodeCounts, itemName) + "/" + SkillManager.Instance.GetDictionaryValue(producer.reservoirMaxes, itemName);
             itemValueText.text = selectedRecipe.value.ToString();
-            timeToCraftText.text = (producer.GetMachineData().defaultCraftingInterval / 30).ToString("F2");
+            timeToCraftText.text = (producer.GetMachineData().skill.defaultCraftingInterval / 30).ToString("F2");
             xpText.text = selectedRecipe.XP.ToString();
             
             // Only calculate mastery XP if all required data exists
@@ -381,25 +381,25 @@ public class ProducerVisuals : MonoBehaviour
     private void UpdateSkillAndMasteryInfo()
     {
         // Skill Level and XP
-        skillLevelText.text = "Level " + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, producer.GetMachineData().skillName);
+        skillLevelText.text = "Level " + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, producer.GetMachineData().skill.skillName);
 
-        int currentSkillLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, producer.GetMachineData().skillName);
-        float currentSkillXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, producer.GetMachineData().skillName);
+        int currentSkillLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, producer.GetMachineData().skill.skillName);
+        float currentSkillXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, producer.GetMachineData().skill.skillName);
         
         float p2 = Mathf.Clamp01(currentSkillXP / SkillManager.Instance.Calculate_XPToNextLevel(currentSkillLevel));
         skillLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p2);
         skillLevelProgressText.text  =  (int)currentSkillXP + " / " + SkillManager.Instance.Calculate_XPToNextLevel(currentSkillLevel).ToString();
 
         // Mastery Pool 
-        float currentMasteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineData().skillName);
+        float currentMasteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineData().skill.skillName);
        
         float p3 = Mathf.Clamp01(currentMasteryPoolXP / 11500000f);
         masteryPoolProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p3);
-        masteryPoolPercentText.text = "Mastery - " + ((currentMasteryPoolXP / producer.GetMachineData().masteryPoolSize) * 100f).ToString("F2") + "%";
-        masteryPoolProgressText.text  =  (int)currentMasteryPoolXP + " / " + producer.GetMachineData().masteryPoolSize;
+        masteryPoolPercentText.text = "Mastery - " + ((currentMasteryPoolXP / producer.GetMachineData().skill.masteryPoolSize) * 100f).ToString("F2") + "%";
+        masteryPoolProgressText.text  =  (int)currentMasteryPoolXP + " / " + producer.GetMachineData().skill.masteryPoolSize;
 
         // Progress Bar
-        if (producer.functioning)
+        if (producer.turnedOn)
         {
             if (producer.respawningReservoir)
             {
@@ -413,9 +413,9 @@ public class ProducerVisuals : MonoBehaviour
             else
             {
                 progressBar.GetComponent<Image>().sprite = redProgressBar;
-                progressPercentText.text = (((float)producer.tickTimer / (float)producer.GetMachineData().defaultCraftingInterval) * 100).ToString("F0") + "%";
+                progressPercentText.text = (((float)producer.tickTimer / (float)producer.GetMachineData().skill.defaultCraftingInterval) * 100).ToString("F0") + "%";
 
-                float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.GetMachineData().defaultCraftingInterval);
+                float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.GetMachineData().skill.defaultCraftingInterval);
                 progressBar.transform.localScale = new Vector3(t,1f,1f);
             }
         }

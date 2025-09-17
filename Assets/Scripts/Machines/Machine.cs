@@ -10,7 +10,7 @@ public class Machine : MonoBehaviour
     public MachineData.Direction direction;
     private List<Machine> associatedMachines;
     public int tickTimer;
-    public bool functioning = false;
+    public bool turnedOn = false;
 
     [SerializeField] protected ItemTag skillTag;
     public ItemTag SkillTag => skillTag;  // Read-only property
@@ -49,56 +49,47 @@ public class Machine : MonoBehaviour
 
     protected virtual void MachineSetup() { }
 
-    public List<Vector2Int> GetGridPositionList()
-    {
-        return machineData.GetGridPositionList(originXY, direction);
-    }
-
-    public string GetMachineName()
-    {
-        return machineData.machineName;
-    }
-
-    public MachineData GetMachineData()
-    {
-        return machineData;
-    }
-
-
-    public Vector2Int GetMachineOrigin()
-    {
-        return originXY;
-    }
-
-    public void DestroySelf()
-    {
-        ClearMachine();
-        Destroy(gameObject);
-    }
-
-    protected virtual void ClearMachine() {}
-
-    public void DispenseUpdateCycle()
-    {
-        //Get output belt
-        GetDispenseTile();
-        GetDispenseBelt();
-    }
-
-    protected virtual void GetDispenseTile() {}
+    public Vector2Int GetMachineOrigin() => originXY;
+    public MachineData GetMachineData() => machineData;
     
-    protected virtual void GetDispenseBelt() {}
+
+
 
     public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
-    
-    public void AssignAssociatedMachines(List<Machine> machines)
-    {   
-        associatedMachines = machines;
-    }
 
-    public List<Machine> GetAssociatedMachines()
-    {
-        return associatedMachines;
-    }
+    public List<Vector2Int> GetGridPositionList() => machineData.GetGridPositionList(originXY, direction);
+
+
+
+
+    
+    public void AssignAssociatedMachines(List<Machine> machines) => associatedMachines = machines;
+    public List<Machine> GetAssociatedMachines() => associatedMachines;
+
+#region UNNAMED
+
+
+
+#endregion
+
+#region UpdateCycle
+
+    public void BeltCheckUpdateCycle() { GetDispenseTile(); GetDispenseBelt(); GetIntakeTile(); GetIntakeBelt(); }
+
+    protected virtual void GetDispenseTile() {}
+    protected virtual void GetDispenseBelt() {}
+    protected virtual void GetIntakeTile() {}
+    protected virtual void GetIntakeBelt() {}
+
+#endregion
+
+#region Destruction
+
+    public void DestroySelf() { ClearMachine(); Destroy(gameObject); }
+    
+    protected virtual void ClearMachine() {}
+
+#endregion
+
 
 }

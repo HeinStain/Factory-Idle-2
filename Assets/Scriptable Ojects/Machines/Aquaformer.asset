@@ -13,13 +13,10 @@ MonoBehaviour:
   m_Name: Aquaformer
   m_EditorClassIdentifier: 
   machineName: Aquaformer
-  skillName: Aquaforming
+  skill: {fileID: 11400000, guid: 53c6705e7ea365744810029046a2725b, type: 2}
   prefab: {fileID: 5350698049709243800, guid: dbf896c40757f2346bd07e1041b69ed0, type: 3}
   visual: {fileID: 5671109144962825261, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
   width: 2
   height: 2
   hasDispenseBelt: 1
   hasIntakeBelt: 0
-  energyCost: 750
-  defaultCraftingInterval: 90
-  masteryPoolSize: 20000000

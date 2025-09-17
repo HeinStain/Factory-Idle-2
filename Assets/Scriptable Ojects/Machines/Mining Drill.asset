@@ -13,13 +13,10 @@ MonoBehaviour:
   m_Name: Mining Drill
   m_EditorClassIdentifier: 
   machineName: Mining Drill
-  skillName: Mining
+  skill: {fileID: 11400000, guid: b2b1bf6f02920844aaf8751397d30fe2, type: 2}
   prefab: {fileID: 6136277925444215783, guid: 63c6ecffa54444c42b1c04f5adddea2d, type: 3}
   visual: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}
   width: 2
   height: 2
   hasDispenseBelt: 1
   hasIntakeBelt: 0
-  energyCost: 500
-  defaultCraftingInterval: 90
-  masteryPoolSize: 27500000

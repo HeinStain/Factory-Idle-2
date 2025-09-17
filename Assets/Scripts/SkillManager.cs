@@ -43,21 +43,20 @@ public class SkillManager : MonoBehaviour
     {
         if (isInitialized) return;
 
-        //Debug.Log("=== Starting SkillManager Initialization ===");
-
         // Initialize skill-related dictionaries
         foreach (MachineData machine in BuildManager.Instance.machineList)
         {
-            skillLevels.TryAdd(machine.skillName, 1);
-            skillXP.TryAdd(machine.skillName, 0);
-            skillMasteryPoolXP.TryAdd(machine.skillName, 0);
-            //Debug.Log($"Initialized skill: {machine.skillName}");
+            if (machine.skill != null)
+            {
+                skillLevels.TryAdd(machine.skill.skillName, 1);
+                skillXP.TryAdd(machine.skill.skillName, 0);
+                skillMasteryPoolXP.TryAdd(machine.skill.skillName, 0);
+            }
         }
 
         // Initialize item-related dictionaries
         foreach (ItemData item in ItemManager.Instance.itemList)
         {
-            //Debug.Log($"Initializing item: {item.displayName} with tags: {string.Join(", ", item.tags)}");
             itemMasteryLevels.TryAdd(item.displayName, 1);
             itemMasteryXPCount.TryAdd(item.displayName, 0f);
             itemUnlockedStatus.TryAdd(item.displayName, false);

@@ -7,16 +7,13 @@ public class MachineData : ScriptableObject
 {
     
     public string machineName;
-    public string skillName;
+    public SkillData skill;
     public Transform prefab;
     public Transform visual;
     public int width;
     public int height;
     public bool hasDispenseBelt;
     public bool hasIntakeBelt;
-    public int energyCost;
-    public int defaultCraftingInterval;
-    public int masteryPoolSize;
 
     public enum Direction
     {

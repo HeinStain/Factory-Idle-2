@@ -146,16 +146,19 @@ public class Belt : Machine
 
     #region Items
     public List<Item> GetItemsOnBelt() => itemsOnBelt;
+
     public bool HasSpace()
     {
         return !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rearSlot) ||
                !itemsOnBelt.Exists(i => i.GetCurrentSlot() == leftSlot) ||
                !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rightSlot);
     }
+
     public bool RearSlotAvailable()
     {
         return !itemsOnBelt.Exists(i => i.GetCurrentSlot() == rearSlot);
     }
+
     public bool TryAddItem(Item item, Belt source)
     {
         Transform inputSlot = GetInputSlot(source);
@@ -165,8 +168,31 @@ public class Belt : Machine
         itemsOnBelt.Add(item);
         return true;
     }
+
     public void RemoveItem(Item item) => itemsOnBelt.Remove(item);
+
+    public Item PeekFrontItem()
+    {
+        return itemsOnBelt.Find(i => i != null && i.GetCurrentSlot() == frontSlot);
+    }
+
+    public Item RemoveFrontItem(bool despawn = false)
+    {
+        var item = PeekFrontItem();
+        if (item == null) return null;
+
+        itemsOnBelt.Remove(item);
+
+        if (despawn && item.gameObject != null)
+        {
+            ItemManager.ReturnObjectToPool(item.gameObject);
+        }
+
+        return item;
+    }
+
     #endregion
+
     private IEnumerator DelayedRefreshNeighbours()
     {
         yield return new WaitForEndOfFrame();
@@ -176,6 +202,7 @@ public class Belt : Machine
 
 
     #region Neighbours
+
     public Belt GetNextBelt()  => nextAvailableBelt;
     public Belt GetRearBelt()  => rearBelt; 
     public Belt GetRightBelt() => rightBelt; 
@@ -193,6 +220,7 @@ public class Belt : Machine
 
 
     #region Nieghour Inputs
+    
     public bool NextAvailable() => nextAvailableBelt != null && nextAvailableBelt.direction != GetNegativeDirection(this);
     public bool RearInput()     => rearBelt          != null && rearBelt.direction == direction;
     public bool RightInput()    => rightBelt         != null && rightBelt.direction == CorrectInputFromRight(this);

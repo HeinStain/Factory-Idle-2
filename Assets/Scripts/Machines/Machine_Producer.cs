@@ -40,7 +40,7 @@ public class Machine_Producer : Machine
         gridMap = GameManager.Instance.GetGrid();
 
         // Set skill tag from machine data
-        skillTag = (ItemTag)System.Enum.Parse(typeof(ItemTag), machineData.skillName);
+        skillTag = (ItemTag)System.Enum.Parse(typeof(ItemTag), machineData.skill.skillName);
         //Debug.Log($"Setting up {machineData.machineName} with skillTag: {skillTag}");
 
         // Now create dictionaries with verified tag
@@ -57,12 +57,34 @@ public class Machine_Producer : Machine
         }
     }
 
-
-
-
     private void Update()
     {
-        if (functioning)   { CraftingCycle();     } // Crafting
+        if (turnedOn)   { CraftingCycle();     } // Crafting
+    }
+
+
+    public void StartCrafting()
+    {
+        // Check for output belt
+        if (outputBelt != null)
+        {
+            // Start Mining
+            itemToCraft = selectedRecipe;
+            tickTimer = 0;
+            turnedOn = true;
+        }
+        else
+        {
+            NotificationManager.Instance.DisplayNotification("No Output Belt");
+        }
+    }
+
+    public void StopCrafting()
+    {
+        // Stop Mining
+        itemToCraft = null;
+        tickTimer = 0;
+        turnedOn = false;
     }
 
 #endregion
@@ -142,7 +164,7 @@ public class Machine_Producer : Machine
 
 
         // Normal crafting
-        if (tickTimer >= machineData.defaultCraftingInterval && !respawningReservoir)
+        if (tickTimer >= machineData.skill.defaultCraftingInterval && !respawningReservoir)
         {
             if (outputBelt != null && outputBelt.RearSlotAvailable())
             {
@@ -203,7 +225,7 @@ public class Machine_Producer : Machine
     private void HandleXPDistribution()
     {
 
-        string skillName = machineData.skillName;
+        string skillName = machineData.skill.skillName;
         string itemName = itemToCraft.displayName;
 
         // Add Skill XP
@@ -277,28 +299,6 @@ public class Machine_Producer : Machine
 
 
 
-public void StartCrafting()
-    {
-        // Check for output belt
-        if (outputBelt != null)
-        {
-            // Start Mining
-            itemToCraft = selectedRecipe;
-            tickTimer = 0;
-            functioning = true;
-        }
-        else
-        {
-            NotificationManager.Instance.DisplayNotification("No Output Belt");
-        }
-    }
 
-    public void StopCrafting()
-    {
-        // Stop Mining
-        itemToCraft = null;
-        tickTimer = 0;
-        functioning = false;
-    }
 
 }

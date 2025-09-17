@@ -143,7 +143,7 @@ public class BuildManager : MonoBehaviour
             }
         }
 
-        machine.DispenseUpdateCycle();
+        machine.BeltCheckUpdateCycle();
         OnMachinePlaced?.Invoke(machine); 
     }
 
@@ -158,7 +158,7 @@ public class BuildManager : MonoBehaviour
         foreach (Vector2Int position in gridPositionList)
             gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
 
-        machine.DispenseUpdateCycle();
+        machine.BeltCheckUpdateCycle();
         OnMachinePlaced?.Invoke(machine);
         
     }
