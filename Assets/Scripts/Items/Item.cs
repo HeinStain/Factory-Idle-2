@@ -28,9 +28,14 @@ public class Item : MonoBehaviour
 
     private int arrivalTick;
 
-    private void Start()
+    private void OnEnable()
     {
         TickManager.OnTick += MoveItem;
+    }
+    private void OnDisable()
+    {
+        
+        TickManager.OnTick -= MoveItem;
     }
 
     public void ItemSetup(ItemData data, Belt spawnBelt)

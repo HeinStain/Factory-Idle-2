@@ -11,17 +11,17 @@ public class Grid <TGridObject>
 
     private int width, height;
     private float cellSize;
-    private Vector2 originPosition;
+    private Vector2 gridOrigin;
     private TGridObject[,] gridArray;
 
 #region Grid
 
-    public Grid(int width, int height, float cellSize, Vector2 originPosition, Func<Grid<TGridObject>, int, int, TGridObject> createGridObject) 
+    public Grid(int width, int height, float cellSize, Vector2 gridOrigin, Func<Grid<TGridObject>, int, int, TGridObject> createGridObject) 
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
-        this.originPosition = originPosition;
+        this.gridOrigin = gridOrigin;
 
         gridArray = new TGridObject[width, height];
 
@@ -50,15 +50,15 @@ public class Grid <TGridObject>
     public float GetCellSize() => cellSize;
 
 
-    public Vector2 GetTileOriginPosition(int x, int y) { return new Vector2(x, y) * cellSize + originPosition; }
-    public Vector2 GetTileCentrePosition(int x, int y) { return new Vector2(x + cellSize/2, y + cellSize/2) * cellSize + originPosition; }
+    public Vector2 GetTileOriginPosition(int x, int y) { return new Vector2(x, y) * cellSize + gridOrigin; }
+    public Vector2 GetTileCentrePosition(int x, int y) { return new Vector2(x + cellSize/2, y + cellSize/2) * cellSize + gridOrigin; }
 
 
     // Convert world position to grid coordinates
     public void GetXY(Vector2 worldPosition, out int x, out int y)
     {
-        x = Mathf.FloorToInt((worldPosition - originPosition).x / cellSize);
-        y = Mathf.FloorToInt((worldPosition - originPosition).y / cellSize);
+        x = Mathf.FloorToInt((worldPosition - gridOrigin).x / cellSize);
+        y = Mathf.FloorToInt((worldPosition - gridOrigin).y / cellSize);
     }
 
     // Check if coordinates are within grid bounds

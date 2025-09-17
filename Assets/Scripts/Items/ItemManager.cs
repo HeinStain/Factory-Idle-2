@@ -59,6 +59,7 @@ public class ItemManager : MonoBehaviour
         {
             // If there are no inactive objects, create a new one, and set it up
             spawnObj = Instantiate(itemPrefab, spawnPosition, spawnRotation);
+            spawnObj.name = itemData.displayName; 
             spawnObj.GetComponent<Item>().ItemSetup(itemData, spawnBelt);
         }
         else
@@ -67,6 +68,7 @@ public class ItemManager : MonoBehaviour
             spawnObj.transform.position = spawnPosition;
             spawnObj.transform.rotation = spawnRotation;
             pool.inactiveObjects.Remove(spawnObj);
+            spawnObj.name = itemData.displayName; 
             spawnObj.SetActive(true);
         }
 
@@ -77,7 +79,7 @@ public class ItemManager : MonoBehaviour
     public static void ReturnObjectToPool(GameObject obj)
     {
         // Take off "(Clone)" from the name 
-        string objName = obj.name.Substring(0, obj.name.Length - 7);
+        string objName = obj.name;
 
         // Look for the object pool of this item type
         ObjectPool pool = null;

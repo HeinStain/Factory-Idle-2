@@ -107,40 +107,65 @@ public class BuildManager : MonoBehaviour
 
         // Create Machine
         Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
+        List<Machine> machines = new List<Machine> { machine };
+        List<Machine> belts = new List<Machine> {};
 
-        if (heldMachine.hasDispenseBelt)
+        // Handle extra belts
+        if (heldMachine.hasDispenseBelt || heldMachine.hasIntakeBelt)
         {
-            // Get Belt positioning
-            Vector2Int dispensePos = machine.GetDispenseTileIndexOffset();
-            Vector2Int beltRotationOffset = machineList[0].GetRotationOffset(direction);
-            Vector2 beltWorldPosition = gridMap.GetTileOriginPosition(dispensePos.x, dispensePos.y) + new Vector2Int(beltRotationOffset.x, beltRotationOffset.y);
+            if (heldMachine.hasDispenseBelt)
+            {
+                // Get Dispense Belt positioning
+                Vector2Int dispenseTileOffset = machine.GetDispenseTileIndexOffset();
+                Vector2Int dispenseBeltRotationOffset = machineList[0].GetRotationOffset(direction);
+                Vector2 dispenseBeltWorldPosition = gridMap.GetTileOriginPosition(dispenseTileOffset.x, dispenseTileOffset.y) 
+                                                  + new Vector2Int(dispenseBeltRotationOffset.x, dispenseBeltRotationOffset.y);
+                // Create Belt
+                Machine dispenseBelt = Machine.Create(
+                       worldPos: dispenseBeltWorldPosition, 
+                       originXY: dispenseTileOffset, 
+                      direction: direction, 
+                    machineData: machineList[0]);
 
-            // Create Belt
-            Machine belt = Machine.Create(beltWorldPosition, dispensePos, direction, machineList[0]);
+                // Associate Machine to Belt
+                dispenseBelt.AssignAssociatedMachines(machines);
+                // Add Belt to list of Belts
+                belts.Add(dispenseBelt);
+                // Occupy Tiles
+                gridMap.GetGridObject(dispenseTileOffset.x, dispenseTileOffset.y).SetMachine(dispenseBelt);
+            }
 
-            // Assign associations
-            List<Machine> machines = new List<Machine> { machine };
-            belt.AssignAssociatedMachines(machines);
-            List<Machine> belts = new List<Machine> { belt };
+            if (heldMachine.hasIntakeBelt)
+            {
+                // Get Intake Belt positioning
+                Vector2Int intakeTileOffset = machine.GetIntakeTileIndexOffset();
+                Vector2Int intakeBeltRotationOffset = machineList[0].GetRotationOffset(direction);
+                Vector2 intakeBeltWorldPosition = gridMap.GetTileOriginPosition(intakeTileOffset.x, intakeTileOffset.y) 
+                                                + new Vector2Int(intakeBeltRotationOffset.x, intakeBeltRotationOffset.y);
+                // Create Belt
+                Machine intakeBelt = Machine.Create(
+                       worldPos: intakeBeltWorldPosition, 
+                       originXY: intakeTileOffset, 
+                      direction: direction, 
+                    machineData: machineList[0]);
+
+                // Associate Machine to Belt
+                intakeBelt.AssignAssociatedMachines(machines);
+                // Add Belt to list of Belts
+                belts.Add(intakeBelt);
+                // Occupy Tiles
+                gridMap.GetGridObject(intakeTileOffset.x, intakeTileOffset.y).SetMachine(intakeBelt);
+            }
+
+            // Associate Belts
             machine.AssignAssociatedMachines(belts);
-
-            // Tell all tiles they're occupied
-            foreach(Vector2Int position in gridPositionList)
-            {
-                if (position == dispensePos)
-                {
-                    gridMap.GetGridObject(position.x, position.y).SetMachine(belt);
-                }
-                gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
-            }
         }
-        else
+
+        // Tell all tiles they're occupied
+        foreach(Vector2Int position in gridPositionList)
         {
-            // Tell all tiles they're occupied
-            foreach(Vector2Int position in gridPositionList)
-            {
-                gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
-            }
+            gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
+        
         }
 
         machine.BeltCheckUpdateCycle();
@@ -148,19 +173,18 @@ public class BuildManager : MonoBehaviour
     }
 
 
-    private void BuildMachine(List<Vector2Int> gridPositionList, int x, int y, MachineData.Direction customDirection)
+    private void ReplaceBelt(List<Vector2Int> gridPositionList, int x, int y, MachineData.Direction customDirection)
     {
         Vector2Int rotationOffset = heldMachine.GetRotationOffset(customDirection);
         Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + (Vector2)rotationOffset;
 
-        Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), customDirection, heldMachine);
+        Machine belt = Machine.Create(machineWorldPosition, new Vector2Int(x, y), customDirection, heldMachine);
 
         foreach (Vector2Int position in gridPositionList)
-            gridMap.GetGridObject(position.x, position.y).SetMachine(machine);
+            gridMap.GetGridObject(position.x, position.y).SetMachine(belt);
 
-        machine.BeltCheckUpdateCycle();
-        OnMachinePlaced?.Invoke(machine);
-        
+        belt.BeltCheckUpdateCycle();
+        OnMachinePlaced?.Invoke(belt);
     }
 
 #endregion
@@ -396,7 +420,7 @@ public class BuildManager : MonoBehaviour
         gridMap.GetGridObject(origin.x, origin.y)?.GetBelt()?.DestroySelf();
 
         // Place belt exactly where ghost was
-        BuildMachine(gridPositionList, origin.x, origin.y, dir);
+        ReplaceBelt(gridPositionList, origin.x, origin.y, dir);
     }
 
     private bool Walkable(Vector2Int tile) => gridMap.GetGridObject(tile.x, tile.y).IsBlockedForBelt(allowOverwriteBelts: true) == false;

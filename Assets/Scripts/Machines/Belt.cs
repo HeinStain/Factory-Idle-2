@@ -82,7 +82,9 @@ public class Belt : Machine
     public void GetNeighbourBelts()
     {
         Belt candidate = GetBeltFromTile(nextAvailableTile);
-        nextAvailableBelt = candidate != null && nextAvailableTile.GetMachine() == null && candidate.direction != GetNegativeDirection(this) ? candidate : null;
+        nextAvailableBelt = candidate != null 
+                     // && nextAvailableTile.GetMachine() == null 
+                        && candidate.direction != GetNegativeDirection(this) ? candidate : null;
 
         rearBelt = GetBeltFromTile(rearTile);
         rightBelt = GetBeltFromTile(rightTile);
@@ -171,9 +173,13 @@ public class Belt : Machine
 
     public void RemoveItem(Item item) => itemsOnBelt.Remove(item);
 
+
+
     public Item PeekFrontItem()
     {
-        return itemsOnBelt.Find(i => i != null && i.GetCurrentSlot() == frontSlot);
+        const float sqrThresh = 0.01f * 0.01f; // ~1 cm in world units; tweak as needed
+        return itemsOnBelt.Find(i => i != null && i.GetCurrentSlot() == frontSlot 
+                            && (i.transform.position - frontSlot.position).sqrMagnitude <= sqrThresh);
     }
 
     public Item RemoveFrontItem(bool despawn = false)

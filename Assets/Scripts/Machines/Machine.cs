@@ -8,7 +8,7 @@ public class Machine : MonoBehaviour
     protected MachineData machineData;
     [SerializeField] protected Vector2Int originXY;
     public MachineData.Direction direction;
-    private List<Machine> associatedMachines;
+    [SerializeField] private List<Machine> associatedMachines;
     public int tickTimer;
     public bool turnedOn = false;
 
@@ -56,6 +56,7 @@ public class Machine : MonoBehaviour
 
 
     public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
+    public virtual Vector2Int GetIntakeTileIndexOffset() { return new Vector2Int(0,0); }
 
     public List<Vector2Int> GetGridPositionList() => machineData.GetGridPositionList(originXY, direction);
 

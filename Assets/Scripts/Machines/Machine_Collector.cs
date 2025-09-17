@@ -41,13 +41,14 @@ public class Machine_Collector : Machine
         belt.RemoveFrontItem(despawn: true);
     }
 
-
-
 #endregion
 
 
+#region Input Belt
 
-
+    public override Vector2Int GetIntakeTileIndexOffset() => originXY;       
+    
+#endregion
 
 
 #region Get Belt

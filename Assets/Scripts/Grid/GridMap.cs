@@ -13,8 +13,8 @@ public class GridMap : Grid<GridMap.GridTile>
     {
         if (showDebug)
         {
-            //debugVisual = new GridDebugVisual<GridTile>(this);
-            //debugVisual.ShowDebugVisuals();
+            debugVisual = new GridDebugVisual<GridTile>(this);
+            debugVisual.ShowDebugVisuals();
         }
     }
 
@@ -98,6 +98,7 @@ public class GridMap : Grid<GridMap.GridTile>
             }
             grid.TriggerGridObjectChanged(x, y);
         }
+
         public void ClearBelt()
         {
             placedBelt = null;
