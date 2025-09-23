@@ -58,7 +58,7 @@ public class ProducerVisuals : MonoBehaviour
     
    
     private bool placed;
-    private Dictionary<string, ItemSelectBlock> itemBlockCache = new Dictionary<string, ItemSelectBlock>();
+    private Dictionary<string, ItemSelectBlock> itemBlocks = new Dictionary<string, ItemSelectBlock>();
 
 
     [Header("Casts")]
@@ -170,7 +170,7 @@ public class ProducerVisuals : MonoBehaviour
         // Clear existing items
         foreach (Transform child in itemsFolder.transform) { Destroy(child.gameObject); }
 
-        itemBlockCache.Clear();
+        itemBlocks.Clear();
 
         // Filter and sort items
         var sortedItems = ItemManager.Instance.itemList
@@ -183,14 +183,12 @@ public class ProducerVisuals : MonoBehaviour
         {
             GameObject itemBlock = Instantiate(menuItemPrefab, itemsFolder.transform);
 
-
             ItemSelectBlock itemMenuBlock = itemBlock.GetComponent<ItemSelectBlock>();
             
-            itemMenuBlock.SetItem(item);
-            itemMenuBlock.UpdateBlock(this);
+            itemMenuBlock.UpdateBlock(this, item);
             
             // Cache the block
-            itemBlockCache[item.displayName] = itemMenuBlock;
+            itemBlocks[item.displayName] = itemMenuBlock;
         }
     }
 
@@ -225,7 +223,7 @@ public class ProducerVisuals : MonoBehaviour
     private void UpdateSelectedItemVisuals(ItemData selectedItem)
     {
         // Update only the previously selected and newly selected items
-        foreach (var blockPair in itemBlockCache)
+        foreach (var blockPair in itemBlocks)
         {
             ItemSelectBlock block = blockPair.Value;
             if (block.item == selectedItem || block.item == selectedRecipe)
@@ -341,11 +339,11 @@ public class ProducerVisuals : MonoBehaviour
            // Debug.Log($"Progress Bar Object: {itemMasteryProgressBar.name}, Current Scale: {itemMasteryProgressBar.transform.localScale}");
 
             // Only update blocks that belong to this machine
-            foreach (var block in itemBlockCache.Values)
+            foreach (var block in itemBlocks.Values)
             {
                 if (block.item.tags.Contains(producer.SkillTag))
                 {
-                    block.UpdateBlock(this);
+                    block.UpdateBlock(this, block.item);
                 }
             }
         }

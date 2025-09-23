@@ -34,10 +34,8 @@ public class Machine_Collector : Machine
         var item = belt.PeekFrontItem();
         if (item == null) return;
 
-        // 1) Add to your inventory (replace with your actual inventory call)
-        // InventoryManager.Instance.AddItem(item);
+        InventoryManager.Instance.AddItem(item);
 
-        // 2) Remove + despawn from the world (pooled)
         belt.RemoveFrontItem(despawn: true);
     }
 

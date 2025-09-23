@@ -49,27 +49,22 @@ public class Machine : MonoBehaviour
 
     protected virtual void MachineSetup() { }
 
+#region Machine Data
+
     public Vector2Int GetMachineOrigin() => originXY;
     public MachineData GetMachineData() => machineData;
     
-
-
-
-    public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
-    public virtual Vector2Int GetIntakeTileIndexOffset() { return new Vector2Int(0,0); }
-
     public List<Vector2Int> GetGridPositionList() => machineData.GetGridPositionList(originXY, direction);
 
+#endregion
 
+#region Associated Machines    
 
-
-    
     public void AssignAssociatedMachines(List<Machine> machines) => associatedMachines = machines;
     public List<Machine> GetAssociatedMachines() => associatedMachines;
 
-#region UNNAMED
-
-
+    public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
+    public virtual Vector2Int GetIntakeTileIndexOffset() { return new Vector2Int(0,0); }
 
 #endregion
 

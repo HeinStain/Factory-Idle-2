@@ -62,14 +62,11 @@ public class ItemSelectBlock : MonoBehaviour
         }
         
     }
-    
-    public void SetItem(ItemData i)
+
+
+    public void UpdateBlock(ProducerVisuals menu, ItemData i)
     {
         item = i;
-    }
-
-    public void UpdateBlock(ProducerVisuals menu)
-    {
         producerVisuals = menu; // Store the reference
         producer = menu.producer;
         SetupInitialState();
