@@ -117,8 +117,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originXY: {x: 0, y: 0}
   direction: 0
+  associatedMachines: []
   tickTimer: 0
-  functioning: 0
+  turnedOn: 0
   skillTag: 0
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
@@ -137,6 +138,10 @@ PrefabInstance:
     - target: {fileID: 47709581654335708, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_Name
       value: Visual
+      objectReference: {fileID: 0}
+    - target: {fileID: 47709581654335708, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1466785700717879711, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_SizeDelta.y

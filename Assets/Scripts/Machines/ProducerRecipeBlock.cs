@@ -7,7 +7,7 @@ using TMPro;
 using Unity.Collections;
 using System.Data;
 
-public class ItemSelectBlock : MonoBehaviour
+public class ProducerRecipeBlock : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private Image itemIcon;
@@ -22,11 +22,11 @@ public class ItemSelectBlock : MonoBehaviour
 
     private Machine_Producer producer;
     private ProducerVisuals producerVisuals; 
-    public ItemData item { get; private set; } 
+    public ItemData itemData { get; private set; } 
 
 
     [SerializeField] private GameObject selectionSquare;
-    public bool IsSelected => producer?.selectedRecipe == item;
+    public bool isSelected => producer?.selectedRecipe == itemData;
 
 
     public void ShowText()
@@ -48,7 +48,7 @@ public class ItemSelectBlock : MonoBehaviour
         
         if (masteryPoolXP >= xpToNextMasteryLevel)
         {
-            // item Mastery Level Up
+            // itemData Mastery Level Up
             SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineData().machineName, -xpToNextMasteryLevel, true);
             SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryLevels, titleText.text, currentitemMasteryLevel + 1, false);
             SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryXPCount, titleText.text, 0, false);
@@ -66,19 +66,19 @@ public class ItemSelectBlock : MonoBehaviour
 
     public void UpdateBlock(ProducerVisuals menu, ItemData i)
     {
-        item = i;
+        itemData = i;
         producerVisuals = menu; // Store the reference
-        producer = menu.producer;
+        producer = menu.GetProducerScript();
         SetupInitialState();
-        UpdateVisuals();
+        UpdateBlockVisuals();
     }
 
     private void SetupInitialState()
     {
-        if (producer == null || item == null) return;
+        if (producer == null || itemData == null) return;
 
-        titleText.text = item.displayName;
-        itemIcon.sprite = item.icon;
+        titleText.text = itemData.displayName;
+        itemIcon.sprite = itemData.icon;
         itemIcon.SetNativeSize();
 
         // Setup button listeners only once
@@ -86,33 +86,33 @@ public class ItemSelectBlock : MonoBehaviour
         if (IsItemUnlocked())
         {
             // Store reference to ProducerVisuals
-            selectButton.onClick.AddListener(() => producerVisuals.SelectItem(item));
+            selectButton.onClick.AddListener(() => producerVisuals.SelectItem(itemData));
         }
     }
 
     private bool IsItemUnlocked()
     {
-        if (producer == null || item == null) return false;
+        if (producer == null || itemData == null) return false;
 
         // Use the stored unlock status instead of recalculating
         return SkillManager.Instance.GetDictionaryValue(
             SkillManager.Instance.itemUnlockedStatus, 
-            item.displayName, 
+            itemData.displayName, 
             false  // Default to locked if not found
         );
     }
 
-    public void UpdateVisuals()
+    public void UpdateBlockVisuals()
     {
-        selectionSquare.SetActive(IsSelected);
+        selectionSquare.SetActive(isSelected);
 
         // Only update the visual elements that need to change
         bool isUnlocked = IsItemUnlocked();
         
-        int masteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, item.displayName);
+        int masteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, itemData.displayName);
         masteryLevelText.text = masteryLevel.ToString();
 
-        float currentMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, item.displayName);
+        float currentMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, itemData.displayName);
         float xpToNextLevel = SkillManager.Instance.Calculate_XPToNextLevel(masteryLevel);
         
         masteryUpgradeText.text = ((int)(xpToNextLevel - currentMasteryXP)).ToString() + "xp for +1 lvls";
@@ -122,7 +122,7 @@ public class ItemSelectBlock : MonoBehaviour
         notUnlockedBlock.SetActive(!isUnlocked);
         if (!isUnlocked)
         {
-            levelReqDisplay.text = "Unlock at Level " + item.unlockLevel;
+            levelReqDisplay.text = "Unlock at Level " + itemData.unlockLevel;
         }
     }
 }

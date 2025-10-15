@@ -7,19 +7,16 @@ public class InventoryManager : MonoBehaviour
 
     public static InventoryManager Instance { get; private set; }
 
-    public event Action<ItemData, int> OnSlotChanged;
 
-    private int inventorySize;
+    private int inventorySize = 24;
 
     [SerializeField] private GameObject inventoryCanvas;
     [SerializeField] private GameObject itemsFolder;
     [SerializeField] private GameObject inventorySlotPrefab;
 
     private Dictionary<ItemData, int> inventoryItems = new();
-    private Dictionary<string, InventorySlot> slots = new();
-
-
-
+    private Dictionary<ItemData, InventorySlot> slots = new();
+    private readonly Queue<InventorySlot> emptySlots = new();
 
     private void Awake()
     {
@@ -28,51 +25,70 @@ public class InventoryManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-
-
-
     public void GenerateInventorySlots()
     {
         // Clear existing items
         foreach (Transform child in itemsFolder.transform) { Destroy(child.gameObject); }
-
         slots.Clear();
-        
-        int temp = 0;
+        emptySlots.Clear();
 
+        // Spawn filled slots first
+        int filled = 0;
         foreach (var kvp in inventoryItems)
         {
             // Spawn Slot with Item
             GameObject itemSlotObj = Instantiate(inventorySlotPrefab, itemsFolder.transform);
             InventorySlot inventorySlot = itemSlotObj.GetComponent<InventorySlot>();
-
-            inventorySlot.UpdateBlock(this, kvp.Key, kvp.Value);
-            
-            slots[kvp.Key.displayName] = inventorySlot;
-            temp++;
+            inventorySlot.UpdateBlock(kvp.Key, kvp.Value);
+            slots[kvp.Key] = inventorySlot;
+            filled++;
         }
 
-        for (int i = temp; i < inventorySize; i++)
+        // Spawn empties after
+        int emptiesToMake = Mathf.Max(0, inventorySize - filled);
+        for (int i = 0; i < emptiesToMake; i++)
         {
-            
             GameObject itemSlotObj = Instantiate(inventorySlotPrefab, itemsFolder.transform);
+            InventorySlot inventorySlot = itemSlotObj.GetComponent<InventorySlot>();
+            emptySlots.Enqueue(inventorySlot);
         }
-
     }
-
 
 #region Add/Remove Items
 
     public void AddItem(Item item)
     {
-        Debug.Log(item.itemData.displayName + " added to Inventory");
-
         if (item == null || item.itemData == null) return;
-
         ItemData data = item.itemData;
+
         inventoryItems.TryGetValue(data, out int count);
         inventoryItems[data] = count += 1;
-        OnSlotChanged?.Invoke(data, count);
+
+        if (slots.TryGetValue(data, out InventorySlot slot))
+        {
+            slot.UpdateBlock(data, count);
+        }
+        else
+        {
+            // NEW item type
+            if (inventoryCanvas.activeSelf && emptySlots.Count > 0)
+            {
+                // Reuse an existing empty slot so it appears before the empties block
+                InventorySlot empty = emptySlots.Dequeue();
+                empty.UpdateBlock(data, count);
+                slots[data] = empty;
+            }
+            else
+            {
+                // Menu closed (or no empties spawned): just create; it’ll be placed correctly on next OpenMenu -> GenerateInventorySlots()
+                GameObject go = Instantiate(inventorySlotPrefab, itemsFolder.transform);
+                InventorySlot newSlot = go.GetComponent<InventorySlot>();
+                newSlot.UpdateBlock(data, count);
+                slots[data] = newSlot;
+            }
+        }
+
+        Debug.Log(item.itemData.displayName + " added to Inventory");
     }
 
     public bool TryRemove(ItemData data, int amount)
@@ -81,8 +97,21 @@ public class InventoryManager : MonoBehaviour
         if (!inventoryItems.TryGetValue(data, out var count) || count < amount) return false;
 
         count -= amount;
-        if (count <= 0) inventoryItems.Remove(data); else inventoryItems[data] = count;
-        OnSlotChanged?.Invoke(data, Math.Max(count, 0));
+        if (count <= 0) 
+        {
+            inventoryItems.Remove(data);
+            if (slots.TryGetValue(data, out InventorySlot slot))
+            {
+                Destroy(slot.gameObject);
+                slots.Remove(data);
+            } 
+        }
+        else 
+        {
+            inventoryItems[data] = count;
+            if (slots.TryGetValue(data, out InventorySlot slot)) slot.UpdateBlock(data, count);
+        }
+
         return true;
     }
 
@@ -114,6 +143,7 @@ public class InventoryManager : MonoBehaviour
     {
         inventoryCanvas.SetActive(true);
         GameManager.Instance.SetMenuOpen(true);
+        GenerateInventorySlots();
     }
 
     // Called from close button

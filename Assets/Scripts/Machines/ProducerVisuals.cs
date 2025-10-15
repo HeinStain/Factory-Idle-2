@@ -9,109 +9,87 @@ using System.Collections.Generic;
 public class ProducerVisuals : MonoBehaviour
 {
 
-
-    private ItemData selectedRecipe;
-    private bool menuOpen = false;
-
-
-
-    [SerializeField] private GameObject itemsFolder;
-    [SerializeField] private GameObject menuItemPrefab;
-    
-
-    [Header("Frame Overlay")]
-    [SerializeField] private GameObject noItemSelectedFrame;
-
-    [Header("Icon")]
-    [SerializeField] private Image itemIcon;
-
-    [Header("Title and Mastery")]
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI itemMasteryLevelText;
-    [SerializeField] private TextMeshProUGUI itemMasteryProgressText;
-    [SerializeField] private GameObject itemMasteryProgressBar;
-
-    [Header("Text Info Display")]
-    [SerializeField] private TextMeshProUGUI veinCountText;
-    [SerializeField] private TextMeshProUGUI itemValueText;
-    [SerializeField] private TextMeshProUGUI timeToCraftText;
-    [SerializeField] private TextMeshProUGUI xpText;
-    [SerializeField] private TextMeshProUGUI masteryXPText;
-    [SerializeField] private TextMeshProUGUI masteryPoolXPText;
-
-    [Header("Progress Bar")]
-    [SerializeField] private TextMeshProUGUI progressPercentText;
-    [SerializeField] private GameObject progressBar;
-
-    [Header("Button")]
-    [SerializeField] private Button craftButton;
-
-    [Header("Total XP Bars")]
-    [SerializeField] private TextMeshProUGUI skillLevelText;
-    [SerializeField] private TextMeshProUGUI skillLevelProgressText;
-    [SerializeField] private GameObject skillLevelProgressBar;
-
-    [SerializeField] private TextMeshProUGUI masteryPoolPercentText;
-    [SerializeField] private TextMeshProUGUI masteryPoolProgressText;
-    [SerializeField] private GameObject masteryPoolProgressBar;
-
-    
-   
-    private bool placed;
-    private Dictionary<string, ItemSelectBlock> itemBlocks = new Dictionary<string, ItemSelectBlock>();
+    [Header("Function")]
+        private Animator anim;
+        private ItemData selectedRecipe;
+        private Machine_Producer producerScript;
+        private SkillManager skillManager;
+        private MachineData machineData;
+        private string skillName;
+        private bool menuOpen = false;
+        private bool placed = false;
+        private Dictionary<ItemData, ProducerRecipeBlock> recipeBlocks = new();
 
 
-    [Header("Casts")]
-    public Machine_Producer producer;
-    [SerializeField] private Animator anim;
-    
-    
-    [Header("Progress Bar Sprites")]
-    [SerializeField] private Sprite whiteProgressBar;
-    [SerializeField] private Sprite redProgressBar;
-    [SerializeField] private Sprite greenProgressBar;
+    [Header("Machine Parts")]
+        [SerializeField] private GameObject machineProgressBar;
+        [SerializeField] private SpriteRenderer machineProgressBarSR;
+        [SerializeField] List<Transform> objectsToKeepStraight;
 
-    [Header("Machine Objects")]
-    [SerializeField] private GameObject machineProgressBar;
-    [SerializeField] List<Transform> objectsToKeepStraight;
+
+    [Header("Resources")]
+        [SerializeField] private GameObject recipeFolder;
+        [SerializeField] private GameObject producerRecipeCard;
+        [SerializeField] private Sprite whiteProgressBar, redProgressBar, greenProgressBar;
+
+
+    [Header("XP Bars")]
+        [SerializeField] private GameObject skillLevelProgressBar;
+        [SerializeField] private GameObject masteryPoolProgressBar;
+        [SerializeField] private TextMeshProUGUI skillLevelText, skillLevelProgressText, masteryPoolPercentText, masteryPoolProgressText;
+        
+
+    [Header("Display Card - Header")]
+        [SerializeField] private GameObject displayCardOverlay;
+        [SerializeField] private Image itemIcon;
+        [SerializeField] private TextMeshProUGUI titleText, itemMasteryLevelText, itemMasteryProgressText;
+        [SerializeField] private GameObject itemMasteryProgressBar;
+
+    [Header("Display Card - Info")]
+        [SerializeField] private Button craftButton;
+        [SerializeField] private TextMeshProUGUI veinCount, value, craftTime, xp, masteryXP, masteryPoolXP;
+
+    [Header("Display Card - Progress Bar")]
+        [SerializeField] private TextMeshProUGUI progressPercentText;
+        [SerializeField] private GameObject progressBar;
+        [SerializeField] private Image progressBarImage;
 
 
 #region Setup
-   private void Awake()
+    private void Awake()
     {
-        placed = false;
-
-        GameManager.Instance.OnMenuTriggered += HandleMenuTriggered;
-        BuildManager.Instance.OnMachinePlaced += HandlePlacement;
+        GameManager.Instance.OnMenuTriggered += MenuTrigger;
+        BuildManager.Instance.OnMachinePlaced += Place;
     }
 
     private void OnDestroy() 
     {
-        GameManager.Instance.OnMenuTriggered -= HandleMenuTriggered;
-        BuildManager.Instance.OnMachinePlaced -= HandlePlacement;
+        GameManager.Instance.OnMenuTriggered -= MenuTrigger;
+        BuildManager.Instance.OnMachinePlaced -= Place;
     }
 
-    private void HandlePlacement(Machine producerType)
+    private void Place(Machine machine)
     {
-        if (!placed)
-        {
-            if (transform.parent != null && transform.parent.GetComponent<Machine>() != null)
-            {
-                producer = producerType as Machine_Producer;
-                anim = transform.parent.GetComponent<Animator>();
-                placed = true;
-            }
-        }
+        if (placed) return;
+
+        producerScript = machine as Machine_Producer;
+        machineData = producerScript.GetMachineData();
+        anim = producerScript.transform.GetComponent<Animator>();
+        skillManager = SkillManager.Instance;
+        skillName = machineData.skill.skillName;
+        placed = true;
     }
 
-    private void HandleMenuTriggered(bool status)
+    private void MenuTrigger(bool status)
     {   
         menuOpen = status;
-        if (producer != null && menuOpen)
+        if (producerScript != null && menuOpen)
         {
             GenerateItemsList();
         }
     }
+
+    public Machine_Producer GetProducerScript() => producerScript;
 
 #endregion 
 
@@ -120,311 +98,286 @@ public class ProducerVisuals : MonoBehaviour
 
     private void Update()
     {
-        foreach (Transform obj in objectsToKeepStraight)
-        {
-            obj.eulerAngles = new Vector3(0,0,0);
-        }
-        
-        if (placed)
-        {
-            if (menuOpen) { UpdateMenuVisuals(); }     // Visuals
-            anim.SetBool("IsActive", producer.turnedOn);      // producer Animation
-        }
+        // Keep objects straight
+        foreach (Transform obj in objectsToKeepStraight) { obj.eulerAngles = new Vector3(0,0,0); }
 
-        // Progress Bar
-        if (producer != null)
-        {
-            if (producer.turnedOn)
-            {
-                if (producer.respawningReservoir)
+        // If placed, animate and handle progress bars and menu
+        if (placed) 
+        { 
+            anim.SetBool("IsActive", producerScript.turnedOn);
+            if (producerScript != null) { MachineProgressBarVisuals(); } 
+
+            if (menuOpen) 
+            { 
+                if (HasValidSelection()) 
                 {
-                    machineProgressBar.GetComponent<SpriteRenderer>().sprite = whiteProgressBar;
-
-                    float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.timeToReservoirRespawn);
-                    machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
+                    Update_DisplayCard();
+                    Update_RecipeCard();
+                    Update_SkillAndMasteryBar();
                 }
                 else
-                {
-                    machineProgressBar.GetComponent<SpriteRenderer>().sprite = greenProgressBar;
-    
-                    float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.GetMachineData().skill.defaultCraftingInterval);
-                    machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
+                { 
+                    ResetDisplayCard(); 
                 }
-            }
-            else
-            {
-                machineProgressBar.transform.localScale = new Vector3(0f,1f,1f);
-            }
-        }
-        
+            } 
+        } 
     }
 
 #endregion
 
+#region Machine Display Bar
+
+    private void MachineProgressBarVisuals()
+    {
+        // Set Bar to 0 if machine is off
+        if (!producerScript.turnedOn) { machineProgressBar.transform.localScale = new Vector3(0f,1f,1f); return; }
+        
+        // Otherwise, show Display / Respawn Bar
+        if (producerScript.respawningReservoir) 
+        {   
+            machineProgressBarSR.sprite = whiteProgressBar;
+            float t = Mathf.Clamp01((float)producerScript.tickTimer / (float)producerScript.timeToReservoirRespawn);
+            machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
+        } else { 
+            machineProgressBarSR.sprite = greenProgressBar;
+            float t = Mathf.Clamp01((float)producerScript.tickTimer / (float)machineData.skill.defaultCraftingInterval);
+            machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
+        } 
+    }
+
+#endregion
 
 #region MenuFunction
 
 
     private void GenerateItemsList()
     {
-        // Clear existing items
-        foreach (Transform child in itemsFolder.transform) { Destroy(child.gameObject); }
+        // Clear existing recipe block objects
+        foreach (Transform child in recipeFolder.transform) { Destroy(child.gameObject); }
 
-        itemBlocks.Clear();
+        // Empty block dictionary
+        recipeBlocks.Clear();
 
-        // Filter and sort items
+        // Filter and sort recipes to a list
         var sortedItems = ItemManager.Instance.itemList
-            .Where(item => item.tags.Contains(producer.SkillTag))
-            .OrderBy(item => item.unlockLevel)
-            .ToList();
+            .Where(item => item.tags.Contains(producerScript.SkillTag)) // Filter to relevant items
+            .OrderBy(item => item.unlockLevel)                          // Order by unlock level
+            .ToList();                                                  // Turn it into a list
 
-        // Create new items
-        foreach (ItemData item in sortedItems)
+        // Create recipe blocks from list 
+        foreach (ItemData itemData in sortedItems)
         {
-            GameObject itemBlock = Instantiate(menuItemPrefab, itemsFolder.transform);
-
-            ItemSelectBlock itemMenuBlock = itemBlock.GetComponent<ItemSelectBlock>();
-            
-            itemMenuBlock.UpdateBlock(this, item);
-            
-            // Cache the block
-            itemBlocks[item.displayName] = itemMenuBlock;
+            GameObject recipeBlockObj = Instantiate(producerRecipeCard, recipeFolder.transform);
+            ProducerRecipeBlock recipeBlockScript = recipeBlockObj.GetComponent<ProducerRecipeBlock>();
+            recipeBlockScript.UpdateBlock(this, itemData);
+            recipeBlocks[itemData] = recipeBlockScript;
         }
     }
-
-
-
 
     public void SelectItem(ItemData item)
     {
-        if (item == null)
-        {
-            Debug.LogError("Attempting to select null item");
-            return;
-        }
+        // Safety checks
+        if (item == null) { Debug.LogError("Attempting to select null item"); return; }
+        if (!ItemManager.Instance.itemList.Contains(item)) { Debug.LogError("Selected Item not in ItemManager.itemList"); return; }
+        if (item == selectedRecipe) { Debug.Log("Item already selected"); return; }
 
-        Debug.Log($"Selecting item: {item.displayName} for {producer.GetMachineData().skill.skillName}");
+        // Print selection
+        Debug.Log($"Selecting item: {item.displayName} in {machineData.skill.skillName}");
         
-        if (ItemManager.Instance.itemList.Contains(item))
-        {
-            if (item != selectedRecipe)
-            {
-                selectedRecipe = item;
-                producer.selectedRecipe = item;
-                producer.respawningReservoir = false;
-                producer.turnedOn = false;
+        // Turn off machine production
+        producerScript.respawningReservoir = false;
+        producerScript.turnedOn = false;
 
-                UpdateSelectedItemVisuals(item);
-                SetCraftButton();
-            }
+        // Set new selection
+        selectedRecipe = item;
+        producerScript.selectedRecipe = item;
+
+        // Update only the selected items
+        foreach (var kvp in recipeBlocks)
+        {
+            ProducerRecipeBlock itemBlock = kvp.Value;
+            if (itemBlock.itemData == selectedRecipe) { itemBlock.UpdateBlockVisuals(); }
         }
+
+        UpdateCraftButton();
     }
 
-    private void UpdateSelectedItemVisuals(ItemData selectedItem)
-    {
-        // Update only the previously selected and newly selected items
-        foreach (var blockPair in itemBlocks)
-        {
-            ItemSelectBlock block = blockPair.Value;
-            if (block.item == selectedItem || block.item == selectedRecipe)
-            {
-                block.UpdateVisuals(); // New method for visual-only updates
-            }
-        }
-    }
+#endregion
 
-    public void ButtonSwitch()
+#region Craft Button
+
+    // Called when "Craft" or "Stop" button is pressed
+    public void UpdateCraftButton()
     {
-        if (producer.turnedOn)
-        {
-            SetStopButton();
-        }
-        else
-        {
-            SetCraftButton();
-        }
+        if (producerScript.turnedOn) SetStopButton();
+        else SetCraftButton();
     }
 
     private void SetCraftButton()
     {
         craftButton.onClick.RemoveAllListeners();
-        craftButton.onClick.AddListener(() => producer.StartCrafting());
-        craftButton.onClick.AddListener(() => ButtonSwitch());
+        craftButton.onClick.AddListener(() => producerScript.StartCrafting());
+        craftButton.onClick.AddListener(() => UpdateCraftButton());
         craftButton.transform.GetComponentInChildren<TextMeshProUGUI>().text = "CRAFT";
     }
 
     private void SetStopButton()
     {
         craftButton.onClick.RemoveAllListeners();
-        craftButton.onClick.AddListener(() => producer.StopCrafting());
-        craftButton.onClick.AddListener(() => ButtonSwitch());
+        craftButton.onClick.AddListener(() => producerScript.StopCrafting());
+        craftButton.onClick.AddListener(() => UpdateCraftButton());
         craftButton.transform.GetComponentInChildren<TextMeshProUGUI>().text = "STOP";
     }
 
 #endregion
-/// <summary>
-/// ////////
-/// ///
-/// 
-/// </summary>
-/// 
 
-///
-///
-///
-///
-
-///
-#region Menu Visuals
-
-    public void UpdateMenuVisuals()
+#region Validation and Reset
+    
+    private bool HasValidSelection()
     {
-        if (selectedRecipe != null)
+        // Verify recipe is selected
+        if (selectedRecipe == null) return false;
+
+        // Verify recipe has correct tag
+        if (!selectedRecipe.tags.Contains(producerScript.SkillTag))
         {
-            // First verify this item belongs to this machine's skill
-            if (!selectedRecipe.tags.Contains(producer.SkillTag))
-            {
-                Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {producer.SkillTag}");
-                selectedRecipe = null;
-                return;
-            }
-
-            noItemSelectedFrame.SetActive(false);
-
-            // Cache dictionary lookups to avoid multiple calls
-            string itemName = selectedRecipe.displayName;
-            string skill = producer.GetMachineData().skill.skillName;
-
-            // Verify all required dictionary entries exist
-            if (!SkillManager.Instance.itemMasteryLevels.ContainsKey(itemName) ||
-                !SkillManager.Instance.itemMasteryXPCount.ContainsKey(itemName) ||
-                !producer.reservoirNodeCounts.ContainsKey(itemName) ||
-                !producer.reservoirMaxes.ContainsKey(itemName))
-            {
-                Debug.LogError($"Missing dictionary entries for {itemName} in {skill}");
-                return;
-            }
-
-            int itemMasteryLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, selectedRecipe.displayName);
-            
-            // Update UI elements
-            itemIcon.gameObject.SetActive(true);
-            itemIcon.sprite = selectedRecipe.icon;
-            itemIcon.SetNativeSize();
-
-            titleText.text = itemName;
-            itemMasteryLevelText.text = itemMasteryLevel.ToString();
-            
-            veinCountText.text = SkillManager.Instance.GetDictionaryValue(producer.reservoirNodeCounts, itemName) + "/" + SkillManager.Instance.GetDictionaryValue(producer.reservoirMaxes, itemName);
-            itemValueText.text = selectedRecipe.value.ToString();
-            timeToCraftText.text = (producer.GetMachineData().skill.defaultCraftingInterval / 30).ToString("F2");
-            xpText.text = selectedRecipe.XP.ToString();
-            
-            // Only calculate mastery XP if all required data exists
-            if (selectedRecipe.tags.Contains(producer.SkillTag))
-            {
-                int givenMasteryXP = (int)SkillManager.Instance.Calculate_GivenItemMasteryXP(itemName, producer.SkillTag);
-                masteryXPText.text = givenMasteryXP.ToString();
-                masteryPoolXPText.text = ((int)(givenMasteryXP / 4)).ToString();
-            }
-
-            // Update mastery progress
-            float currentMasteryXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryXPCount, itemName);
-            float nextLevelXP = SkillManager.Instance.Calculate_XPToNextLevel(itemMasteryLevel);
-            
-            float p1 = Mathf.Clamp01(currentMasteryXP / nextLevelXP);
-           // Debug.Log($"Progress Bar Scale: {p1} for {itemName} - Raw values: {currentMasteryXP}/{nextLevelXP}");
-            itemMasteryProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p1);
-            itemMasteryProgressText.text = $"{(int)currentMasteryXP} / {nextLevelXP}";
-           // Debug.Log($"Progress Bar Object: {itemMasteryProgressBar.name}, Current Scale: {itemMasteryProgressBar.transform.localScale}");
-
-            // Only update blocks that belong to this machine
-            foreach (var block in itemBlocks.Values)
-            {
-                if (block.item.tags.Contains(producer.SkillTag))
-                {
-                    block.UpdateBlock(this, block.item);
-                }
-            }
-        }
-        else
-        {
-            noItemSelectedFrame.SetActive(true);
-            itemIcon.gameObject.SetActive(false);
-
-            titleText.text = "";
-            itemMasteryLevelText.text = "";
-            itemMasteryProgressText.text = "";
-
-            veinCountText.text = "";
-            itemValueText.text = "";
-
-            timeToCraftText.text = "";
-            xpText.text = "";
-            masteryXPText.text = "";
-            masteryPoolXPText.text = "";
-
-            itemMasteryProgressBar.transform.localScale = new Vector2(0f,1f);
-            itemMasteryProgressText.text = "0 / 0";
-
-            progressPercentText.text = "";
-            craftButton.onClick.RemoveAllListeners();
+            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {producerScript.SkillTag}");
+            selectedRecipe = null;
+            return false;
         }
 
-        UpdateSkillAndMasteryInfo();
-        
+        // Verify all required dictionary entries exist
+        if (!skillManager.itemMasteryLevels.ContainsKey(selectedRecipe.displayName) ||
+            !skillManager.itemMasteryXPCount.ContainsKey(selectedRecipe.displayName) ||
+            !producerScript.reservoirNodeCounts.ContainsKey(selectedRecipe.displayName) ||
+            !producerScript.reservoirMaxes.ContainsKey(selectedRecipe.displayName))
+        {
+            Debug.LogError($"Missing dictionary entries for {selectedRecipe.displayName} in {machineData.skill.skillName}");
+            return false;
+        }
+
+        return true;
     }
 
-
-    private void UpdateSkillAndMasteryInfo()
+    private void ResetDisplayCard()
     {
-        // Skill Level and XP
-        skillLevelText.text = "Level " + SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, producer.GetMachineData().skill.skillName);
+        displayCardOverlay.SetActive(true);
+        itemIcon.gameObject.SetActive(false);
 
-        int currentSkillLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, producer.GetMachineData().skill.skillName);
-        float currentSkillXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, producer.GetMachineData().skill.skillName);
+        titleText.text = "";
+        itemMasteryLevelText.text = "";
+        itemMasteryProgressText.text = "";
+
+        veinCount.text = "";
+        value.text = "";
+
+        craftTime.text = "";
+        xp.text = "";
+        masteryXP.text = "";
+        masteryPoolXP.text = "";
+
+        itemMasteryProgressBar.transform.localScale = new Vector2(0f,1f);
+        itemMasteryProgressText.text = "0 / 0";
+
+        progressPercentText.text = "";
+        craftButton.onClick.RemoveAllListeners();
+    }
+
+#endregion
+
+#region Update Visuals
+    
+    private void Update_DisplayCard()
+    {
+        // Remove overlay
+        displayCardOverlay.SetActive(false);
+
+        // Header
+        itemIcon.gameObject.SetActive(true);
+        itemIcon.sprite = selectedRecipe.icon;
+        itemIcon.SetNativeSize();
+        titleText.text = selectedRecipe.displayName;
+        itemMasteryLevelText.text = skillManager.GetDictionaryValue(skillManager.itemMasteryLevels, selectedRecipe.displayName).ToString();
+
+        // Calculate and Update mastery progress
+        float currentMasteryXP = skillManager.GetDictionaryValue(skillManager.itemMasteryXPCount, selectedRecipe.displayName);
+        float nextLevelXP = skillManager.Calculate_XPToNextLevel(skillManager.GetDictionaryValue(skillManager.itemMasteryLevels, selectedRecipe.displayName));
+        float progress = Mathf.Clamp01(currentMasteryXP / nextLevelXP);
+        itemMasteryProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), progress);
+        itemMasteryProgressText.text = $"{(int)currentMasteryXP} / {nextLevelXP}";
         
-        float p2 = Mathf.Clamp01(currentSkillXP / SkillManager.Instance.Calculate_XPToNextLevel(currentSkillLevel));
-        skillLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p2);
-        skillLevelProgressText.text  =  (int)currentSkillXP + " / " + SkillManager.Instance.Calculate_XPToNextLevel(currentSkillLevel).ToString();
+        // Info Display
+        veinCount.text = skillManager.GetDictionaryValue(producerScript.reservoirNodeCounts, selectedRecipe.displayName) + "/" + skillManager.GetDictionaryValue(producerScript.reservoirMaxes, selectedRecipe.displayName);
+        value.text = selectedRecipe.value.ToString();
+        craftTime.text = (machineData.skill.defaultCraftingInterval / 30).ToString("F2");
+        xp.text = selectedRecipe.XP.ToString();
+        int givenMasteryXP = (int)skillManager.Calculate_GivenItemMasteryXP(selectedRecipe.displayName, producerScript.SkillTag);
+        masteryXP.text = givenMasteryXP.ToString();
+        masteryPoolXP.text = ((int)(givenMasteryXP / 4)).ToString();
 
-        // Mastery Pool 
-        float currentMasteryPoolXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, producer.GetMachineData().skill.skillName);
-       
-        float p3 = Mathf.Clamp01(currentMasteryPoolXP / 11500000f);
-        masteryPoolProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), p3);
-        masteryPoolPercentText.text = "Mastery - " + ((currentMasteryPoolXP / producer.GetMachineData().skill.masteryPoolSize) * 100f).ToString("F2") + "%";
-        masteryPoolProgressText.text  =  (int)currentMasteryPoolXP + " / " + producer.GetMachineData().skill.masteryPoolSize;
+        CraftingProgressBar();
+    }
 
-        // Progress Bar
-        if (producer.turnedOn)
-        {
-            if (producer.respawningReservoir)
-            {
-                progressBar.GetComponent<Image>().sprite = whiteProgressBar;
-                progressPercentText.text = ((float)producer.tickTimer / (float)producer.timeToReservoirRespawn * 100).ToString("F0") + "%";
-
-                float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.timeToReservoirRespawn);
-                progressBar.transform.localScale = new Vector3(t,1f,1f);
-                
-            }
-            else
-            {
-                progressBar.GetComponent<Image>().sprite = redProgressBar;
-                progressPercentText.text = (((float)producer.tickTimer / (float)producer.GetMachineData().skill.defaultCraftingInterval) * 100).ToString("F0") + "%";
-
-                float t = Mathf.Clamp01((float)producer.tickTimer / (float)producer.GetMachineData().skill.defaultCraftingInterval);
-                progressBar.transform.localScale = new Vector3(t,1f,1f);
-            }
-        }
-        else
+    private void CraftingProgressBar()
+    {
+        // Reset if off
+        if (!producerScript.turnedOn)
         {
             progressPercentText.text = "0%";
             progressBar.transform.localScale = new Vector3(0f,2.5f,1f);
+            return;
+        }
+
+        // Set bar colour 
+        progressBarImage.sprite = producerScript.respawningReservoir 
+            ? whiteProgressBar 
+            : redProgressBar;
+
+        // Get time limits
+        float limit = producerScript.respawningReservoir 
+            ? producerScript.timeToReservoirRespawn 
+            : machineData.skill.defaultCraftingInterval;
+
+        // Calculate and normalize time (0-1)
+        float progress = (limit > 0f) 
+            ? Mathf.Clamp01(producerScript.tickTimer / limit) 
+            : 0f;
+
+        // Scale bar, show percentage
+        progressPercentText.text = $"{progress * 100:0}%"; 
+        progressBar.transform.localScale = new Vector3(progress,1f,1f);
+    }
+
+    private void Update_RecipeCard()
+    {
+        if (recipeBlocks.TryGetValue(selectedRecipe, out var selectedBlock))
+        {
+            selectedBlock.UpdateBlock(this, selectedBlock.itemData);
         }
     }
 
-    
+    private void Update_SkillAndMasteryBar()
+    {
+        // Skill Level and XP
+        skillLevelText.text = "Level " + skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill.skillName);
+
+        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill.skillName);
+        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, machineData.skill.skillName);
+        
+        float t1 = Mathf.Clamp01(currentSkillXP / skillManager.Calculate_XPToNextLevel(currentSkillLevel));
+        skillLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), t1);
+        skillLevelProgressText.text  =  (int)currentSkillXP + " / " + skillManager.Calculate_XPToNextLevel(currentSkillLevel).ToString();
+
+        // Mastery Pool 
+        float currentMasteryPoolXP = skillManager.GetDictionaryValue(skillManager.skillMasteryPoolXP, machineData.skill.skillName);
+       
+        float t2 = Mathf.Clamp01(currentMasteryPoolXP / machineData.skill.masteryPoolSize);
+        masteryPoolProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), t2);
+        masteryPoolPercentText.text = "Mastery - " + ((currentMasteryPoolXP / machineData.skill.masteryPoolSize) * 100f).ToString("F2") + "%";
+        masteryPoolProgressText.text  =  (int)currentMasteryPoolXP + " / " + machineData.skill.masteryPoolSize;
+    }
+
+
 
 #endregion
 

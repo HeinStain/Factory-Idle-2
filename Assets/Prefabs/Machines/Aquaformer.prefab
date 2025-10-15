@@ -119,7 +119,7 @@ MonoBehaviour:
   direction: 0
   associatedMachines: []
   tickTimer: 0
-  functioning: 0
+  turnedOn: 0
   skillTag: 2
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
@@ -138,6 +138,42 @@ PrefabInstance:
     - target: {fileID: 401486798265300108, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
       propertyPath: m_Name
       value: Visual (Aquaformer)
+      objectReference: {fileID: 0}
+    - target: {fileID: 401486798265300108, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 623839477520195374, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3538330978721639246, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3538330978721639246, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280623888940334657, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_Size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280623888940334657, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5019993660742814117, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5019993660742814117, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5019993660742814117, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5671109144962825261, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
       propertyPath: m_LocalPosition.x
@@ -191,6 +227,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Machine_Producer, Assembly-CSharp
       objectReference: {fileID: 0}
+    - target: {fileID: 7246193914543752752, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: anim
+      value: 
+      objectReference: {fileID: 4537550319712567299}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

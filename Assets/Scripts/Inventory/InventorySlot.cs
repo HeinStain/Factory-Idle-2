@@ -5,8 +5,7 @@ using TMPro;
 public class InventorySlot : MonoBehaviour
 {
 
-
-
+    [Header("UI")]
     [SerializeField] private Image selectionBox;
     [SerializeField] private Image slotFrame;
     [SerializeField] private Image itemIcon;
@@ -14,20 +13,31 @@ public class InventorySlot : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countText;
     [SerializeField] private Button selectButton;
 
-    private InventoryManager inventoryManager;
-    public ItemData itemData;
+    [Header("Data")]
+    private ItemData itemData;
     private int count;
 
 
+/*
 
-    public void UpdateBlock(InventoryManager invMan, ItemData data, int cnt)
+    private void Awake()
     {
+        InventoryManager.Instance.OnSlotChanged += UpdateBlock;
+    }
 
-        if (invMan == null || data == null) return;
+    private void OnDestroy() 
+    {
+        InventoryManager.Instance.OnSlotChanged -= UpdateBlock;
+    }
+
+*/
+
+    public void UpdateBlock(ItemData data, int amount)
+    {
+        if (data == null) return;
         
-        inventoryManager = invMan;
         itemData = data;
-        count = cnt;
+        count = amount;
 
         slotFrame.enabled = true;
         itemIcon.enabled = true;
@@ -36,21 +46,12 @@ public class InventorySlot : MonoBehaviour
         numberBubble.SetActive(true);
         countText.text = count.ToString();                                            
 
-        // Setup button listeners only once
         selectButton.onClick.RemoveAllListeners();                                                        
-        selectButton.onClick.AddListener(() => invMan.SlotSelected(this));
+        selectButton.onClick.AddListener(() => InventoryManager.Instance.SlotSelected(this));
     }
 
+    public void SelectSlot() => selectionBox.enabled = true;
 
-    public void SelectSlot()
-    {
-        selectionBox.enabled = true;
-    }
-
-
-    public void DeselectSlot()
-    {
-        selectionBox.enabled = false;
-    }   
+    public void DeselectSlot() => selectionBox.enabled = false;
 
 }

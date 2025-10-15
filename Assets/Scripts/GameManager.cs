@@ -135,10 +135,8 @@ public class GameManager : MonoBehaviour
     #region Menu
  
     public event Action<bool> OnMenuTriggered;
-    public void SetMenuOpen(bool status)
-    {
-        OnMenuTriggered?.Invoke(status);
-    }
+    public void SetMenuOpen(bool status) => OnMenuTriggered?.Invoke(status);
+    
     #endregion 
 
 }
