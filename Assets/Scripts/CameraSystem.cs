@@ -10,10 +10,16 @@ public class CameraSystem : MonoBehaviour
     [SerializeField] private bool useEdgeScroll = false;
     [SerializeField] private bool useDragPan = false;
 
+    [SerializeField] private SpriteRenderer fence;
+    [SerializeField] private Vector2 clampPadding = new(0.1f, 0.1f);
+
     private bool dragPanActive;
     private Vector2 lastMousePosition;
+    private Camera cam;
 
     public static event Action<bool> DragPanTriggered;
+
+    void Awake() => cam = Camera.main;
 
     private void Update()
     {
@@ -22,6 +28,8 @@ public class CameraSystem : MonoBehaviour
         if (useDragPan) DragPan();
     }
 
+    void LateUpdate() => ClampToFence();
+    
     private void MovementWASD()
     {
         Vector2 inputDir = new Vector2(0, 0);
@@ -99,5 +107,35 @@ public class CameraSystem : MonoBehaviour
 
         float moveSpeed = 10f;
         transform.position += moveDir * moveSpeed * Time.deltaTime;
+    }
+
+    
+
+    private void ClampToFence()
+    {
+        if (!cam || !cam.orthographic || !fence) return;
+
+        Bounds b = fence.bounds;
+
+        float halfH = cam.orthographicSize;
+        float halfW = halfH * cam.aspect;
+
+        // If the camera view is larger than the fence, just center and bail
+        if (b.size.x <= 2f * halfW || b.size.y <= 2f * halfH)
+        {
+            var c = b.center;
+            transform.position = new Vector3(c.x, c.y, transform.position.z);
+            return;
+        }
+
+        float minX = b.min.x + halfW + clampPadding.x;
+        float maxX = b.max.x - halfW - clampPadding.x;
+        float minY = b.min.y + halfH + clampPadding.y;
+        float maxY = b.max.y - halfH - clampPadding.y;
+
+        Vector3 p = transform.position;
+        p.x = Mathf.Clamp(p.x, minX, maxX);
+        p.y = Mathf.Clamp(p.y, minY, maxY);
+        transform.position = p;
     }
 }

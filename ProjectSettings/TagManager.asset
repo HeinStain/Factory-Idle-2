@@ -2,14 +2,14 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags:
   - Interactable
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - BG
   - Water
   - UI
   - Machines
@@ -60,6 +60,9 @@ TagManager:
   - name: Build Ghost
     uniqueID: 2553288987
     locked: 0
+  - name: Vignette
+    uniqueID: 1536552313
+    locked: 0
   - name: Debug
     uniqueID: 451191673
     locked: 0
@@ -69,3 +72,5 @@ TagManager:
   - name: Mouse
     uniqueID: 497914975
     locked: 0
+  m_RenderingLayers:
+  - Default
