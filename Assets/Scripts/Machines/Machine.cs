@@ -24,7 +24,7 @@ public class Machine : MonoBehaviour
         };
     }
 
-    public static Machine Create(Vector2 worldPos, Vector2Int originXY, MachineData.Direction direction, MachineData machineData)
+    public static Machine Create(Vector2 worldPos, Vector2Int originXY, MachineData.Direction direction, MachineData machineData, int tag)
     {
         Transform machineTransform = Instantiate(machineData.prefab, worldPos, Quaternion.Euler(0,0, machineData.GetRotationAngle(direction)));
         Machine machine = machineTransform.GetComponent<Machine>();
@@ -39,9 +39,11 @@ public class Machine : MonoBehaviour
                 spriteRenderer.sortingLayerName = "Placed Machine";
             }
         }
+
         machine.machineData = machineData;
         machine.originXY = originXY;
         machine.direction = direction;
+        machine.AssignTag(tag);
         machine.MachineSetup();
         
         return machine;
@@ -62,9 +64,9 @@ public class Machine : MonoBehaviour
 
     public void AssignAssociatedMachines(List<Machine> machines) => associatedMachines = machines;
     public List<Machine> GetAssociatedMachines() => associatedMachines;
-
     public virtual Vector2Int GetDispenseTileIndexOffset() { return new Vector2Int(0,0); }
     public virtual Vector2Int GetIntakeTileIndexOffset() { return new Vector2Int(0,0); }
+    public virtual void AssignTag(int tag) {}
 
 #endregion
 

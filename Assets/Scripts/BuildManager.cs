@@ -106,7 +106,7 @@ public class BuildManager : MonoBehaviour
         Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + new Vector2(rotationOffset.x, rotationOffset.y);
 
         // Create Machine
-        Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine);
+        Machine machine = Machine.Create(machineWorldPosition, new Vector2Int(x, y), direction, heldMachine, 99);
         List<Machine> machines = new List<Machine> { machine };
         List<Machine> belts = new List<Machine> {};
 
@@ -125,7 +125,8 @@ public class BuildManager : MonoBehaviour
                        worldPos: dispenseBeltWorldPosition, 
                        originXY: dispenseTileOffset, 
                       direction: direction, 
-                    machineData: machineList[0]);
+                    machineData: machineList[0],
+                            tag: 1);
 
                 // Associate Machine to Belt
                 dispenseBelt.AssignAssociatedMachines(machines);
@@ -147,7 +148,8 @@ public class BuildManager : MonoBehaviour
                        worldPos: intakeBeltWorldPosition, 
                        originXY: intakeTileOffset, 
                       direction: direction, 
-                    machineData: machineList[0]);
+                    machineData: machineList[0],
+                            tag: 0);
 
                 // Associate Machine to Belt
                 intakeBelt.AssignAssociatedMachines(machines);
@@ -178,7 +180,7 @@ public class BuildManager : MonoBehaviour
         Vector2Int rotationOffset = heldMachine.GetRotationOffset(customDirection);
         Vector2 machineWorldPosition = gridMap.GetTileOriginPosition(x, y) + (Vector2)rotationOffset;
 
-        Machine belt = Machine.Create(machineWorldPosition, new Vector2Int(x, y), customDirection, heldMachine);
+        Machine belt = Machine.Create(machineWorldPosition, new Vector2Int(x, y), customDirection, heldMachine, 99);
 
         foreach (Vector2Int position in gridPositionList)
             gridMap.GetGridObject(position.x, position.y).SetMachine(belt);

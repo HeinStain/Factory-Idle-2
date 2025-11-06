@@ -8,8 +8,10 @@ public class Belt : Machine
     public override string ToString() => "Belt";
 
 
-    [Header("Grid")]
+    [Header("Data")]
     private GridMap gridMap;
+    public bool isIntakeBelt;
+    public bool isDispenseBelt;
     [SerializeField] private List<Item> itemsOnBelt = new();
 
 
@@ -81,19 +83,40 @@ public class Belt : Machine
 
     public void GetNeighbourBelts()
     {
-        Belt candidate = GetBeltFromTile(nextAvailableTile);
-        nextAvailableBelt = candidate != null 
-                     // && nextAvailableTile.GetMachine() == null 
-                        && candidate.direction != GetNegativeDirection(this) ? candidate : null;
-
+        nextAvailableBelt = CheckNextAvailable();
         rearBelt = GetBeltFromTile(rearTile);
         rightBelt = GetBeltFromTile(rightTile);
         leftBelt = GetBeltFromTile(leftTile);
 
         Belt GetBeltFromTile(GridMap.GridTile tile)
         {
-            return tile?.GetBelt();
+            var candidate = tile?.GetBelt();
+            if (candidate == null) return null;
+
+            if (candidate.isIntakeBelt) return null;
+            else return candidate;
         }
+
+        Belt CheckNextAvailable()
+        {
+            Belt candidate = nextAvailableTile?.GetBelt();
+            bool machineOnNext = nextAvailableTile.GetMachine() != null;
+
+            // If this is an intake belt, always null
+            if (this.isIntakeBelt) return null;     
+            // No Next Belt Found
+            if (candidate == null) return null;
+            // Never connect to a dispense belt
+            if (candidate.isDispenseBelt) return null;
+            // Only connect to correct direction intake belt
+            if (candidate.isIntakeBelt) return candidate.direction == direction ? candidate : null;
+            // No machine, Connect if not facing opposite
+            if (!machineOnNext && candidate.direction != GetNegativeDirection(this)) return candidate;
+
+            return null;
+        }
+
+            
     }
 
     public void RefreshSurroundingBelts()
@@ -264,7 +287,7 @@ public class Belt : Machine
     #endregion
 
 
-    #region Belt Centre
+    #region Belt Info
     public Vector3 GetBeltCentre()
     {
         Vector3 basePos = new Vector3(transform.position.x, transform.position.y, 0);
@@ -277,5 +300,12 @@ public class Belt : Machine
             _ => basePos
         };
     }
+
+    public override void AssignTag(int tag)
+    {
+        if (tag == 0) isIntakeBelt = true;
+        if (tag == 1) isDispenseBelt = true;
+    }
+    
     #endregion
 }
