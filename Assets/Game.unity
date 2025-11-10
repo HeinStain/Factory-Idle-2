@@ -5363,7 +5363,457 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPrefabVisualNode: {fileID: 1395564801548813136, guid: cccfbfacdf352e247b5fdc1d308d26b1, type: 3}
   openTile: {fileID: -1169363856, guid: 77f9a70fa4a5b074c8edf2b948c776d1, type: 3}
-  wallTile: {fileID: 2069862246, guid: 77f9a70fa4a5b074c8edf2b948c776d1, type: 3}
+  rules:
+  - key: FourWall
+    sprite: {fileID: -1746011141, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 1
+    Down: 1
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall1
+    sprite: {fileID: 1902065864, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: 0
+    DownLeft: 0
+  - key: Wall2
+    sprite: {fileID: -316145844, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: -1
+    DownRight: -1
+    DownLeft: 0
+  - key: Wall3
+    sprite: {fileID: 1283568899, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 1
+    Left: 0
+    UpLeft: 0
+    UpRight: 0
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall4
+    sprite: {fileID: 612208382, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: 0
+    DownRight: 0
+    DownLeft: -1
+  - key: CornerBR
+    sprite: {fileID: -3218248262026354849, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 0
+    DownRight: 1
+    DownLeft: 0
+  - key: CornerBL
+    sprite: {fileID: -1588685015, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 0
+    DownRight: 0
+    DownLeft: 1
+  - key: CornerTL
+    sprite: {fileID: 2052663300, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 0
+    DownRight: 0
+    DownLeft: 0
+  - key: CornerTR
+    sprite: {fileID: -297051025, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 1
+    DownRight: 0
+    DownLeft: 0
+  - key: 3CornerNoTL
+    sprite: {fileID: 1959478932, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 1
+    DownRight: 1
+    DownLeft: 1
+  - key: 3CornerNoBL
+    sprite: {fileID: -338024640, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 1
+    DownRight: 1
+    DownLeft: 0
+  - key: 3CornerNoTR
+    sprite: {fileID: -166839799, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 0
+    DownRight: 1
+    DownLeft: 1
+  - key: 3CornerNoBR
+    sprite: {fileID: -565727382, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 1
+    DownRight: 0
+    DownLeft: 1
+  - key: TwoWallHorizontal
+    sprite: {fileID: 754599837, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: TwoWallVertical
+    sprite: {fileID: 1417289135, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 1
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: TwoWallBR
+    sprite: {fileID: 944639341, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 1
+    Left: 0
+    UpLeft: 0
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: TwoWallBL
+    sprite: {fileID: -1923855832, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 1
+    Left: 1
+    UpLeft: -1
+    UpRight: 0
+    DownRight: -1
+    DownLeft: -1
+  - key: TwoWallTR
+    sprite: {fileID: 1772311720, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 1
+    Down: 0
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: 0
+  - key: TwoWallTL
+    sprite: {fileID: 1349504146, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: 0
+    DownLeft: -1
+  - key: ThreeWallRight
+    sprite: {fileID: -1150453837, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 1
+    Down: 1
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: ThreeWallLeft
+    sprite: {fileID: 744338487, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 1
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: ThreeWallUp
+    sprite: {fileID: 359479370, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 1
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: ThreeWallDown
+    sprite: {fileID: 1143762801, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 1
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall3_2Corner
+    sprite: {fileID: -1392894634, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 1
+    Left: 0
+    UpLeft: 1
+    UpRight: 1
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall2_2Corner
+    sprite: {fileID: 1450510554, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: 1
+  - key: Wall4_2Corner
+    sprite: {fileID: -776978658, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: 1
+    DownRight: 1
+    DownLeft: -1
+  - key: Wall1_2Corner
+    sprite: {fileID: 212198984, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: 1
+    DownLeft: 1
+  - key: 2WallTL_CornerBR
+    sprite: {fileID: 310377377, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: -1
+    DownRight: 1
+    DownLeft: -1
+  - key: 2WallBL_CornerTR
+    sprite: {fileID: 1303223316, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 1
+    Left: 1
+    UpLeft: -1
+    UpRight: 1
+    DownRight: -1
+    DownLeft: -1
+  - key: 2WallTR_CornerBL
+    sprite: {fileID: 459013785, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 1
+    Down: 0
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: 1
+  - key: 2WallBR_CornerTL
+    sprite: {fileID: 109633918, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 1
+    Left: 0
+    UpLeft: 1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall3_CornerTR
+    sprite: {fileID: 5729988, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 1
+    Left: 0
+    UpLeft: 0
+    UpRight: 1
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall3_CornerTL
+    sprite: {fileID: 936661187, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 1
+    Left: 0
+    UpLeft: 1
+    UpRight: 0
+    DownRight: -1
+    DownLeft: -1
+  - key: Wall1_CornerBR
+    sprite: {fileID: 81286589, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: 1
+    DownLeft: 0
+  - key: Wall1_CornerBL
+    sprite: {fileID: -1053526394, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 1
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: -1
+    UpRight: -1
+    DownRight: 0
+    DownLeft: 1
+  - key: Wall4_CornerTR
+    sprite: {fileID: 912754251, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: 1
+    DownRight: 0
+    DownLeft: -1
+  - key: Wall4_CornerBR
+    sprite: {fileID: 1794184215, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 1
+    UpLeft: -1
+    UpRight: 0
+    DownRight: 1
+    DownLeft: -1
+  - key: Wall2_CornerTL
+    sprite: {fileID: 1281169972, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: -1
+    DownRight: -1
+    DownLeft: 0
+  - key: Wall2_CornerBL
+    sprite: {fileID: -910891485, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 1
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: -1
+    DownRight: -1
+    DownLeft: 1
+  - key: 2CornerURBL
+    sprite: {fileID: -2072805091, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 1
+    DownRight: 0
+    DownLeft: 1
+  - key: 2CornerULBR
+    sprite: {fileID: -1795765594, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 0
+    DownRight: 1
+    DownLeft: 0
+  - key: 2CornerRight
+    sprite: {fileID: -204042810, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 1
+    DownRight: 1
+    DownLeft: 0
+  - key: 2CornerLeft
+    sprite: {fileID: -255984045, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 0
+    DownRight: 0
+    DownLeft: 1
+  - key: 2CornerTop
+    sprite: {fileID: 66514533, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 1
+    UpRight: 1
+    DownRight: 0
+    DownLeft: 0
+  - key: 2CornerDown
+    sprite: {fileID: -521227311, guid: 9e28f9c2ebf98114aa3747fb9925a7e1, type: 3}
+    Up: 0
+    Right: 0
+    Down: 0
+    Left: 0
+    UpLeft: 0
+    UpRight: 0
+    DownRight: 1
+    DownLeft: 1
 --- !u!114 &2107962714
 MonoBehaviour:
   m_ObjectHideFlags: 0
