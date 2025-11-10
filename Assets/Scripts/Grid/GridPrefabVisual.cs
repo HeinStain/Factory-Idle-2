@@ -16,7 +16,6 @@ public class GridPrefabVisual : MonoBehaviour
 
     [SerializeField] private Sprite openTile;
     [SerializeField] private Sprite wallTile;
-    [SerializeField] private Sprite lockedTile;
 
     private bool buyMode;
 
@@ -102,21 +101,28 @@ public class GridPrefabVisual : MonoBehaviour
         switch (gridTile.GetTileVisualState())
         {
             default:
+
             case GridMap.GridTile.TileVisualState.Locked :
-                tileSprite.sprite = lockedTile;
+                tileSprite.enabled = false;
                 costText.gameObject.SetActive(false);
                 break;
+
             case GridMap.GridTile.TileVisualState.CanBuy :
+                tileSprite.enabled = true;
                 tileSprite.sprite = wallTile;
                 costText.text = "$ " + gridTile.GetUnlockCost().ToString();
-                if (buyMode) costText.gameObject.SetActive(true);
-                else costText.gameObject.SetActive(false);
+                costText.gameObject.SetActive(buyMode);
+
                 break;
+
             case GridMap.GridTile.TileVisualState.Corner :
+                tileSprite.enabled = true;
                 tileSprite.sprite = wallTile;
                 costText.gameObject.SetActive(false);
                 break;
+
             case GridMap.GridTile.TileVisualState.Open :
+                tileSprite.enabled = true;
                 tileSprite.sprite = openTile;
                 costText.gameObject.SetActive(false);
                 break;

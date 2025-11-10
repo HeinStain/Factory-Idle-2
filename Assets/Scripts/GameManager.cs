@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [SerializeField] private GridPrefabVisual gridPrefabVisual;
+    [SerializeField] private GridEdgeOverlay gridEdgeOverlay;
     
     private GridMap gridMap;
 
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
 
         SetBeginningGridStates();
         gridPrefabVisual.Setup(gridMap);
+        gridEdgeOverlay.Setup(gridMap);
         
         MoneyManager.Instance.IncreaseMoney(1000000);
     }

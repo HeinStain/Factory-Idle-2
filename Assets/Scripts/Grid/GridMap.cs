@@ -13,8 +13,8 @@ public class GridMap : Grid<GridMap.GridTile>
     {
         if (showDebug)
         {
-            debugVisual = new GridDebugVisual<GridTile>(this);
-            debugVisual.ShowDebugVisuals();
+            // debugVisual = new GridDebugVisual<GridTile>(this);
+            // debugVisual.ShowDebugVisuals();
         }
     }
 
