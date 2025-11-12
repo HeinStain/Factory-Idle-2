@@ -5,6 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class GridEdgeOverlay : MonoBehaviour
 {
+
+    private bool overlayDirty;
+
     [Header("Render")]
     [SerializeField] private string sortingLayerName = "Grid Overlay";
     [SerializeField] private int sortingOrder = 0;
@@ -54,13 +57,23 @@ public class GridEdgeOverlay : MonoBehaviour
     {
         grid = g;
 
-        onGridChanged    = (_, __) => Rebuild();
+        onGridChanged    = (_, __) => overlayDirty = true;
         onBuyModeChanged = OnBuyModeChanged;
 
         grid.OnGridValueChanged += onGridChanged;
         GridBuyManager.Instance.OnBuyModeChanged += onBuyModeChanged;
 
         Rebuild();
+    }
+
+    // Add LateUpdate:
+    private void LateUpdate()
+    {
+        if (overlayDirty)
+        {
+            overlayDirty = false;
+            Rebuild();
+        }
     }
 
     private void OnDestroy()
@@ -73,7 +86,7 @@ public class GridEdgeOverlay : MonoBehaviour
     private void OnBuyModeChanged(bool isOn)
     {
         mr.enabled = isOn;
-        if (isOn) Rebuild();
+        if (isOn) overlayDirty = true;
     }
 
     private void Rebuild()
@@ -95,12 +108,12 @@ public class GridEdgeOverlay : MonoBehaviour
         const float stripZ = -0.001f;
         float halfEdge = edgeThickness * 0.5f;
 
-        bool IsOpen(int x, int y)
+        bool IsCanBuy(int x, int y)
         {
             if (x < 0 || y < 0 || x >= w || y >= h) return false;
-            return grid.GetGridObject(x, y).GetTileVisualState() == GridMap.GridTile.TileVisualState.Open;
+            var s = grid.GetGridObject(x, y).GetTileVisualState();
+            return s == GridMap.GridTile.TileVisualState.CanBuy;
         }
-
         // 1) Build border strips and collect corner direction masks
         for (int x = 0; x < w; x++)
         for (int y = 0; y < h; y++)
@@ -113,29 +126,14 @@ public class GridEdgeOverlay : MonoBehaviour
             Vector2 tr = origin + new Vector2((x + 1)*cs, (y + 1)*cs);
 
             // bottom
-            if (!IsOpen(x, y - 1))
-            {
-                AddStrip(bl, br, Vector2.down);
-                Reg(x, y, DOWN); Reg(x + 1, y, DOWN);
-            }
+            if (IsCanBuy(x, y - 1)) { AddStrip(bl, br, Vector2.down); Reg(x, y, DOWN); Reg(x+1, y, DOWN); }
             // top
-            if (!IsOpen(x, y + 1))
-            {
-                AddStrip(tl, tr, Vector2.up);
-                Reg(x, y + 1, UP); Reg(x + 1, y + 1, UP);
-            }
+            if (IsCanBuy(x, y + 1)) { AddStrip(tl, tr, Vector2.up);   Reg(x, y+1, UP);  Reg(x+1, y+1, UP);  }
             // left
-            if (!IsOpen(x - 1, y))
-            {
-                AddStrip(bl, tl, Vector2.left);
-                Reg(x, y, LEFT); Reg(x, y + 1, LEFT);
-            }
+            if (IsCanBuy(x - 1, y)) { AddStrip(bl, tl, Vector2.left); Reg(x, y, LEFT);  Reg(x, y+1, LEFT);  }
             // right
-            if (!IsOpen(x + 1, y))
-            {
-                AddStrip(br, tr, Vector2.right);
-                Reg(x + 1, y, RIGHT); Reg(x + 1, y + 1, RIGHT);
-            }
+            if (IsCanBuy(x + 1, y)) { AddStrip(br, tr, Vector2.right);Reg(x+1,y,RIGHT); Reg(x+1,y+1,RIGHT); }
+
 
             void AddStrip(Vector2 a, Vector2 b, Vector2 outward)
             {
@@ -222,4 +220,9 @@ public class GridEdgeOverlay : MonoBehaviour
             }
         }
     }
+
+
+
+
+
 }

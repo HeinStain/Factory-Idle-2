@@ -13,6 +13,7 @@ public class GridPrefabVisual : MonoBehaviour
     private Transform[,] visualNodeArray;
     private GridMap gridMap;
     private bool buyMode;
+    private bool visualDirty;
 
     [Header("Floor / Fallback")]
     [SerializeField] private Sprite openTile;
@@ -93,13 +94,17 @@ public class GridPrefabVisual : MonoBehaviour
         GridBuyManager.Instance.OnBuyModeChanged += Instance_OnBuyModeChanged;
     }
 
-    private void GridMap_OnGridValueChanged(object sender, GridMap.OnGridValueChangedEventArgs e) => UpdateVisual(gridMap);
-
-    private void Instance_OnBuyModeChanged(bool arg)
+    private void LateUpdate()
     {
-        buyMode = arg;
-        UpdateVisual(gridMap);
+        if (visualDirty)
+        {
+            visualDirty = false;
+            UpdateVisual(gridMap);
+        }
     }
+
+    private void GridMap_OnGridValueChanged(object s, GridMap.OnGridValueChangedEventArgs e) { visualDirty = true; }
+    private void Instance_OnBuyModeChanged(bool arg) { buyMode = arg; visualDirty = true; }
 
     public void UpdateVisual(GridMap gridMap)
     {
@@ -209,7 +214,7 @@ public class GridPrefabVisual : MonoBehaviour
 
                 if (gridTile.GetTileVisualState() == GridMap.GridTile.TileVisualState.CanBuy)
                 {
-                    costText.text = "$ " + gridTile.GetUnlockCost().ToString();
+                    costText.text = "$ " + GridBuyManager.Instance.GetTileCost().ToString();
                     costText.gameObject.SetActive(buyMode);
                 }
                 else costText.gameObject.SetActive(false);
