@@ -1914,6 +1914,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6e30fd5439fb1dc4e8ed5316ccf06769, type: 2}
   - {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
   - {fileID: 11400000, guid: 792244270d5988047848957e31fc871d, type: 2}
+  - {fileID: 11400000, guid: fb10c13c5d401724582d49786cf5d095, type: 2}
   heldMachine: {fileID: 0}
   draggingBelt: 0
 --- !u!4 &616188007
@@ -3334,7 +3335,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -48.5, y: 0}
   m_SizeDelta: {x: 17, y: 17}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1299049908
@@ -6132,11 +6133,11 @@ MonoBehaviour:
     5. Collector
 
     6.
-    battery_test
+    Grabber
 
-    7. collector_test
+    7. <n/a>
 
-    8. grabber_test
+    8. <n/a>
 
     0. Deselect'
   m_isRightToLeft: 0

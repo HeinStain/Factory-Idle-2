@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda049340ecf0ef46b097422de5102d2, type: 3}
+  m_Name: Grabber
+  m_EditorClassIdentifier: 
+  machineName: Grabber
+  skill: {fileID: 0}
+  prefab: {fileID: 8361633519508303915, guid: 7f7767c7a40765c46b2e799e2547688f, type: 3}
+  visual: {fileID: 1417175592132991586, guid: d0e981a0218f0c6438f0179eff7bdff2, type: 3}
+  width: 1
+  height: 1
+  hasDispenseBelt: 0
+  hasIntakeBelt: 0
