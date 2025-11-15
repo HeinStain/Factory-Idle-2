@@ -219,6 +219,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Hand 2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 45
+        width: 44
+        height: 44
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87eb41854f7c2f54b9121bc09db36cb6
+      internalID: -829427870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -236,6 +258,7 @@ TextureImporter:
       Arm: 6794614588935098457
       Base: 4145476482268031810
       Hand: -4585252961612494119
+      Hand 2: -829427870
       Pin: -75796904
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

@@ -15,7 +15,7 @@ public class TickManager : MonoBehaviour
     public static event EventHandler<OnTickEventArgs> OnTick;
 
     public static float beltsPerSecond =  1f;
-    public static float ticksPer = 60f;
+    public static float ticksPer = 30f;
     public static float tickTimerMax => 1f / ticksPer;
 
     private int tick;

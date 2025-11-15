@@ -194,9 +194,17 @@ public class Belt : Machine
         return true;
     }
 
+    public bool TryAddItemAtSlot(Item item, Transform slot)
+    {
+        if (slot == null) return false;
+        if (itemsOnBelt.Exists(i => i.GetCurrentSlot() == slot)) return false;
+
+        item.AssignSlot(slot);
+        itemsOnBelt.Add(item);
+        return true;
+    }
+    
     public void RemoveItem(Item item) => itemsOnBelt.Remove(item);
-
-
 
     public Item PeekFrontItem()
     {

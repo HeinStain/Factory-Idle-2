@@ -28,6 +28,8 @@ public class Item : MonoBehaviour
 
     private int arrivalTick;
 
+
+#region Setup
     private void OnEnable()
     {
         TickManager.OnTick += MoveItem;
@@ -58,6 +60,10 @@ public class Item : MonoBehaviour
         transitionProgress = 0f;
     }
 
+#endregion
+
+#region Movement
+
     private void MoveItem(object sender, TickManager.OnTickEventArgs e)
     {
         
@@ -78,7 +84,6 @@ public class Item : MonoBehaviour
                     if (!hasTransferredThisCycle)
                     {
                         TryStartTransfer();
-                        // ✅ Only transfer once per cycle — moved to when item actually starts moving forward
                     }
                 }
                 else if (state == BeltItemState.MovingToNextBeltSlot)
@@ -128,7 +133,10 @@ public class Item : MonoBehaviour
             }
         }
     }
+    
+#endregion
 
+#region Slots
     private void TryStartTransfer()
     {
         Belt nextBelt = currentBelt.GetNextBelt();
@@ -164,12 +172,55 @@ public class Item : MonoBehaviour
 
     public void AssignSlot(Transform slot) => targetSlot = slot;
     public Transform GetCurrentSlot() => targetSlot;
-    
+    public Belt GetCurrentBelt() => currentBelt;
     public int GetArrivalTick() => arrivalTick;
-
 
     ////////////////////////////
         
+#endregion
+
+#region Grab/Drop
+
+    public void GrabToHand(Transform hand)
+    {
+        // Kill belt control
+        currentBelt = null;
+        targetSlot = null;
+
+        // Parent to the hand so it follows the animation
+        transform.SetParent(null, worldPositionStays: true);
+        transform.localPosition = Vector3.zero;
+
+            // Reset all movement values
+        state = BeltItemState.IdleOnSlot;   // doesn't matter, MoveItem early-returns on currentBelt == null
+        transitionProgress = 0f;
+        hasTransferredThisCycle = false;
+    }
+
+    public void AttachToBeltFromGrab(Belt belt, Transform slot)
+    {
+        // Detach from hand but keep world position where the hand left it
+        transform.SetParent(null, worldPositionStays: true);
+
+        currentBelt = belt;
+
+        // TELEPORT to the input slot
+        transform.position = slot.position;
+        movementStart = transform.position;  
+        targetSlot = slot;
+
+        // Treat it as idling on that slot, like it was spawned there
+        state = BeltItemState.MovingToNextBeltSlot; 
+        transitionProgress = 0f;
+        hasTransferredThisCycle = false;
+        arrivalTick = TickManager.Instance.GetCurrentTick();
+    }
+
+
+#endregion
+
+#region Sorting Order
+
     private void UpdateSortingOrder()
     {
         if (spriteRenderer == null || currentBelt == null) return;
@@ -189,4 +240,7 @@ public class Item : MonoBehaviour
 
         spriteRenderer.sortingOrder = baseOrder + offset;
     }
+
+#endregion
+
 }
