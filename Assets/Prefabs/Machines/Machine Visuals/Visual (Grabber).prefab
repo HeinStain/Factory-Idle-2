@@ -44,7 +44,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2681983972002546065}
   m_Layer: 0
-  m_Name: Test
+  m_Name: Targets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -198,7 +198,7 @@ GameObject:
   - component: {fileID: 6361284508006523020}
   - component: {fileID: 4755942817597354499}
   m_Layer: 0
-  m_Name: Dot
+  m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -264,7 +264,7 @@ SpriteRenderer:
   m_SortingLayer: 6
   m_SortingOrder: 100
   m_Sprite: {fileID: 1043976119, guid: a2c8288f13e682f42954863964e84518, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -438,7 +438,7 @@ SpriteRenderer:
   m_SortingLayer: 6
   m_SortingOrder: 100
   m_Sprite: {fileID: 651472829, guid: a2c8288f13e682f42954863964e84518, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

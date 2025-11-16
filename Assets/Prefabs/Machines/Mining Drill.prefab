@@ -159,6 +159,14 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5355281474496344976, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5355281474496344976, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 6860196260949812734, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -183,6 +191,10 @@ PrefabInstance:
       propertyPath: producer
       value: 
       objectReference: {fileID: 7651154511321310354}
+    - target: {fileID: 7609776882283872324, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+      propertyPath: recipeDisplaySprite
+      value: 
+      objectReference: {fileID: 1302473055546501227}
     - target: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -228,6 +240,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+--- !u!212 &1302473055546501227 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4327041996098588031, guid: 743edf86e6f8db84383476388ed04713, type: 3}
+  m_PrefabInstance: {fileID: 3323636264782701844}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5397272109034386433 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7275877398449787157, guid: 743edf86e6f8db84383476388ed04713, type: 3}

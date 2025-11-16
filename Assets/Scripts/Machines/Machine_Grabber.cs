@@ -17,9 +17,18 @@ public class Machine_Grabber : Machine
     [SerializeField] private Belt destinationBelt;
 
 
-    [Header("Hand")]
+    [Header("Parts")]
+    [SerializeField] private GameObject targets;
     [SerializeField] private Transform handSlot;
+
+    [SerializeField] private SpriteRenderer baseSprite;
+    [SerializeField] private SpriteRenderer innerArm;
+    [SerializeField] private SpriteRenderer outerArm;
+    [SerializeField] private SpriteRenderer handSprite;
+    
     private Item heldItem;
+
+
 
     
     [Header("Timing (ticks)")]
@@ -49,6 +58,12 @@ public class Machine_Grabber : Machine
     protected override void MachineSetup()
     {
         gridMap = GameManager.Instance.GetGrid();
+
+        targets.SetActive(false);
+        baseSprite.sortingLayerName = "Machine Frames";
+        innerArm.sortingLayerName = "Machine Frames";
+        outerArm.sortingLayerName = "Placed Machine";
+        handSprite.sortingLayerName = "Placed Machine";
 
         RefreshConnections();
         SetupAnimation();

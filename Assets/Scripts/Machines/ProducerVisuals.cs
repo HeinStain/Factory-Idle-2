@@ -22,6 +22,7 @@ public class ProducerVisuals : MonoBehaviour
 
 
     [Header("Machine Parts")]
+        [SerializeField] private SpriteRenderer recipeDisplaySprite;
         [SerializeField] private GameObject machineProgressBar;
         [SerializeField] private SpriteRenderer machineProgressBarSR;
         [SerializeField] List<Transform> objectsToKeepStraight;
@@ -105,7 +106,20 @@ public class ProducerVisuals : MonoBehaviour
         if (placed) 
         { 
             anim.SetBool("IsActive", producerScript.turnedOn);
-            if (producerScript != null) { MachineProgressBarVisuals(); } 
+            
+            if (producerScript != null) 
+            { 
+                MachineProgressBarVisuals(); 
+
+                if (producerScript.turnedOn && selectedRecipe != null)
+                {
+                    DisplayRecipe(selectedRecipe);
+                }
+                else
+                {
+                    ClearRecipeDisplay();
+                }
+            } 
 
             if (menuOpen) 
             { 
@@ -380,5 +394,21 @@ public class ProducerVisuals : MonoBehaviour
 
 
 #endregion
+
+#region 
+    
+
+    private void DisplayRecipe(ItemData recipe)
+    {
+        recipeDisplaySprite.sprite = recipe.icon;
+    }
+
+    private void ClearRecipeDisplay()
+    {
+        recipeDisplaySprite.sprite = null;
+    }
+
+#endregion
+
 
 }

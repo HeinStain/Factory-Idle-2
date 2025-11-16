@@ -46,7 +46,7 @@ public class Item : MonoBehaviour
         // Set up item
         itemData = data;
         spriteRenderer = GetComponent<SpriteRenderer>();
-        //spriteRenderer.sortingLayerName = "Items";
+        spriteRenderer.sortingLayerName = "Items";
         spriteRenderer.sprite = itemData.icon;
 
         // Set start belt
