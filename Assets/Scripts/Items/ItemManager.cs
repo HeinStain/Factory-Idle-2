@@ -24,8 +24,9 @@ public class ItemManager : MonoBehaviour
 
     public static List<ObjectPool> objectPools = new List<ObjectPool>();
 
-    public static GameObject SpawnObject(Belt spawnBelt, GameObject itemPrefab, ItemData itemData, Vector3 spawnPosition, Quaternion spawnRotation)
+    public static GameObject SpawnObject(Belt spawnBelt, ItemData itemData)
     {
+        Vector3 spawnPosition = spawnBelt.rearSlot.position;
         // Look for the object pool of this item type
         ObjectPool pool = null;
         foreach (ObjectPool objPool in objectPools)
@@ -44,33 +45,26 @@ public class ItemManager : MonoBehaviour
             objectPools.Add(pool);
         }
 
-        // Check if there are any inactive objects in the pool
+        // Get object (new or pooled)
         GameObject spawnObj = null;
-        foreach (GameObject inactiveObj in pool.inactiveObjects)
+        if (pool.inactiveObjects.Count > 0)
         {
-            if (inactiveObj != null)
-            {
-                spawnObj = inactiveObj;
-                break;
-            }
-        }
-
-        if (spawnObj == null)
-        {
-            // If there are no inactive objects, create a new one, and set it up
-            spawnObj = Instantiate(itemPrefab, spawnPosition, spawnRotation);
-            spawnObj.name = itemData.displayName; 
-            spawnObj.GetComponent<Item>().ItemSetup(itemData, spawnBelt);
+            spawnObj = pool.inactiveObjects[0];
+            pool.inactiveObjects.RemoveAt(0);
+            spawnObj.SetActive(true);
         }
         else
         {
-            // If there is an inactive object, reactivate it
-            spawnObj.transform.position = spawnPosition;
-            spawnObj.transform.rotation = spawnRotation;
-            pool.inactiveObjects.Remove(spawnObj);
-            spawnObj.name = itemData.displayName; 
-            spawnObj.SetActive(true);
+            spawnObj = Instantiate(Instance.itemPrefab);
         }
+
+        // Common setup for both paths
+        spawnObj.transform.position = spawnPosition;
+        spawnObj.transform.rotation = Quaternion.identity;
+        spawnObj.name = itemData.displayName;
+
+        var item = spawnObj.GetComponent<Item>();
+        item.ItemSetup(itemData, spawnBelt);
 
         return spawnObj;
     }

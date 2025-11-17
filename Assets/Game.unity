@@ -1915,6 +1915,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
   - {fileID: 11400000, guid: 792244270d5988047848957e31fc871d, type: 2}
   - {fileID: 11400000, guid: fb10c13c5d401724582d49786cf5d095, type: 2}
+  - {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
   heldMachine: {fileID: 0}
   draggingBelt: 0
 --- !u!4 &616188007
@@ -6135,7 +6136,7 @@ MonoBehaviour:
     6.
     Grabber
 
-    7. <n/a>
+    7. Furnace
 
     8. <n/a>
 

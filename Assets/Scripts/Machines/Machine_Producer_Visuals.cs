@@ -6,7 +6,7 @@ using System.Data;
 using System.Collections.Generic;
 
 
-public class ProducerVisuals : MonoBehaviour
+public class Machine_Producer_Visuals : MonoBehaviour
 {
 
     [Header("Function")]

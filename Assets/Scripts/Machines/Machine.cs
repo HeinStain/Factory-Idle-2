@@ -70,16 +70,6 @@ public class Machine : MonoBehaviour
 
 #endregion
 
-#region UpdateCycle
-
-    public void BeltCheckUpdateCycle() { GetDispenseTile(); GetDispenseBelt(); GetIntakeTile(); GetIntakeBelt(); }
-
-    protected virtual void GetDispenseTile() {}
-    protected virtual void GetDispenseBelt() {}
-    protected virtual void GetIntakeTile() {}
-    protected virtual void GetIntakeBelt() {}
-
-#endregion
 
 #region Destruction
 

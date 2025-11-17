@@ -16,9 +16,9 @@ public class Machine_Producer : Machine
 
     [Header("Selection")]
     public ItemData selectedRecipe;
-    public ItemData itemToCraft;
+    public ItemData activeRecipe;
 
-    private bool holdingCraftedItem = false;
+    private bool itemPending = false;
 
     [Header("Data")]
     public bool respawningReservoir;
@@ -55,6 +55,13 @@ public class Machine_Producer : Machine
                     SkillManager.Instance.GetDictionaryValue(reservoirMaxes, item.displayName));
             }
         }
+        
+        BuildManager.Instance.OnMachinePlaced += RefreshBelt;
+    }
+
+    private void OnDestroy()
+    {
+        BuildManager.Instance.OnMachinePlaced -= RefreshBelt;
     }
 
     private void Update()
@@ -65,24 +72,16 @@ public class Machine_Producer : Machine
 
     public void StartCrafting()
     {
-        // Check for output belt
-        if (outputBelt != null)
-        {
-            // Start Mining
-            itemToCraft = selectedRecipe;
-            tickTimer = 0;
-            turnedOn = true;
-        }
-        else
-        {
-            NotificationManager.Instance.DisplayNotification("No Output Belt");
-        }
+        // Start Mining
+        activeRecipe = selectedRecipe;
+        tickTimer = 0;
+        turnedOn = true;
     }
 
     public void StopCrafting()
     {
         // Stop Mining
-        itemToCraft = null;
+        activeRecipe = null;
         tickTimer = 0;
         turnedOn = false;
     }
@@ -92,38 +91,19 @@ public class Machine_Producer : Machine
 
 #region Get Output Belt
 
-    protected override void GetDispenseTile()  
+    private void RefreshBelt(Machine machine)
     {
-        // Get machine origin
-        Vector2Int tileXY = originXY;
-        
-        Debug.Log(originXY);
-        // Calculate tile Position
-        switch (direction)
-        {
-            case MachineData.Direction.Up:     tileXY.x += 1; tileXY.y += 1;  break;
-            case MachineData.Direction.Right:  tileXY.x += 1; tileXY.y += 0;  break;
-            case MachineData.Direction.Down:   tileXY.x += 0; tileXY.y += 0;  break;
-            case MachineData.Direction.Left:   tileXY.x += 0; tileXY.y += 1;  break;
-        }
+        if (machine != this) return;
+        if (gridMap == null) return;
 
         // Return the tile
-        outputTile = gridMap.GetGridObject(tileXY.x, tileXY.y);
-    }
-
-    protected override void GetDispenseBelt()
-    {
-        // Check for Output Tile, Open state, and machine type of Belt
-        if (outputTile == null || 
-            outputTile.GetTileVisualState() != GridMap.GridTile.TileVisualState.Open || 
-            outputTile.GetBelt() == null)
-        {
-            outputBelt = null; return;
-        }
-
-        // Get Belt
-        Belt belt = outputTile.GetBelt();
-        outputBelt = belt;
+        outputTile = gridMap.GetGridObject(
+            GetDispenseTileIndexOffset().x, 
+            GetDispenseTileIndexOffset().y);
+        
+        // Return the belt
+        if (outputTile != null)
+            outputBelt = outputTile.GetBelt() != null ? outputTile.GetBelt() : null;
     }
 
     public override Vector2Int GetDispenseTileIndexOffset()
@@ -152,11 +132,11 @@ public class Machine_Producer : Machine
     {
 
         // Handle pending item
-        if (holdingCraftedItem)
+        if (itemPending)
         {
             if (outputBelt != null && outputBelt.RearSlotAvailable()) 
             { 
-                holdingCraftedItem = false;
+                itemPending = false;
                 ProduceItem(); 
             }
             return; // Don’t progress crafting until item is placed
@@ -172,7 +152,7 @@ public class Machine_Producer : Machine
             }
             else
             {
-                holdingCraftedItem = true;
+                itemPending = true;
             }
         }
         
@@ -182,8 +162,8 @@ public class Machine_Producer : Machine
             if (tickTimer >= timeToReservoirRespawn)
             {
                 // Set Reservoir to max
-                int reservoirMax = SkillManager.Instance.GetDictionaryValue(reservoirMaxes, itemToCraft.displayName);
-                SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, itemToCraft.displayName, reservoirMax, false);
+                int reservoirMax = SkillManager.Instance.GetDictionaryValue(reservoirMaxes, activeRecipe.displayName);
+                SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, activeRecipe.displayName, reservoirMax, false);
                 // Reset
                 respawningReservoir = false;
                 // Timer
@@ -194,27 +174,17 @@ public class Machine_Producer : Machine
 
     private void ProduceItem()
     {
-        Vector3 outputPos = outputBelt.rearSlot.position;
-        GameObject obj = ItemManager.SpawnObject(outputBelt, ItemManager.Instance.itemPrefab, itemToCraft, outputPos, Quaternion.identity);
-        Item item = obj.GetComponent<Item>();
-
-        if (!outputBelt.GetItemsOnBelt().Contains(item))
-        {
-            GameObject.Destroy(obj);
-            holdingCraftedItem = true;
-            return;
-        }
-
-        if (!holdingCraftedItem) { tickTimer = 0; }
-
-        // Subtract from Reservoir Count
-        SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, itemToCraft.displayName, -1, true);
-
         // Distribute XP
         HandleXPDistribution();
 
+        tickTimer = 0; 
+        ItemManager.SpawnObject(outputBelt, activeRecipe);
+      
+        // Subtract from Reservoir Count
+        SkillManager.Instance.ModifyDictionaryValue(reservoirNodeCounts, activeRecipe.displayName, -1, true);
+
         // Check for last Reservoir Node
-        int currentNodeCount = SkillManager.Instance.GetDictionaryValue(reservoirNodeCounts, itemToCraft.displayName);
+        int currentNodeCount = SkillManager.Instance.GetDictionaryValue(reservoirNodeCounts, activeRecipe.displayName);
         if (currentNodeCount < 1) { respawningReservoir = true; } 
     }
 
@@ -226,10 +196,10 @@ public class Machine_Producer : Machine
     {
 
         string skillName = machineData.skill.skillName;
-        string itemName = itemToCraft.displayName;
+        string itemName = activeRecipe.displayName;
 
         // Add Skill XP
-        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillName, itemToCraft.XP, true);
+        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillName, activeRecipe.XP, true);
         // Add Mastery and Mastery Pool XP
         float givenMasteryXP = SkillManager.Instance.Calculate_GivenItemMasteryXP(itemName, skillTag);
         SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, skillName, givenMasteryXP/4, true);

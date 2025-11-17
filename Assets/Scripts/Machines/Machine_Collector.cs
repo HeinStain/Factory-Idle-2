@@ -18,12 +18,14 @@ public class Machine_Collector : Machine
     {
         gridMap = GameManager.Instance.GetGrid();
         TickManager.OnTick += HandleTick;
+        BuildManager.Instance.OnMachinePlaced += RefreshBelt;
     }
-    
+
     private void OnDestroy()
     {
         // Always unsubscribe to avoid memory leaks / null refs
         TickManager.OnTick -= HandleTick;
+        BuildManager.Instance.OnMachinePlaced -= RefreshBelt;
     }
 
 
@@ -51,13 +53,14 @@ public class Machine_Collector : Machine
 
 #region Get Belt
 
-    protected override void GetIntakeTile()  
-    {
-        tile = gridMap.GetGridObject(originXY.x, originXY.y);
-    }
 
-    protected override void GetIntakeBelt()
+    private void RefreshBelt(Machine machine)
     {
+        if (machine != this) return;
+        if (gridMap == null) return;
+
+        tile = gridMap.GetGridObject(originXY.x, originXY.y);
+
         // Check for Output Tile, Open state, and machine type of Belt
         if (tile == null || 
             tile.GetTileVisualState() != GridMap.GridTile.TileVisualState.Open || 
@@ -69,7 +72,6 @@ public class Machine_Collector : Machine
     }
 
 #endregion
-
 
 
 

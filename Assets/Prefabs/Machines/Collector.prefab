@@ -213,6 +213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originXY: {x: 0, y: 0}
   direction: 0
+  associatedMachines: []
   tickTimer: 0
   turnedOn: 0
   skillTag: 0

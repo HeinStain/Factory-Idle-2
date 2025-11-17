@@ -21,7 +21,7 @@ public class ProducerRecipeBlock : MonoBehaviour
 
 
     private Machine_Producer producer;
-    private ProducerVisuals producerVisuals; 
+    private Machine_Producer_Visuals producerVisuals; 
     public ItemData itemData { get; private set; } 
 
 
@@ -64,7 +64,7 @@ public class ProducerRecipeBlock : MonoBehaviour
     }
 
 
-    public void UpdateBlock(ProducerVisuals menu, ItemData i)
+    public void UpdateBlock(Machine_Producer_Visuals menu, ItemData i)
     {
         itemData = i;
         producerVisuals = menu; // Store the reference
@@ -85,7 +85,7 @@ public class ProducerRecipeBlock : MonoBehaviour
         selectButton.onClick.RemoveAllListeners();
         if (IsItemUnlocked())
         {
-            // Store reference to ProducerVisuals
+            // Store reference to Machine_Producer_Visuals
             selectButton.onClick.AddListener(() => producerVisuals.SelectItem(itemData));
         }
     }
