@@ -98,7 +98,6 @@ MonoBehaviour:
   numberBubble: {fileID: 4939306345963517735}
   countText: {fileID: 8318344065019436027}
   selectButton: {fileID: 2373571226721334877}
-  itemData: {fileID: 0}
 --- !u!1 &4740545109502834476
 GameObject:
   m_ObjectHideFlags: 0
