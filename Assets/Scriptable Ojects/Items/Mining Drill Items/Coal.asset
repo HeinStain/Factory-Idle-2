@@ -17,4 +17,5 @@ MonoBehaviour:
   value: 13
   unlockLevel: 25
   XP: 18
-  tags: 000000000a000000
+  skillData: {fileID: 11400000, guid: b2b1bf6f02920844aaf8751397d30fe2, type: 2}
+  ingredients: []

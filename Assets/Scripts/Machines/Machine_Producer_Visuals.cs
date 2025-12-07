@@ -6,7 +6,7 @@ using System.Data;
 using System.Collections.Generic;
 
 
-public class Machine_Producer_Visuals : MonoBehaviour
+public class Machine_Producer_Visuals : MonoBehaviour, IRecipeMenu
 {
 
     [Header("Function")]
@@ -18,7 +18,10 @@ public class Machine_Producer_Visuals : MonoBehaviour
         private string skillName;
         private bool menuOpen = false;
         private bool placed = false;
-        private Dictionary<ItemData, ProducerRecipeBlock> recipeBlocks = new();
+        private Dictionary<ItemData, RecipeBlock> recipeBlocks = new();
+        public Machine GetMachineScript() => producerScript;
+        public void SelectItem(ItemData item) => SelectItemInternal(item);
+        public ItemData GetSelectedRecipe() => selectedRecipe;
 
 
     [Header("Machine Parts")]
@@ -88,9 +91,9 @@ public class Machine_Producer_Visuals : MonoBehaviour
         {
             GenerateItemsList();
         }
-    }
-
-    public Machine_Producer GetProducerScript() => producerScript;
+    }    
+    
+ 
 
 #endregion 
 
@@ -174,7 +177,7 @@ public class Machine_Producer_Visuals : MonoBehaviour
 
         // Filter and sort recipes to a list
         var sortedItems = ItemManager.Instance.itemList
-            .Where(item => item.tags.Contains(producerScript.SkillTag)) // Filter to relevant items
+            .Where(item => item.skillData == producerScript.skillData)    // Filter to relevant items
             .OrderBy(item => item.unlockLevel)                          // Order by unlock level
             .ToList();                                                  // Turn it into a list
 
@@ -182,13 +185,13 @@ public class Machine_Producer_Visuals : MonoBehaviour
         foreach (ItemData itemData in sortedItems)
         {
             GameObject recipeBlockObj = Instantiate(producerRecipeCard, recipeFolder.transform);
-            ProducerRecipeBlock recipeBlockScript = recipeBlockObj.GetComponent<ProducerRecipeBlock>();
+            RecipeBlock recipeBlockScript = recipeBlockObj.GetComponent<RecipeBlock>();
             recipeBlockScript.UpdateBlock(this, itemData);
             recipeBlocks[itemData] = recipeBlockScript;
         }
     }
 
-    public void SelectItem(ItemData item)
+    public void SelectItemInternal(ItemData item)
     {
         // Safety checks
         if (item == null) { Debug.LogError("Attempting to select null item"); return; }
@@ -209,8 +212,9 @@ public class Machine_Producer_Visuals : MonoBehaviour
         // Update only the selected items
         foreach (var kvp in recipeBlocks)
         {
-            ProducerRecipeBlock itemBlock = kvp.Value;
+            RecipeBlock itemBlock = kvp.Value;
             if (itemBlock.itemData == selectedRecipe) { itemBlock.UpdateBlockVisuals(); }
+            itemBlock.UpdateBlockVisuals();
         }
 
         UpdateCraftButton();
@@ -253,9 +257,9 @@ public class Machine_Producer_Visuals : MonoBehaviour
         if (selectedRecipe == null) return false;
 
         // Verify recipe has correct tag
-        if (!selectedRecipe.tags.Contains(producerScript.SkillTag))
+        if (selectedRecipe.skillData != producerScript.skillData)
         {
-            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {producerScript.SkillTag}");
+            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {producerScript.skillData}");
             selectedRecipe = null;
             return false;
         }
@@ -325,7 +329,7 @@ public class Machine_Producer_Visuals : MonoBehaviour
         value.text = selectedRecipe.value.ToString();
         craftTime.text = (machineData.skill.defaultCraftingInterval / 30).ToString("F2");
         xp.text = selectedRecipe.XP.ToString();
-        int givenMasteryXP = (int)skillManager.Calculate_GivenItemMasteryXP(selectedRecipe.displayName, producerScript.SkillTag);
+        int givenMasteryXP = (int)skillManager.Calculate_GivenItemMasteryXP(selectedRecipe.displayName, producerScript.skillData);
         masteryXP.text = givenMasteryXP.ToString();
         masteryPoolXP.text = ((int)(givenMasteryXP / 4)).ToString();
 
@@ -373,17 +377,17 @@ public class Machine_Producer_Visuals : MonoBehaviour
     private void Update_SkillAndMasteryBar()
     {
         // Skill Level and XP
-        skillLevelText.text = "Level " + skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill.skillName);
+        skillLevelText.text = "Level " + skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill);
 
-        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill.skillName);
-        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, machineData.skill.skillName);
+        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill);
+        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, machineData.skill);
         
         float t1 = Mathf.Clamp01(currentSkillXP / skillManager.Calculate_XPToNextLevel(currentSkillLevel));
         skillLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), t1);
         skillLevelProgressText.text  =  (int)currentSkillXP + " / " + skillManager.Calculate_XPToNextLevel(currentSkillLevel).ToString();
 
         // Mastery Pool 
-        float currentMasteryPoolXP = skillManager.GetDictionaryValue(skillManager.skillMasteryPoolXP, machineData.skill.skillName);
+        float currentMasteryPoolXP = skillManager.GetDictionaryValue(skillManager.skillMasteryPoolXP, machineData.skill);
        
         float t2 = Mathf.Clamp01(currentMasteryPoolXP / machineData.skill.masteryPoolSize);
         masteryPoolProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), t2);

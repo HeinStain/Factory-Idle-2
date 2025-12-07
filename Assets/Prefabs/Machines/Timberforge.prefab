@@ -120,7 +120,7 @@ MonoBehaviour:
   associatedMachines: []
   tickTimer: 0
   turnedOn: 0
-  skillTag: 1
+  skillData: {fileID: 11400000, guid: 99f8c2bf1e3d66c438c6ecac797678fa, type: 2}
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
   activeRecipe: {fileID: 0}

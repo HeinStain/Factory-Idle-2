@@ -120,10 +120,10 @@ MonoBehaviour:
   associatedMachines: []
   tickTimer: 0
   turnedOn: 0
-  skillTag: 0
+  skillData: {fileID: 11400000, guid: b2b1bf6f02920844aaf8751397d30fe2, type: 2}
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
-  itemToCraft: {fileID: 0}
+  activeRecipe: {fileID: 0}
   respawningReservoir: 0
   timeToReservoirRespawn: 100
   menuCanvas: {fileID: 5397272109034386433}

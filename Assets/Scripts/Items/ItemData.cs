@@ -11,25 +11,17 @@ public class ItemData : ScriptableObject
     public int value;
     public int unlockLevel;
     public int XP;
-    public List<ItemTag> tags;
+
+    public SkillData skillData;
+  //  public List<ItemTag> tags;
+
+    public List<ItemData> ingredients;
 
 }
 
+/*
 public enum ItemTag
 {
-    //Skill Tags
-    Mining,
-    Timberforging,
-    Aquaforming,
-    Smelting,
-    Refining,
-    Crafting,
-    Assembly,
-    Printing,
-    Robocraft,
-    Alchemy,
-
-
     Liquid,
     Fuel,
     Sand,
@@ -41,4 +33,7 @@ public enum ItemTag
     Gem,
     Log,
 
+    Glass,
+    Bar,
 }
+*/

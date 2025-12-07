@@ -12,8 +12,7 @@ public class Machine : MonoBehaviour
     public int tickTimer;
     public bool turnedOn = false;
 
-    [SerializeField] protected ItemTag skillTag;
-    public ItemTag SkillTag => skillTag;  // Read-only property
+    public SkillData skillData;  // Read-only property
 
 
     private void Start()
@@ -79,5 +78,8 @@ public class Machine : MonoBehaviour
 
 #endregion
 
+    public virtual void StartCrafting() {}
+    public virtual void StopCrafting() {}
+    public virtual void SetSelectedRecipe(ItemData item) {}
 
 }

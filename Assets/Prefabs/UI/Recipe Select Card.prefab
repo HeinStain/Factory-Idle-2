@@ -1315,7 +1315,7 @@ GameObject:
   - component: {fileID: 3981329781152692215}
   - component: {fileID: 5865264169595589573}
   m_Layer: 5
-  m_Name: Producer Recipe Card
+  m_Name: Recipe Select Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1723,7 +1723,7 @@ RectTransform:
   m_GameObject: {fileID: 9134743289166297404}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
+  m_LocalScale: {x: 0.65, y: 0.65, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 488578939085176148}

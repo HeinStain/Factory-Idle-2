@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ea5ed691fe1bdc4a823c925e97c1f71, type: 3}
+  m_Name: Steel Bar
+  m_EditorClassIdentifier: 
+  displayName: Steel Bar
+  icon: {fileID: -3575619786948452146, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
+  value: 21
+  unlockLevel: 20
+  XP: 12
+  skillData: {fileID: 11400000, guid: 0ce6f826be9a79b42b83c904cf08a514, type: 2}
+  ingredients:
+  - {fileID: 11400000, guid: d527497fa89256041aece21a7a9e6af8, type: 2}
+  - {fileID: 11400000, guid: 87a1c38e9d214b04d9f27f5fe34d76ff, type: 2}

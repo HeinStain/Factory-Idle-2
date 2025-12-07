@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e721d8ebfe211404c874c4b65725e09e
+guid: 79020e3dfff4c124ea507b1e6c75eb68
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -64,7 +64,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -78,7 +78,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 60
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -102,7 +102,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -153,15 +153,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Items_Furnace_0
+      name: Copper Bar
       rect:
         serializedVersion: 2
-        x: 2
-        y: 6
-        width: 50
-        height: 46
+        x: 0
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -175,15 +175,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_1
+      name: Iron Bar
       rect:
         serializedVersion: 2
-        x: 51
-        y: 6
-        width: 50
-        height: 46
+        x: 49
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -200,12 +200,12 @@ TextureImporter:
       name: Steel Bar
       rect:
         serializedVersion: 2
-        x: 104
-        y: 6
-        width: 42
-        height: 42
+        x: 102
+        y: 4
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -219,15 +219,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_3
+      name: Silver Bar
       rect:
         serializedVersion: 2
-        x: 149
-        y: 6
-        width: 50
-        height: 46
+        x: 147
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -241,15 +241,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_4
+      name: Gold Bar
       rect:
         serializedVersion: 2
-        x: 198
-        y: 6
-        width: 50
-        height: 46
+        x: 196
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -263,15 +263,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_5
+      name: Titanium Bar
       rect:
         serializedVersion: 2
-        x: 247
-        y: 6
-        width: 50
-        height: 46
+        x: 245
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -285,15 +285,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_6
+      name: Glass Bar
       rect:
         serializedVersion: 2
         x: 300
-        y: 6
-        width: 42
-        height: 42
+        y: 4
+        width: 36
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -307,15 +307,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_7
+      name: Moltenite Bar
       rect:
         serializedVersion: 2
-        x: 345
-        y: 6
-        width: 50
-        height: 46
+        x: 343
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -329,15 +329,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_8
+      name: Magicite Bar
       rect:
         serializedVersion: 2
-        x: 394
-        y: 6
-        width: 50
-        height: 46
+        x: 392
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -351,15 +351,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Items_Furnace_9
+      name: Nebulite Bar
       rect:
         serializedVersion: 2
-        x: 443
-        y: 6
-        width: 50
-        height: 46
+        x: 441
+        y: 4
+        width: 48
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -376,7 +376,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: aabb976183c293942af79b35a5e7c384
+    spriteID: 733db19e827c0424fa58afa06fc75da2
     internalID: 0
     vertices: []
     indices: 
@@ -386,7 +386,16 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
+      Copper Bar: 2890306434817254571
+      Glass Bar: 2399018463769355300
+      Gold Bar: 2693728699959278774
+      Iron Bar: 7514164291111973498
+      Magicite Bar: -170655085344437585
+      Moltenite Bar: 2200804320355124235
+      Nebulite Bar: 7274314527460068081
+      Silver Bar: -4617858041064005571
       Steel Bar: -3575619786948452146
+      Titanium Bar: 7733712856203060608
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

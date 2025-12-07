@@ -27,7 +27,7 @@ public class Machine_Furnace : Machine
         gridMap = GameManager.Instance.GetGrid();
 
         // Set skill tag from machine data
-        skillTag = (ItemTag)System.Enum.Parse(typeof(ItemTag), machineData.skill.skillName);
+        skillData = machineData.skill;
         
         BuildManager.Instance.OnMachinePlaced += RefreshBelt;
     }
@@ -46,7 +46,7 @@ public class Machine_Furnace : Machine
         if (turnedOn)   { CraftingCycle();     } // Crafting
     }
 
-    public void StartCrafting()
+    public override void StartCrafting()
     {
         // Start skillManagerelting
         activeRecipe = selectedRecipe;
@@ -54,12 +54,17 @@ public class Machine_Furnace : Machine
         turnedOn = true;
     }
 
-    public void StopCrafting()
+    public override void StopCrafting()
     {
         // Stop Mining
         activeRecipe = null;
         tickTimer = 0;
         turnedOn = false;
+    }
+
+    public override void SetSelectedRecipe(ItemData item)
+    {
+        selectedRecipe = item;
     }
 
 #endregion
@@ -145,14 +150,14 @@ public class Machine_Furnace : Machine
     private void HandleXPDistribution()
     {
         SkillManager skillManager = SkillManager.Instance;
-        string skillName = machineData.skill.skillName;
+        SkillData skillData = machineData.skill;
         string itemName = activeRecipe.displayName;
 
         // Add Skill XP
-        skillManager.ModifyDictionaryValue(skillManager.skillXP, skillName, activeRecipe.XP, true);
+        skillManager.ModifyDictionaryValue(skillManager.skillXP, skillData, activeRecipe.XP, true);
         // Add Mastery and Mastery Pool XP
-        float givenMasteryXP = skillManager.Calculate_GivenItemMasteryXP(itemName, skillTag);
-        skillManager.ModifyDictionaryValue(skillManager.skillMasteryPoolXP, skillName, givenMasteryXP/4, true);
+        float givenMasteryXP = skillManager.Calculate_GivenItemMasteryXP(itemName, skillData);
+        skillManager.ModifyDictionaryValue(skillManager.skillMasteryPoolXP, skillData, givenMasteryXP/4, true);
         skillManager.ModifyDictionaryValue(skillManager.itemMasteryXPCount, itemName, givenMasteryXP, true);
  
         //
@@ -173,22 +178,22 @@ public class Machine_Furnace : Machine
         //
         //
         // Handle Skill Level Up
-        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, skillName);
-        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, skillName);
+        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, skillData);
+        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, skillData);
         float levelXPReq = skillManager.Calculate_XPToNextLevel(currentSkillLevel);
 
         if (currentSkillXP >= levelXPReq)
         {
             // Level up and update XP
             float leftOverXP = currentSkillXP - levelXPReq;
-            skillManager.ModifyDictionaryValue(skillManager.skillLevels, skillName, currentSkillLevel + 1, false);
-            skillManager.ModifyDictionaryValue(skillManager.skillXP, skillName, leftOverXP, false);
+            skillManager.ModifyDictionaryValue(skillManager.skillLevels, skillData, currentSkillLevel + 1, false);
+            skillManager.ModifyDictionaryValue(skillManager.skillXP, skillData, leftOverXP, false);
 
             // Check all unlocks for this skill
-            skillManager.CheckSkillUnlocks(skillName);
+            skillManager.CheckSkillUnlocks(skillData);
 
             // Notify level up
-            NotificationManager.Instance.DisplayNotification($"{skillName} Level {currentSkillLevel + 1}!");
+            NotificationManager.Instance.DisplayNotification($"{skillData} Level {currentSkillLevel + 1}!");
         }
     }
     

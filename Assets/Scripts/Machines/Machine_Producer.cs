@@ -40,15 +40,15 @@ public class Machine_Producer : Machine
         gridMap = GameManager.Instance.GetGrid();
 
         // Set skill tag from machine data
-        skillTag = (ItemTag)System.Enum.Parse(typeof(ItemTag), machineData.skill.skillName);
-        //Debug.Log($"Setting up {machineData.machineName} with skillTag: {skillTag}");
+        skillData = machineData.skill;
+        //Debug.Log($"Setting up {machineData.machineName} with skillData: {skillData}");
 
         // Now create dictionaries with verified tag
         foreach (ItemData item in ItemManager.Instance.itemList)
         {
-            if (item.tags.Contains(skillTag))
+            if (item.skillData == skillData)
             {
-                //Debug.Log($"Adding {item.displayName} to {machineData.machineName} with tag {skillTag}");
+                //Debug.Log($"Adding {item.displayName} to {machineData.machineName} with tag {skillData}");
                 reservoirMaxes.Add(item.displayName, 
                     SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.itemMasteryLevels, item.displayName) + 5);
                 reservoirNodeCounts.Add(item.displayName, 
@@ -70,7 +70,7 @@ public class Machine_Producer : Machine
     }
 
 
-    public void StartCrafting()
+    public override void StartCrafting()
     {
         // Start Mining
         activeRecipe = selectedRecipe;
@@ -78,12 +78,17 @@ public class Machine_Producer : Machine
         turnedOn = true;
     }
 
-    public void StopCrafting()
+    public override void StopCrafting()
     {
         // Stop Mining
         activeRecipe = null;
         tickTimer = 0;
         turnedOn = false;
+    }
+    
+    public override void SetSelectedRecipe(ItemData item)
+    {
+        selectedRecipe = item;
     }
 
 #endregion
@@ -195,14 +200,14 @@ public class Machine_Producer : Machine
     private void HandleXPDistribution()
     {
 
-        string skillName = machineData.skill.skillName;
+        SkillData skillData = machineData.skill;
         string itemName = activeRecipe.displayName;
 
         // Add Skill XP
-        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillName, activeRecipe.XP, true);
+        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillData, activeRecipe.XP, true);
         // Add Mastery and Mastery Pool XP
-        float givenMasteryXP = SkillManager.Instance.Calculate_GivenItemMasteryXP(itemName, skillTag);
-        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, skillName, givenMasteryXP/4, true);
+        float givenMasteryXP = SkillManager.Instance.Calculate_GivenItemMasteryXP(itemName, skillData);
+        SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillMasteryPoolXP, skillData, givenMasteryXP/4, true);
         SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.itemMasteryXPCount, itemName, givenMasteryXP, true);
  
         //
@@ -227,22 +232,22 @@ public class Machine_Producer : Machine
         //
         //
         // Handle Skill Level Up
-        int currentSkillLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, skillName);
-        float currentSkillXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, skillName);
+        int currentSkillLevel = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillLevels, skillData);
+        float currentSkillXP = SkillManager.Instance.GetDictionaryValue(SkillManager.Instance.skillXP, skillData);
         float levelXPReq = SkillManager.Instance.Calculate_XPToNextLevel(currentSkillLevel);
 
         if (currentSkillXP >= levelXPReq)
         {
             // Level up and update XP
             float leftOverXP = currentSkillXP - levelXPReq;
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillLevels, skillName, currentSkillLevel + 1, false);
-            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillName, leftOverXP, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillLevels, skillData, currentSkillLevel + 1, false);
+            SkillManager.Instance.ModifyDictionaryValue(SkillManager.Instance.skillXP, skillData, leftOverXP, false);
 
             // Check all unlocks for this skill
-            SkillManager.Instance.CheckSkillUnlocks(skillName);
+            SkillManager.Instance.CheckSkillUnlocks(skillData);
 
             // Notify level up
-            NotificationManager.Instance.DisplayNotification($"{skillName} Level {currentSkillLevel + 1}!");
+            NotificationManager.Instance.DisplayNotification($"{skillData} Level {currentSkillLevel + 1}!");
         }
     }
     

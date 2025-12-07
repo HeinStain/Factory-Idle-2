@@ -11,6 +11,4 @@ public class SkillData : ScriptableObject
     public int defaultCraftingInterval;
     public int masteryPoolSize;
 
-
 }
-
