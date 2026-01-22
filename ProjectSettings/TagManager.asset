@@ -57,6 +57,9 @@ TagManager:
   - name: Placed Machine
     uniqueID: 3936778891
     locked: 0
+  - name: Grid Overlay
+    uniqueID: 4151459737
+    locked: 0
   - name: Build Ghost
     uniqueID: 2553288987
     locked: 0
@@ -71,9 +74,6 @@ TagManager:
     locked: 0
   - name: Mouse
     uniqueID: 497914975
-    locked: 0
-  - name: Grid Overlay
-    uniqueID: 4151459737
     locked: 0
   m_RenderingLayers:
   - Default
