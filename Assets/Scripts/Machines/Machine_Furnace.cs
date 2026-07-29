@@ -8,27 +8,22 @@ public class Machine_Furnace : Machine
     private GridMap gridMap;
     private GridMap.GridTile outputTile;
     public Belt outputBelt;
-
-
+    
     [Header("Selection")]
     public ItemData selectedRecipe;
     public ItemData activeRecipe;
+    
     private bool itemPending = false;
-
 
     [Header("Visuals")]
     [SerializeField] private GameObject menuCanvas;
-
-#region Setup
+    
+#region Main
 
     protected override void MachineSetup()
     {
         // Get grid first
         gridMap = GameManager.Instance.GetGrid();
-
-        // Set skill tag from machine data
-        skillData = machineData.skill;
-        
         BuildManager.Instance.OnMachinePlaced += RefreshBelt;
     }
 
@@ -37,18 +32,14 @@ public class Machine_Furnace : Machine
         BuildManager.Instance.OnMachinePlaced -= RefreshBelt;
     }
 
-#endregion
-
-#region Main
-
     private void Update()
     {
-        if (turnedOn)   { CraftingCycle();     } // Crafting
+        if (turnedOn) { CraftingCycle(); } // Crafting
     }
 
     public override void StartCrafting()
     {
-        // Start skillManagerelting
+        // Start Smelting
         activeRecipe = selectedRecipe;
         tickTimer = 0;
         turnedOn = true;
@@ -56,7 +47,7 @@ public class Machine_Furnace : Machine
 
     public override void StopCrafting()
     {
-        // Stop Mining
+        // Stop Smelting
         activeRecipe = null;
         tickTimer = 0;
         turnedOn = false;
@@ -105,7 +96,7 @@ public class Machine_Furnace : Machine
     
 #endregion
 
-#region Crafting Cycle
+#region Crafting 
 
     private void CraftingCycle()
     {
@@ -115,85 +106,24 @@ public class Machine_Furnace : Machine
             if (outputBelt != null && outputBelt.RearSlotAvailable()) 
             { 
                 itemPending = false;
-                ProduceItem(); 
+                tickTimer = 0;
+                ItemManager.SpawnObject(outputBelt, activeRecipe);
             }
             return; // Don’t progress crafting until item is placed
         }
 
         // Normal crafting
-        if (tickTimer >= machineData.skill.defaultCraftingInterval)
+        if (tickTimer >= machineData.defaultCraftingInterval)
         {
             if (outputBelt != null && outputBelt.RearSlotAvailable())
             {
-                ProduceItem();
+                tickTimer = 0;
+                ItemManager.SpawnObject(outputBelt, activeRecipe);
             }
             else
             {
                 itemPending = true;
             }
-        }
-    }
-
-    private void ProduceItem()
-    {
-        // Distribute XP
-        HandleXPDistribution();
-        
-        // Spawn Item
-        tickTimer = 0;
-        ItemManager.SpawnObject(outputBelt, activeRecipe);
-    }
-
-#endregion
-
-#region XP Distribution
-    private void HandleXPDistribution()
-    {
-        SkillManager skillManager = SkillManager.Instance;
-        SkillData skillData = machineData.skill;
-        string itemName = activeRecipe.displayName;
-
-        // Add Skill XP
-        skillManager.ModifyDictionaryValue(skillManager.skillXP, skillData, activeRecipe.XP, true);
-        // Add Mastery and Mastery Pool XP
-        float givenMasteryXP = skillManager.Calculate_GivenItemMasteryXP(itemName, skillData);
-        skillManager.ModifyDictionaryValue(skillManager.skillMasteryPoolXP, skillData, givenMasteryXP/4, true);
-        skillManager.ModifyDictionaryValue(skillManager.itemMasteryXPCount, itemName, givenMasteryXP, true);
- 
-        //
-        //
-        // Handle Item Mastery Level Up
-        int itemCurrentMasteryLevel = skillManager.GetDictionaryValue(skillManager.itemMasteryLevels, itemName);
-        float itemCurrentMasteryXP = skillManager.GetDictionaryValue(skillManager.itemMasteryXPCount, itemName);
-        float masteryLevelXPReq = skillManager.Calculate_XPToNextLevel(itemCurrentMasteryLevel);
-
-        if (itemCurrentMasteryXP >= masteryLevelXPReq)
-        {
-            // Level up and update XP
-            float leftOverMasteryXP = itemCurrentMasteryXP - masteryLevelXPReq;
-            skillManager.ModifyDictionaryValue(skillManager.itemMasteryLevels, itemName, itemCurrentMasteryLevel + 1, false);
-            skillManager.ModifyDictionaryValue(skillManager.itemMasteryXPCount, itemName, leftOverMasteryXP, false);
-        }
-
-        //
-        //
-        // Handle Skill Level Up
-        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, skillData);
-        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, skillData);
-        float levelXPReq = skillManager.Calculate_XPToNextLevel(currentSkillLevel);
-
-        if (currentSkillXP >= levelXPReq)
-        {
-            // Level up and update XP
-            float leftOverXP = currentSkillXP - levelXPReq;
-            skillManager.ModifyDictionaryValue(skillManager.skillLevels, skillData, currentSkillLevel + 1, false);
-            skillManager.ModifyDictionaryValue(skillManager.skillXP, skillData, leftOverXP, false);
-
-            // Check all unlocks for this skill
-            skillManager.CheckSkillUnlocks(skillData);
-
-            // Notify level up
-            NotificationManager.Instance.DisplayNotification($"{skillData} Level {currentSkillLevel + 1}!");
         }
     }
     
@@ -216,59 +146,5 @@ public class Machine_Furnace : Machine
     }
 
 #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

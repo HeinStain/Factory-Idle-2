@@ -11,10 +11,7 @@ public class Machine : MonoBehaviour
     [SerializeField] private List<Machine> associatedMachines;
     public int tickTimer;
     public bool turnedOn = false;
-
-    public SkillData skillData;  // Read-only property
-
-
+    
     private void Start()
     {
         TickManager.OnTick += delegate (object sender, TickManager.OnTickEventArgs e) 

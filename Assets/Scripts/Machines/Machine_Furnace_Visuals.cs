@@ -11,7 +11,6 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         private Animator anim; 
         private ItemData selectedRecipe;
         private Machine machineScript;
-        private SkillManager skillManager;
         private MachineData machineData;
         private string skillName;
         private bool menuOpen = false;
@@ -26,36 +25,24 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         [SerializeField] private GameObject machineProgressBar;
         [SerializeField] private SpriteRenderer machineProgressBarSR;
         [SerializeField] List<Transform> objectsToKeepStraight;
-
-
+        
     [Header("Resources")]
         [SerializeField] private GameObject contentRoot;
         [SerializeField] private GameObject recipeCard;
         [SerializeField] private Sprite redProgressBar, greenProgressBar;
 
-
-    [Header("XP Bars")]
-        [SerializeField] private GameObject skillLevelProgressBar;
-        [SerializeField] private GameObject masteryPoolProgressBar;
-        [SerializeField] private TextMeshProUGUI skillLevelText, skillLevelProgressText, masteryPoolPercentText, masteryPoolProgressText;
-        
-
     [Header("Display Card - Header")]
         [SerializeField] private GameObject displayCardOverlay;
-        [SerializeField] private TextMeshProUGUI titleText, itemMasteryLevelText, itemMasteryProgressText;
-        [SerializeField] private GameObject itemMasteryProgressBar;
-
+        [SerializeField] private TextMeshProUGUI titleText;
 
     [Header("Display Card - Recipe")]
         [SerializeField] private Image part1Icon, part2Icon, resultIcon;
         [SerializeField] private TextMeshProUGUI part1ReqText, part2ReqText, resultValueText;
         [SerializeField] private GameObject arrow, part1Obj, part2Obj;
-
-
+        
     [Header("Display Card - Info")]
         [SerializeField] private Button craftButton;
-        [SerializeField] private TextMeshProUGUI value, craftTime, xp, masteryXP, masteryPoolXP;
-
+        [SerializeField] private TextMeshProUGUI value, craftTime;
 
     [Header("Display Card - Progress Bar")]
         [SerializeField] private TextMeshProUGUI progressPercentText;
@@ -83,8 +70,6 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         machineScript = machine;
         machineData = machineScript.GetMachineData();
         anim = machineScript.transform.GetComponent<Animator>();
-        skillManager = SkillManager.Instance;
-        skillName = machineData.skill.skillName;
         placed = true;
     }
 
@@ -133,7 +118,6 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
                 {
                     Update_DisplayCard();
                     Update_RecipeCard();
-                    Update_SkillAndMasteryBar();
                 }
                 else
                 { 
@@ -154,7 +138,7 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         
         // Otherwise, show Display Bar
         machineProgressBarSR.sprite = greenProgressBar;
-        float t = Mathf.Clamp01((float)machineScript.tickTimer / (float)machineData.skill.defaultCraftingInterval);
+        float t = Mathf.Clamp01((float)machineScript.tickTimer / (float)machineData.defaultCraftingInterval);
         machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
     }
 
@@ -173,9 +157,8 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
 
         // Filter and sort recipes to a list
         var sortedItems = ItemManager.Instance.itemList
-            .Where(item => item.skillData == machineScript.skillData)    // Filter to relevant items
-            .OrderBy(item => item.unlockLevel)                          // Order by unlock level
-            .ToList();                                                  // Turn it into a list
+            .Where(item => item.producedBy == machineData)    // Filter to relevant items
+            .ToList();                                                           // Turn it into a list
 
         // Create recipe blocks from list 
         foreach (ItemData itemData in sortedItems)
@@ -195,7 +178,7 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         if (item == selectedRecipe) { Debug.Log("Item already selected"); return; }
 
         // Print selection
-        Debug.Log($"Selecting item: {item.displayName} in {machineData.skill.skillName}");
+        Debug.Log($"Selecting item: {item.displayName} in {machineData.machineName}");
         
         // Turn off machine production
         machineScript.turnedOn = false;
@@ -226,18 +209,10 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         if (selectedRecipe == null) return false;
 
         // Verify recipe has correct tag
-        if (selectedRecipe.skillData != machineScript.skillData)
+        if (selectedRecipe.producedBy != machineData)
         {
-            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {machineScript.skillData}");
+            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {machineData}");
             selectedRecipe = null;
-            return false;
-        }
-
-        // Verify all required dictionary entries exist
-        if (!skillManager.itemMasteryLevels.ContainsKey(selectedRecipe.displayName) ||
-            !skillManager.itemMasteryXPCount.ContainsKey(selectedRecipe.displayName))
-        {
-            Debug.LogError($"Missing dictionary entries for {selectedRecipe.displayName} in {machineData.skill.skillName}");
             return false;
         }
 
@@ -281,8 +256,7 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
 
         // Header
         titleText.text = selectedRecipe.displayName;
-        itemMasteryLevelText.text = skillManager.GetDictionaryValue(skillManager.itemMasteryLevels, selectedRecipe.displayName).ToString();
-
+        
         // Reset Recipe
         arrow.SetActive(false);
         part1Obj.gameObject.SetActive(false);
@@ -312,21 +286,11 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         resultIcon.sprite = selectedRecipe.icon;
         resultIcon.SetNativeSize();
 
-        // Calculate and Update mastery progress
-        float currentMasteryXP = skillManager.GetDictionaryValue(skillManager.itemMasteryXPCount, selectedRecipe.displayName);
-        float nextLevelXP = skillManager.Calculate_XPToNextLevel(skillManager.GetDictionaryValue(skillManager.itemMasteryLevels, selectedRecipe.displayName));
-        float progress = Mathf.Clamp01(currentMasteryXP / nextLevelXP);
-        itemMasteryProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), progress);
-        itemMasteryProgressText.text = $"{(int)currentMasteryXP} / {nextLevelXP}";
-        
+   
         // Info Display
         value.text = selectedRecipe.value.ToString();
-        craftTime.text = (machineData.skill.defaultCraftingInterval / 30).ToString("F2");
-        xp.text = selectedRecipe.XP.ToString();
-        int givenMasteryXP = (int)skillManager.Calculate_GivenItemMasteryXP(selectedRecipe.displayName, machineScript.skillData);
-        masteryXP.text = givenMasteryXP.ToString();
-        masteryPoolXP.text = ((int)(givenMasteryXP / 4)).ToString();
-
+        craftTime.text = (machineData.defaultCraftingInterval / 30).ToString("F2");
+     
         CraftingProgressBar();
     }
 
@@ -344,7 +308,7 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         progressBarImage.sprite = redProgressBar;
 
         // Get time limits
-        float limit = machineData.skill.defaultCraftingInterval;
+        float limit = machineData.defaultCraftingInterval;
 
         // Calculate and normalize time (0-1)
         float progress = (limit > 0f) 
@@ -363,28 +327,6 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
             selectedBlock.UpdateBlock(this, selectedBlock.itemData);
         }
     }
-
-    private void Update_SkillAndMasteryBar()
-    {
-        // Skill Level and XP
-        skillLevelText.text = "Level " + skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill);
-
-        int currentSkillLevel = skillManager.GetDictionaryValue(skillManager.skillLevels, machineData.skill);
-        float currentSkillXP = skillManager.GetDictionaryValue(skillManager.skillXP, machineData.skill);
-        
-        float t1 = Mathf.Clamp01(currentSkillXP / skillManager.Calculate_XPToNextLevel(currentSkillLevel));
-        skillLevelProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), t1);
-        skillLevelProgressText.text  =  (int)currentSkillXP + " / " + skillManager.Calculate_XPToNextLevel(currentSkillLevel).ToString();
-
-        // Mastery Pool 
-        float currentMasteryPoolXP = skillManager.GetDictionaryValue(skillManager.skillMasteryPoolXP, machineData.skill);
-       
-        float t2 = Mathf.Clamp01(currentMasteryPoolXP / machineData.skill.masteryPoolSize);
-        masteryPoolProgressBar.transform.localScale = Vector2.Lerp(new Vector2(0,1f), new Vector2(1,1f), t2);
-        masteryPoolPercentText.text = "Mastery - " + ((currentMasteryPoolXP / machineData.skill.masteryPoolSize) * 100f).ToString("F2") + "%";
-        masteryPoolProgressText.text  =  (int)currentMasteryPoolXP + " / " + machineData.skill.masteryPoolSize;
-    }
-
 
 
 #endregion
