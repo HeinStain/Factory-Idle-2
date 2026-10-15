@@ -15,7 +15,5 @@ MonoBehaviour:
   displayName: Magicite Ore
   icon: {fileID: -1291602564, guid: 154733aacd843444eb6b8554d14789c2, type: 3}
   value: 135
-  unlockLevel: 85
-  XP: 101
-  skillData: {fileID: 11400000, guid: b2b1bf6f02920844aaf8751397d30fe2, type: 2}
+  producedBy: {fileID: 11400000, guid: 0df94d6630a9a4b419521034351082cc, type: 2}
   ingredients: []

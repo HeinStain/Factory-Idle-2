@@ -15,8 +15,6 @@ MonoBehaviour:
   displayName: Copper Bar
   icon: {fileID: 2890306434817254571, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
   value: 6
-  unlockLevel: 1
-  XP: 5
-  skillData: {fileID: 11400000, guid: 0ce6f826be9a79b42b83c904cf08a514, type: 2}
+  producedBy: {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
   ingredients:
   - {fileID: 11400000, guid: 7958c67a1942d324bb58519aed5084aa, type: 2}

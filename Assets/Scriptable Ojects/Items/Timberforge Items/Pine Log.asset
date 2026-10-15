@@ -15,7 +15,5 @@ MonoBehaviour:
   displayName: Pine Log
   icon: {fileID: 6071087182763030558, guid: be3515eb5161fc34d8a0659f724164de, type: 3}
   value: 2
-  unlockLevel: 1
-  XP: 7
-  skillData: {fileID: 11400000, guid: 99f8c2bf1e3d66c438c6ecac797678fa, type: 2}
+  producedBy: {fileID: 11400000, guid: 6e30fd5439fb1dc4e8ed5316ccf06769, type: 2}
   ingredients: []

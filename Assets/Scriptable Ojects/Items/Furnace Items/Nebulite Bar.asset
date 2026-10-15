@@ -15,8 +15,6 @@ MonoBehaviour:
   displayName: Nebulite Bar
   icon: {fileID: 7274314527460068081, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
   value: 251
-  unlockLevel: 85
-  XP: 72
-  skillData: {fileID: 11400000, guid: 0ce6f826be9a79b42b83c904cf08a514, type: 2}
+  producedBy: {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
   ingredients:
   - {fileID: 11400000, guid: 5fc147301ebad9f46b81339e277ca934, type: 2}

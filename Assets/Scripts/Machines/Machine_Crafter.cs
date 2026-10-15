@@ -1,23 +1,34 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public class Machine_Furnace : Machine
+public class Machine_Crafter : Machine
 {
-    public override string ToString() => "Furnace";
+    public override string ToString() => "Crafter";
 
     [Header("Grid")]
     private GridMap gridMap;
     private GridMap.GridTile outputTile;
     public Belt outputBelt;
-    
+
     [Header("Selection")]
     public ItemData selectedRecipe;
     public ItemData activeRecipe;
-    
+
     private bool itemPending = false;
+
+    [Header("Ingredients")]
+    [SerializeField] private List<IngredientSlot> ingredientSlots = new();
+
+    [System.Serializable]
+    private class IngredientSlot
+    {
+        public ItemData acceptedItem;
+        public bool filled;
+    }
 
     [Header("Visuals")]
     [SerializeField] private GameObject menuCanvas;
-    
+
 #region Main
 
     protected override void MachineSetup()
@@ -34,6 +45,12 @@ public class Machine_Furnace : Machine
 
     private void Update()
     {
+        // Auto-start once a recipe is selected and every ingredient slot is filled
+        if (!turnedOn && selectedRecipe != null && AllSlotsFilled())
+        {
+            StartCrafting();
+        }
+
         if (turnedOn) { CraftingCycle(); } // Crafting
     }
 
@@ -41,6 +58,7 @@ public class Machine_Furnace : Machine
     {
         // Start Smelting
         activeRecipe = selectedRecipe;
+        ConsumeIngredients();
         tickTimer = 0;
         turnedOn = true;
     }
@@ -51,12 +69,90 @@ public class Machine_Furnace : Machine
         activeRecipe = null;
         tickTimer = 0;
         turnedOn = false;
+        itemPending = false;
     }
 
     public override void SetSelectedRecipe(ItemData item)
     {
         selectedRecipe = item;
+        BuildIngredientSlots(item);
     }
+
+#endregion
+
+#region Ingredient Slots
+
+    private void BuildIngredientSlots(ItemData recipe)
+    {
+        if (ingredientSlots.Exists(slot => slot.filled))
+        {
+            Debug.Log($"Discarding filled ingredients in {machineData.machineName} due to recipe change");
+        }
+
+        ingredientSlots.Clear();
+
+        if (recipe == null) return;
+
+        foreach (ItemData ingredient in recipe.ingredients)
+        {
+            ingredientSlots.Add(new IngredientSlot { acceptedItem = ingredient, filled = false });
+        }
+    }
+
+    private bool AllSlotsFilled()
+    {
+        if (ingredientSlots.Count == 0) return false;
+
+        foreach (IngredientSlot slot in ingredientSlots)
+        {
+            if (!slot.filled) return false;
+        }
+
+        return true;
+    }
+
+    private void ConsumeIngredients()
+    {
+        foreach (IngredientSlot slot in ingredientSlots)
+        {
+            slot.filled = false;
+        }
+    }
+
+    // Non-mutating check: would TryDepositIngredient succeed right now?
+    public bool CanAcceptIngredient(ItemData item)
+    {
+        if (selectedRecipe == null) return false;
+
+        foreach (IngredientSlot slot in ingredientSlots)
+        {
+            if (slot.acceptedItem == item && !slot.filled) return true;
+        }
+
+        return false;
+    }
+
+    // Called by Grabbers to deliver an ingredient. Returns whether it was accepted.
+    public bool TryDepositIngredient(ItemData item)
+    {
+        if (!CanAcceptIngredient(item)) return false;
+
+        foreach (IngredientSlot slot in ingredientSlots)
+        {
+            if (slot.acceptedItem == item && !slot.filled)
+            {
+                slot.filled = true;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Read-only access for the display UI
+    public int GetIngredientSlotCount() => ingredientSlots.Count;
+    public ItemData GetIngredientSlotItem(int index) => ingredientSlots[index].acceptedItem;
+    public bool GetIngredientSlotFilled(int index) => ingredientSlots[index].filled;
 
 #endregion
 
@@ -103,11 +199,11 @@ public class Machine_Furnace : Machine
         // Handle pending item
         if (itemPending)
         {
-            if (outputBelt != null && outputBelt.RearSlotAvailable()) 
-            { 
+            if (outputBelt != null && outputBelt.RearSlotAvailable())
+            {
                 itemPending = false;
-                tickTimer = 0;
                 ItemManager.SpawnObject(outputBelt, activeRecipe);
+                StopCrafting();
             }
             return; // Don’t progress crafting until item is placed
         }
@@ -117,8 +213,8 @@ public class Machine_Furnace : Machine
         {
             if (outputBelt != null && outputBelt.RearSlotAvailable())
             {
-                tickTimer = 0;
                 ItemManager.SpawnObject(outputBelt, activeRecipe);
+                StopCrafting();
             }
             else
             {

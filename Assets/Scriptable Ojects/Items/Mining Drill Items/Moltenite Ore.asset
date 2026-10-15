@@ -15,7 +15,5 @@ MonoBehaviour:
   displayName: Moltenite Ore
   icon: {fileID: 1415493552, guid: 154733aacd843444eb6b8554d14789c2, type: 3}
   value: 100
-  unlockLevel: 75
-  XP: 86
-  skillData: {fileID: 11400000, guid: b2b1bf6f02920844aaf8751397d30fe2, type: 2}
+  producedBy: {fileID: 11400000, guid: 0df94d6630a9a4b419521034351082cc, type: 2}
   ingredients: []

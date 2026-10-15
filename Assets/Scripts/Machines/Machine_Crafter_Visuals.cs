@@ -5,7 +5,7 @@ using TMPro;
 using System.Data;
 using System.Collections.Generic;
 
-public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
+public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
 {
     [Header("Function")]
         private Animator anim; 
@@ -36,12 +36,14 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         [SerializeField] private TextMeshProUGUI titleText;
 
     [Header("Display Card - Recipe")]
-        [SerializeField] private Image part1Icon, part2Icon, resultIcon;
-        [SerializeField] private TextMeshProUGUI part1ReqText, part2ReqText, resultValueText;
-        [SerializeField] private GameObject arrow, part1Obj, part2Obj;
-        
+        [SerializeField] private Image resultIcon;
+        [SerializeField] private TextMeshProUGUI resultValueText;
+        [SerializeField] private GameObject arrow;
+        [SerializeField] private Transform ingredientSlotsRoot;
+        [SerializeField] private GameObject ingredientSlotPrefab;
+        private List<IngredientSlotUI> ingredientSlotUIs = new();
+
     [Header("Display Card - Info")]
-        [SerializeField] private Button craftButton;
         [SerializeField] private TextMeshProUGUI value, craftTime;
 
     [Header("Display Card - Progress Bar")]
@@ -181,7 +183,7 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         Debug.Log($"Selecting item: {item.displayName} in {machineData.machineName}");
         
         // Turn off machine production
-        machineScript.turnedOn = false;
+        machineScript.StopCrafting();
 
         // Set new selection
         selectedRecipe = item;
@@ -194,8 +196,6 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
             if (itemBlock.itemData == selectedRecipe) { itemBlock.UpdateBlockVisuals(); }
             itemBlock.UpdateBlockVisuals();
         }
-
-        craftButton.transform.GetComponentInChildren<TextMeshProUGUI>().text = "Recipe Selected";
     }
 
 #endregion
@@ -211,7 +211,7 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         // Verify recipe has correct tag
         if (selectedRecipe.producedBy != machineData)
         {
-            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine skill {machineData}");
+            Debug.LogError($"Selected recipe {selectedRecipe.displayName} doesn't match machine {machineData}");
             selectedRecipe = null;
             return false;
         }
@@ -222,27 +222,6 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
     private void ResetDisplayCard()
     {
         displayCardOverlay.SetActive(true);
-        /*
-        resultIcon.gameObject.SetActive(false);
-
-        titleText.text = "";
-        itemMasteryLevelText.text = "";
-        itemMasteryProgressText.text = "";
-
-        veinCount.text = "";
-        value.text = "";
-
-        craftTime.text = "";
-        xp.text = "";
-        masteryXP.text = "";
-        masteryPoolXP.text = "";
-
-        itemMasteryProgressBar.transform.localScale = new Vector2(0f,1f);
-        itemMasteryProgressText.text = "0 / 0";
-
-        progressPercentText.text = "";
-        craftButton.onClick.RemoveAllListeners();
-        */
     }
 
 #endregion
@@ -258,33 +237,14 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         titleText.text = selectedRecipe.displayName;
         
         // Reset Recipe
-        arrow.SetActive(false);
-        part1Obj.gameObject.SetActive(false);
-        part2Obj.gameObject.SetActive(false);
+        arrow.SetActive(selectedRecipe.ingredients.Count > 0);
 
-        // Checks for Ingredient
-        if (selectedRecipe.ingredients.Count > 0)
-        {
-            arrow.SetActive(true);
-            part1Obj.SetActive(true);
-            part1Icon.gameObject.SetActive(true);
-            part1Icon.sprite = selectedRecipe.ingredients[0].icon;
-            part1Icon.SetNativeSize();
-            
-            //Check for Second Ingredient
-            if (selectedRecipe.ingredients.Count > 1)
-            {
-                part2Obj.SetActive(true);
-                part2Icon.gameObject.SetActive(true);
-                part2Icon.sprite = selectedRecipe.ingredients[1].icon;
-                part2Icon.SetNativeSize();
-            }
-        }
+        // Ingredient slots
+        UpdateIngredientSlots();
 
         // Recipe Result
         resultIcon.gameObject.SetActive(true);
         resultIcon.sprite = selectedRecipe.icon;
-        resultIcon.SetNativeSize();
 
    
         // Info Display
@@ -292,6 +252,35 @@ public class Machine_Furnace_Visuals : MonoBehaviour, IRecipeMenu
         craftTime.text = (machineData.defaultCraftingInterval / 30).ToString("F2");
      
         CraftingProgressBar();
+    }
+
+    private void UpdateIngredientSlots()
+    {
+        Machine_Crafter crafter = machineScript as Machine_Crafter;
+        if (crafter == null || ingredientSlotsRoot == null || ingredientSlotPrefab == null) return;
+
+        int slotCount = crafter.GetIngredientSlotCount();
+
+        // Grow the pool if this recipe needs more slots than we've built so far
+        while (ingredientSlotUIs.Count < slotCount)
+        {
+            GameObject slotObj = Instantiate(ingredientSlotPrefab, ingredientSlotsRoot);
+            ingredientSlotUIs.Add(slotObj.GetComponent<IngredientSlotUI>());
+        }
+
+        // Show and update the slots this recipe needs, hide the rest of the pool
+        for (int i = 0; i < ingredientSlotUIs.Count; i++)
+        {
+            bool active = i < slotCount;
+            ingredientSlotUIs[i].gameObject.SetActive(active);
+
+            if (active)
+            {
+                // Keep slots as the first children of their parent, ahead of the arrow/result objects
+                ingredientSlotUIs[i].transform.SetSiblingIndex(i);
+                ingredientSlotUIs[i].UpdateVisual(crafter.GetIngredientSlotItem(i), crafter.GetIngredientSlotFilled(i));
+            }
+        }
     }
 
     private void CraftingProgressBar()

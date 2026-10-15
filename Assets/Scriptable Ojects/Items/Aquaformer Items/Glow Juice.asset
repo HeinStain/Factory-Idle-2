@@ -15,7 +15,5 @@ MonoBehaviour:
   displayName: Glow Juice
   icon: {fileID: -1229541148271507298, guid: 69f3032f212f58c41af40881b8423bdb, type: 3}
   value: 145
-  unlockLevel: 95
-  XP: 120
-  skillData: {fileID: 11400000, guid: 53c6705e7ea365744810029046a2725b, type: 2}
+  producedBy: {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
   ingredients: []

@@ -120,12 +120,9 @@ MonoBehaviour:
   associatedMachines: []
   tickTimer: 0
   turnedOn: 0
-  skillData: {fileID: 11400000, guid: 53c6705e7ea365744810029046a2725b, type: 2}
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
   activeRecipe: {fileID: 0}
-  respawningReservoir: 0
-  timeToReservoirRespawn: 100
   menuCanvas: {fileID: 5352321674728645667}
 --- !u!1001 &4823098497289419533
 PrefabInstance:
@@ -137,7 +134,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 401486798265300108, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
       propertyPath: m_Name
-      value: Visual (Aquaformer)
+      value: Visual
       objectReference: {fileID: 0}
     - target: {fileID: 401486798265300108, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
       propertyPath: m_IsActive

@@ -15,6 +15,7 @@ public class Machine_Grabber : Machine
     [Header("Belts")]
     [SerializeField] private Belt sourceBelt;
     [SerializeField] private Belt destinationBelt;
+    [SerializeField] private Machine_Crafter destinationCrafter;
 
 
     [Header("Parts")]
@@ -41,6 +42,7 @@ public class Machine_Grabber : Machine
     private enum GrabberState { Idle, Moving, Blocked }
     private int cycleTimer = 0;
     private bool hasDroppedThisCycle = false;
+    private bool loggedStaleIngredientBlock = false;
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
@@ -101,7 +103,7 @@ public class Machine_Grabber : Machine
     
     private void HandleMachinePlaced(Machine machine)
     {
-        if (machine is Belt) RefreshConnections();
+        if (machine is Belt || machine is Machine_Crafter) RefreshConnections();
     }
 
 #endregion
@@ -136,6 +138,14 @@ public class Machine_Grabber : Machine
         animator.Play(moveStateName, 0, 0f);
     }
 
+    // Resumes the move clip partway through, for unblocking mid-cycle instead of restarting the swing.
+    private void ResumeMoveAnimationFromDropPoint()
+    {
+        if (animator == null) return;
+        animator.speed = moveAnimSpeed;
+        animator.Play(moveStateName, 0, dropPointPercent);
+    }
+
     private void PlayBlockedAnimation()
     {
         if (animator == null) return;
@@ -161,6 +171,15 @@ public class Machine_Grabber : Machine
 
         sourceBelt = sourceTile?.GetBelt();
         destinationBelt = destinationTile?.GetBelt();
+        destinationCrafter = destinationTile != null ? destinationTile.GetMachine() as Machine_Crafter : null;
+    }
+
+    // Would the current destination accept this item if the Grabber delivered it right now?
+    private bool CanAcceptAtDestination(ItemData itemData)
+    {
+        if (destinationCrafter != null) return destinationCrafter.CanAcceptIngredient(itemData);
+        if (destinationBelt != null) return true; // unchanged belt behaviour: space is checked at drop time
+        return false; // no usable destination (empty, or an unsupported machine type)
     }
     
     
@@ -211,6 +230,11 @@ public class Machine_Grabber : Machine
                 if ( slot != front)
                     continue;
 
+                // Don't grab something the current destination can't take right now —
+                // otherwise we'd be stuck holding it with nowhere to drop it.
+                if (!CanAcceptAtDestination(item.itemData))
+                    continue;
+
                 int arrival = item.GetArrivalTick();
                 if (arrival < bestArrivalTick)
                 {
@@ -223,11 +247,13 @@ public class Machine_Grabber : Machine
         }
     }
 
+    private int GetDropTick() => Mathf.Max(1, Mathf.RoundToInt(cycleDurationTicks * dropPointPercent));
+
     private void Moving()
     {
         cycleTimer++;
-        
-        int dropTick = Mathf.Max(1, Mathf.RoundToInt(cycleDurationTicks * dropPointPercent));
+
+        int dropTick = GetDropTick();
 
         // Try to drop at the configured point in the cycle
         if (!hasDroppedThisCycle && cycleTimer >= dropTick)
@@ -263,16 +289,38 @@ public class Machine_Grabber : Machine
             currentState = GrabberState.Idle;
             cycleTimer = 0;
             hasDroppedThisCycle = false;
+            loggedStaleIngredientBlock = false;
             return;
         }
 
+        // Known edge case: the recipe changed after we grabbed, and the held item is no
+        // longer one of its ingredients — we'll never be able to drop it. Log once, don't fix.
+        if (destinationCrafter != null && !loggedStaleIngredientBlock)
+        {
+            bool stillAnIngredient = destinationCrafter.selectedRecipe != null
+                && destinationCrafter.selectedRecipe.ingredients.Contains(heldItem.itemData);
+
+            if (!stillAnIngredient)
+            {
+                Debug.Log($"{name}: stuck holding {heldItem.itemData.displayName}, which is no longer an ingredient of {destinationCrafter.name}'s selected recipe.");
+                loggedStaleIngredientBlock = true;
+            }
+        }
+
+        // TODO: known bug - when multiple Grabbers are Blocked on the same destination (e.g.
+        // several feeding one Crafter slot), whichever one's retry happens to land on the tick
+        // the destination frees up wins. There's no queue/ordering, so a Grabber can get
+        // starved and skipped by others even if it's been waiting longest. Not fixed yet.
         // Keep retrying until the destination accepts the item
         if (TryDropHeldItem())
         {
-            currentState = GrabberState.Idle;
-            cycleTimer = 0;
-            hasDroppedThisCycle = false;
-            PlayIdleAnimation();
+            // Resume the move cycle from the drop point so the return-swing animation
+            // plays out, instead of snapping straight to the idle pose.
+            currentState = GrabberState.Moving;
+            cycleTimer = GetDropTick();
+            hasDroppedThisCycle = true;
+            loggedStaleIngredientBlock = false;
+            ResumeMoveAnimationFromDropPoint();
         }
     }
 
@@ -287,6 +335,16 @@ public class Machine_Grabber : Machine
     private bool TryDropHeldItem()
     {
         if (heldItem == null) return true;           // nothing to drop
+
+        if (destinationCrafter != null)
+        {
+            if (!destinationCrafter.TryDepositIngredient(heldItem.itemData)) return false;
+
+            ItemManager.ReturnObjectToPool(heldItem.gameObject);
+            heldItem = null;
+            return true;
+        }
+
         if (destinationBelt == null) return false;   // nowhere to drop
         if (!destinationBelt.HasSpace()) return false;
 

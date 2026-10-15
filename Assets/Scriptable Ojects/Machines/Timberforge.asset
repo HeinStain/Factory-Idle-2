@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Timberforge
   m_EditorClassIdentifier: 
   machineName: Timberforge
-  skill: {fileID: 11400000, guid: 99f8c2bf1e3d66c438c6ecac797678fa, type: 2}
   prefab: {fileID: 4491798940824302409, guid: 9ef02de2a8185c043b796c5737ab640b, type: 3}
   visual: {fileID: 7967027145017852785, guid: a4808a8f88797e34fa753599abe37518, type: 3}
   width: 2
   height: 2
   hasDispenseBelt: 1
   hasIntakeBelt: 0
+  defaultCraftingInterval: 90
+  energyCost: 0

@@ -120,11 +120,12 @@ MonoBehaviour:
   associatedMachines: []
   tickTimer: 0
   turnedOn: 0
-  skillData: {fileID: 11400000, guid: 0ce6f826be9a79b42b83c904cf08a514, type: 2}
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
   activeRecipe: {fileID: 0}
+  ingredientSlots: []
   menuCanvas: {fileID: 6822638944385161925}
+  devTestItem: {fileID: 0}
 --- !u!1001 &2936166149531819021
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -173,6 +174,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 784765137665433137, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+      propertyPath: resultIcon
+      value: 
+      objectReference: {fileID: 3639668456075300567}
+    - target: {fileID: 784765137665433137, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+      propertyPath: resultValueText
+      value: 
+      objectReference: {fileID: 7726062890208494440}
+    - target: {fileID: 784765137665433137, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+      propertyPath: ingredientSlotsRoot
+      value: 
+      objectReference: {fileID: 411228079878746425}
+    - target: {fileID: 784765137665433137, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+      propertyPath: ingredientSlotPrefab
+      value: 
+      objectReference: {fileID: 8225692169400593208, guid: 5fc13f8fdf542d24883def3bb61fe2cc, type: 3}
     - target: {fileID: 986474207710648875, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -192,6 +209,10 @@ PrefabInstance:
     - target: {fileID: 986474207710648875, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142033873774422568, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+      propertyPath: m_Name
+      value: Node - Result
       objectReference: {fileID: 0}
     - target: {fileID: 1437966016839709194, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -319,7 +340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4872580314197265958, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
       propertyPath: m_Name
-      value: Furnace Visual
+      value: Visual
       objectReference: {fileID: 0}
     - target: {fileID: 5079748070120554263, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -538,10 +559,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2644141439495344633, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+    - {fileID: 731153832757760865, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+--- !u!224 &411228079878746425 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3245866408022142260, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+  m_PrefabInstance: {fileID: 2936166149531819021}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3639668456075300567 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1890923206027432666, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+  m_PrefabInstance: {fileID: 2936166149531819021}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6822638944385161925 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8507786189976897224, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
@@ -552,3 +591,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8532194472827719981, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
   m_PrefabInstance: {fileID: 2936166149531819021}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7726062890208494440 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4865900587988442981, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
+  m_PrefabInstance: {fileID: 2936166149531819021}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
