@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5923305710646377117}
   - component: {fileID: 3140374162575239968}
   m_Layer: 6
-  m_Name: Timberforge
+  m_Name: Bioforge
   m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

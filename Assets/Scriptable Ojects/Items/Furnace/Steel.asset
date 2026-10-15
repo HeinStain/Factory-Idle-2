@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ea5ed691fe1bdc4a823c925e97c1f71, type: 3}
-  m_Name: Gem_Topaz
+  m_Name: Steel
   m_EditorClassIdentifier: 
-  displayName: Topaz
-  icon: {fileID: -1180549105, guid: 154733aacd843444eb6b8554d14789c2, type: 3}
-  value: 225
-  unlockLevel: 0
-  XP: 0
-  tags: 0d000000
+  displayName: Steel
+  icon: {fileID: -3575619786948452146, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
+  value: 21
+  producedBy: {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
+  ingredients:
+  - {fileID: 11400000, guid: d527497fa89256041aece21a7a9e6af8, type: 2}
+  - {fileID: 11400000, guid: 87a1c38e9d214b04d9f27f5fe34d76ff, type: 2}
