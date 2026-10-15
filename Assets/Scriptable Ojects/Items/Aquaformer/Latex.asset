@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ea5ed691fe1bdc4a823c925e97c1f71, type: 3}
-  m_Name: Seeds
+  m_Name: Latex
   m_EditorClassIdentifier: 
-  displayName: Seeds
-  icon: {fileID: -9189742789656749639, guid: 4a4708d16e3b6e0438c4e929ba5b3569, type: 3}
-  value: 65
-  unlockLevel: 0
-  XP: 0
-  tags: 0c000000
+  displayName: Latex
+  icon: {fileID: -7952861430343037026, guid: 69f3032f212f58c41af40881b8423bdb, type: 3}
+  value: 90
+  producedBy: {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
+  ingredients: []

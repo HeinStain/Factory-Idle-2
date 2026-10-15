@@ -5291,7 +5291,7 @@ GameObject:
   - component: {fileID: 7967027145017852785}
   - component: {fileID: 5046492687285013280}
   m_Layer: 0
-  m_Name: Visual (Timberforge)
+  m_Name: Visual (Bioforge)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

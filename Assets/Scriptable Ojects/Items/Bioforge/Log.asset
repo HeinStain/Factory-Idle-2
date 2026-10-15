@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ea5ed691fe1bdc4a823c925e97c1f71, type: 3}
-  m_Name: Liquid Latex
+  m_Name: Log
   m_EditorClassIdentifier: 
-  displayName: Liquid Latex
-  icon: {fileID: -7952861430343037026, guid: 69f3032f212f58c41af40881b8423bdb, type: 3}
-  value: 90
-  producedBy: {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
+  displayName: Log
+  icon: {fileID: 2255162495656297578, guid: be3515eb5161fc34d8a0659f724164de, type: 3}
+  value: 5
+  producedBy: {fileID: 11400000, guid: 6e30fd5439fb1dc4e8ed5316ccf06769, type: 2}
   ingredients: []

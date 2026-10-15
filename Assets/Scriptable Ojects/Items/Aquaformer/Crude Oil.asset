@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ea5ed691fe1bdc4a823c925e97c1f71, type: 3}
-  m_Name: Moltenite Ore
+  m_Name: Crude Oil
   m_EditorClassIdentifier: 
-  displayName: Moltenite Ore
-  icon: {fileID: 1415493552, guid: 154733aacd843444eb6b8554d14789c2, type: 3}
-  value: 100
-  producedBy: {fileID: 11400000, guid: 0df94d6630a9a4b419521034351082cc, type: 2}
+  displayName: Crude Oil
+  icon: {fileID: -4774395369764809770, guid: 69f3032f212f58c41af40881b8423bdb, type: 3}
+  value: 15
+  producedBy: {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
   ingredients: []
