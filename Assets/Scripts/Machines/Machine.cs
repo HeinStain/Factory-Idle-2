@@ -75,6 +75,34 @@ public class Machine : MonoBehaviour
 
 #endregion
 
+#region Craft Time
+
+    // Items already warned about, so each item only logs once per play session
+    private static HashSet<ItemData> warnedNoCraftTime = new HashSet<ItemData>();
+
+    // Clear on play start (covers Enter Play Mode with domain reload disabled)
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetCraftTimeWarnings()
+    {
+        warnedNoCraftTime.Clear();
+    }
+
+    // Ticks needed to craft a recipe. Uses the recipe's craftTicks and never returns less than 1.
+    public int GetCraftTicks(ItemData recipe)
+    {
+        if (recipe == null) return 1;
+
+        if (recipe.craftTicks > 0) return recipe.craftTicks;
+
+        if (warnedNoCraftTime.Add(recipe))
+        {
+            Debug.LogWarning($"{recipe.displayName} ({recipe.name}): no craft time set on item ({machineData.machineName}), using 1 tick", recipe);
+        }
+        return 1;
+    }
+
+#endregion
+
     public virtual void StartCrafting() {}
     public virtual void StopCrafting() {}
     public virtual void SetSelectedRecipe(ItemData item) {}

@@ -15,5 +15,6 @@ MonoBehaviour:
   displayName: Sand
   icon: {fileID: 2062433910, guid: 154733aacd843444eb6b8554d14789c2, type: 3}
   value: 2
+  craftTicks: 90
   producedBy: {fileID: 11400000, guid: 0df94d6630a9a4b419521034351082cc, type: 2}
   ingredients: []

@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Titanium Bar
   icon: {fileID: 7733712856203060608, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
   value: 108
+  craftTicks: 360
   producedBy: {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
   ingredients:
   - {fileID: 11400000, guid: 8ab7103237654f247bd935de017a009c, type: 2}

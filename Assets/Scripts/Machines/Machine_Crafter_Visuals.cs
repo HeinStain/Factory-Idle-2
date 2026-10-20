@@ -135,12 +135,12 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
 
     private void MachineProgressBarVisuals()
     {
-        // Set Bar to 0 if machine is off
-        if (!machineScript.turnedOn) { machineProgressBar.transform.localScale = new Vector3(0f,1f,1f); return; }
-        
+        // Set Bar to 0 if machine is off or no recipe is selected
+        if (!machineScript.turnedOn || selectedRecipe == null) { machineProgressBar.transform.localScale = new Vector3(0f,1f,1f); return; }
+
         // Otherwise, show Display Bar
         machineProgressBarSR.sprite = greenProgressBar;
-        float t = Mathf.Clamp01((float)machineScript.tickTimer / (float)machineData.defaultCraftingInterval);
+        float t = Mathf.Clamp01((float)machineScript.tickTimer / (float)machineScript.GetCraftTicks(selectedRecipe));
         machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
     }
 
@@ -249,7 +249,9 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
    
         // Info Display
         value.text = selectedRecipe.value.ToString();
-        craftTime.text = (machineData.defaultCraftingInterval / 30).ToString("F2");
+        craftTime.text = selectedRecipe != null
+            ? (machineScript.GetCraftTicks(selectedRecipe) / 30f).ToString("F2")
+            : "0.00";
      
         CraftingProgressBar();
     }
@@ -285,19 +287,19 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
 
     private void CraftingProgressBar()
     {
-        // Reset if off
-        if (!machineScript.turnedOn)
+        // Reset if off or no recipe is selected
+        if (!machineScript.turnedOn || selectedRecipe == null)
         {
             progressPercentText.text = "0%";
             progressBar.transform.localScale = new Vector3(0f,2.5f,1f);
             return;
         }
 
-        // Set bar colour 
+        // Set bar colour
         progressBarImage.sprite = redProgressBar;
 
         // Get time limits
-        float limit = machineData.defaultCraftingInterval;
+        float limit = machineScript.GetCraftTicks(selectedRecipe);
 
         // Calculate and normalize time (0-1)
         float progress = (limit > 0f) 

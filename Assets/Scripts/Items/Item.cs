@@ -181,11 +181,15 @@ public class Item : MonoBehaviour
 
 #region Grab/Drop
 
-    public void GrabToHand(Transform hand)
+    public void GrabToHand(Transform hand, SpriteRenderer handSprite)
     {
         // Kill belt control
         currentBelt = null;
         targetSlot = null;
+
+        // Render on the hand's layer, just under the hand, so it draws above machines
+        spriteRenderer.sortingLayerName = handSprite.sortingLayerName;
+        spriteRenderer.sortingOrder = handSprite.sortingOrder - 1;
 
         // Parent to the hand so it follows the animation
         transform.SetParent(null, worldPositionStays: true);
@@ -214,6 +218,10 @@ public class Item : MonoBehaviour
         transitionProgress = 0f;
         hasTransferredThisCycle = false;
         arrivalTick = TickManager.Instance.GetCurrentTick();
+
+        // Back to the belt item layer
+        spriteRenderer.sortingLayerName = "Items";
+        UpdateSortingOrder();
     }
 
 

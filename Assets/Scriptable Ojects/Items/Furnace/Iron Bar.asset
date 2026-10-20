@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Iron Bar
   icon: {fileID: 7514164291111973498, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
   value: 12
+  craftTicks: 180
   producedBy: {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
   ingredients:
   - {fileID: 11400000, guid: d527497fa89256041aece21a7a9e6af8, type: 2}

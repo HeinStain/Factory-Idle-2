@@ -15,5 +15,6 @@ MonoBehaviour:
   displayName: Log
   icon: {fileID: 2255162495656297578, guid: be3515eb5161fc34d8a0659f724164de, type: 3}
   value: 5
+  craftTicks: 90
   producedBy: {fileID: 11400000, guid: 6e30fd5439fb1dc4e8ed5316ccf06769, type: 2}
   ingredients: []

@@ -9,6 +9,8 @@ public class ItemData : ScriptableObject
     public string displayName;
     public Sprite icon;
     public int value;
+    [Tooltip("ticks, 30 = 1 second")]
+    public int craftTicks;
 
     public MachineData producedBy;
   //  public List<ItemTag> tags;

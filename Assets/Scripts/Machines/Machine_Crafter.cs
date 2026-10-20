@@ -209,7 +209,7 @@ public class Machine_Crafter : Machine
         }
 
         // Normal crafting
-        if (tickTimer >= machineData.defaultCraftingInterval)
+        if (tickTimer >= GetCraftTicks(activeRecipe))
         {
             if (outputBelt != null && outputBelt.RearSlotAvailable())
             {

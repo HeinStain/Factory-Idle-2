@@ -55,6 +55,8 @@ public class Machine_Producer : Machine
     
     public override void SetSelectedRecipe(ItemData item)
     {
+        // Discard any output still waiting for belt space from the previous recipe
+        itemPending = false;
         selectedRecipe = item;
     }
 
@@ -113,7 +115,7 @@ public class Machine_Producer : Machine
         }
 
         // Normal crafting
-        if (tickTimer >= machineData.defaultCraftingInterval)
+        if (tickTimer >= GetCraftTicks(activeRecipe))
         {
             if (outputBelt != null && outputBelt.RearSlotAvailable())
             {

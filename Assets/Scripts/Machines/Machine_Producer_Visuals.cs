@@ -131,12 +131,12 @@ public class Machine_Producer_Visuals : MonoBehaviour, IRecipeMenu
 
     private void MachineProgressBarVisuals()
     {
-        // Set Bar to 0 if machine is off
-        if (!producerScript.turnedOn) { machineProgressBar.transform.localScale = new Vector3(0f,1f,1f); return; }
-        
+        // Set Bar to 0 if machine is off or no recipe is selected
+        if (!producerScript.turnedOn || selectedRecipe == null) { machineProgressBar.transform.localScale = new Vector3(0f,1f,1f); return; }
+
         // Show Display Bar
         machineProgressBarSR.sprite = greenProgressBar;
-        float t = Mathf.Clamp01((float)producerScript.tickTimer / (float)machineData.defaultCraftingInterval);
+        float t = Mathf.Clamp01((float)producerScript.tickTimer / (float)producerScript.GetCraftTicks(selectedRecipe));
         machineProgressBar.transform.localScale = new Vector3(t,1f,1f);
     }
 
@@ -179,11 +179,11 @@ public class Machine_Producer_Visuals : MonoBehaviour, IRecipeMenu
         Debug.Log($"Selecting item: {item.displayName} in {machineData.machineName}");
         
         // Turn off machine production
-        producerScript.turnedOn = false;
+        producerScript.StopCrafting();
 
         // Set new selection
         selectedRecipe = item;
-        producerScript.selectedRecipe = item;
+        producerScript.SetSelectedRecipe(item);
 
         // Update only the selected items
         foreach (var kvp in recipeBlocks)
@@ -275,26 +275,28 @@ public class Machine_Producer_Visuals : MonoBehaviour, IRecipeMenu
         
         // Info Display
         value.text = selectedRecipe.value.ToString();
-        craftTime.text = (machineData.defaultCraftingInterval / 30).ToString("F2");
+        craftTime.text = selectedRecipe != null
+            ? (producerScript.GetCraftTicks(selectedRecipe) / 30f).ToString("F2")
+            : "0.00";
 
         CraftingProgressBar();
     }
 
     private void CraftingProgressBar()
     {
-        // Reset if off
-        if (!producerScript.turnedOn)
+        // Reset if off or no recipe is selected
+        if (!producerScript.turnedOn || selectedRecipe == null)
         {
             progressPercentText.text = "0%";
             progressBar.transform.localScale = new Vector3(0f,2.5f,1f);
             return;
         }
 
-        // Set bar colour 
+        // Set bar colour
         progressBarImage.sprite = redProgressBar;
 
         // Get time limits
-        float limit = machineData.defaultCraftingInterval;
+        float limit = producerScript.GetCraftTicks(selectedRecipe);
 
         // Calculate and normalize time (0-1)
         float progress = (limit > 0f) 

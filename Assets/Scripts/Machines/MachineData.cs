@@ -13,7 +13,6 @@ public class MachineData : ScriptableObject
     public int height;
     public bool hasDispenseBelt;
     public bool hasIntakeBelt;
-    public int defaultCraftingInterval;
     public int energyCost;
     
     public enum Direction

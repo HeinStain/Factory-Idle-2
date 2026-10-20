@@ -15,5 +15,6 @@ MonoBehaviour:
   displayName: Solvent
   icon: {fileID: -6317920089422614182, guid: 69f3032f212f58c41af40881b8423bdb, type: 3}
   value: 65
+  craftTicks: 120
   producedBy: {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
   ingredients: []

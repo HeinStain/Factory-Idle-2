@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Gold Bar
   icon: {fileID: 2693728699959278774, guid: 79020e3dfff4c124ea507b1e6c75eb68, type: 3}
   value: 64
+  craftTicks: 240
   producedBy: {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
   ingredients:
   - {fileID: 11400000, guid: 0227351731ecb39429fcd70f7def9723, type: 2}

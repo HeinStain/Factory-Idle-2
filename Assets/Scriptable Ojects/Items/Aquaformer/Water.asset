@@ -15,5 +15,6 @@ MonoBehaviour:
   displayName: Water
   icon: {fileID: 7471074405659639087, guid: 69f3032f212f58c41af40881b8423bdb, type: 3}
   value: 1
+  craftTicks: 90
   producedBy: {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
   ingredients: []

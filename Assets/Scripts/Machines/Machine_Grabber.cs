@@ -196,7 +196,7 @@ public class Machine_Grabber : Machine
         if (candidate == null) return;
 
         sourceBelt.RemoveItem(candidate);
-        candidate.GrabToHand(handSlot);
+        candidate.GrabToHand(handSlot, handSprite);
 
         heldItem = candidate;
         currentState = GrabberState.Moving;
