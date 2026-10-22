@@ -42,7 +42,8 @@ public class MouseManager : MonoBehaviour
     private void OnDisable() 
     { 
         GameManager.OnBuyModeTriggered -= BuyModeTriggered; 
-        GameManager.OnBuildModeTriggered -= BuildModeTriggered; 
+        GameManager.OnBuildModeTriggered -= BuildModeTriggered;
+        if (GameManager.Instance != null) GameManager.Instance.OnMenuTriggered -= MenuOpenTriggered;
         CameraSystem.DragPanTriggered -= DragPanTriggered;
     }
     
@@ -67,13 +68,18 @@ public class MouseManager : MonoBehaviour
         canvasMousePosition = Input.mousePosition;
         mouseObj.transform.position = canvasMousePosition;
 
-        if (!menuOpen)
+        if (!menuOpen && !GameManager.Instance.IsMachineMenuOpen)
         {
             if (dragPanActive)
             {
                 SetMouseIcon(Icon.PANNING);
             }
-            else if (!dragPanActive)
+            else if (GameManager.IsPointerOverUI())
+            {
+                // Standard cursor over UI, whatever mode is active
+                SetMouseIcon(Icon.DEFAULT);
+            }
+            else
             {
                 if (buildModeActive)
                 {
@@ -92,7 +98,7 @@ public class MouseManager : MonoBehaviour
                         SetMouseIcon(Icon.INTERACT);
 
                         // On Left Mouse Click
-                        if (Input.GetMouseButtonDown(0))
+                        if (Input.GetMouseButtonDown(0) && !GameManager.IsPointerOverUI())
                         {
                             hit.transform.SendMessage("OpenMenu", SendMessageOptions.DontRequireReceiver);
                         }
@@ -104,7 +110,7 @@ public class MouseManager : MonoBehaviour
                 }
             }
         }   
-        else if (menuOpen)
+        else
         {
             SetMouseIcon(Icon.DEFAULT);
         }

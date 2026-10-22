@@ -7,6 +7,11 @@ public class MachineData : ScriptableObject
 {
     
     public string machineName;
+    public Sprite icon;
+    [TextArea(2, 4)]
+    [Tooltip("Short description for the machine menu, about 120 characters at most")]
+    public string description;
+    public MachineCategory category;
     public Transform prefab;
     public Transform visual;
     public int width;
@@ -14,7 +19,16 @@ public class MachineData : ScriptableObject
     public bool hasDispenseBelt;
     public bool hasIntakeBelt;
     public int energyCost;
-    
+
+    public enum MachineCategory
+    {
+        Producer,
+        Crafter,
+        Logistics,
+        Dock,
+        Power,
+    }
+
     public enum Direction
     {
         Up,

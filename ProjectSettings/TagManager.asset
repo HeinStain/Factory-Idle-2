@@ -66,8 +66,14 @@ TagManager:
   - name: Vignette
     uniqueID: 1536552313
     locked: 0
-  - name: Debug
+  - name: UI Canvas
     uniqueID: 451191673
+    locked: 0
+  - name: Money Flipper
+    uniqueID: 1844121085
+    locked: 0
+  - name: Menus
+    uniqueID: 3742114097
     locked: 0
   - name: Notifications
     uniqueID: 851132065

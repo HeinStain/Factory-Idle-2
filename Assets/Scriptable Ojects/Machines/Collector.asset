@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Collector
   m_EditorClassIdentifier: 
   machineName: Collector
-  skillName: 
+  icon: {fileID: -5401834985061380536, guid: cb8ba360f9398574b81c54e803c0dcae, type: 3}
+  description: 'Placeholder: becomes the Tunnel in v0.2.7.'
+  category: 2
   prefab: {fileID: 314034151270571200, guid: 500ea9adadaa61f47972d01de9f424c9, type: 3}
   visual: {fileID: 7077483816036277611, guid: 65f275f30f38ffd4a94f70ae4aee7349, type: 3}
   width: 1
@@ -21,5 +23,3 @@ MonoBehaviour:
   hasDispenseBelt: 0
   hasIntakeBelt: 1
   energyCost: 0
-  defaultCraftingInterval: 0
-  masteryPoolSize: 0

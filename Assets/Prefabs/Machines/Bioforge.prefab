@@ -120,12 +120,9 @@ MonoBehaviour:
   associatedMachines: []
   tickTimer: 0
   turnedOn: 0
-  skillData: {fileID: 11400000, guid: 99f8c2bf1e3d66c438c6ecac797678fa, type: 2}
   outputBelt: {fileID: 0}
   selectedRecipe: {fileID: 0}
   activeRecipe: {fileID: 0}
-  respawningReservoir: 0
-  timeToReservoirRespawn: 100
   menuCanvas: {fileID: 7050929341469586032}
 --- !u!1001 &5681801795318382732
 PrefabInstance:
@@ -230,6 +227,14 @@ PrefabInstance:
     - target: {fileID: 3386775372712211196, guid: a4808a8f88797e34fa753599abe37518, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937952430577614717, guid: a4808a8f88797e34fa753599abe37518, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937952430577614717, guid: a4808a8f88797e34fa753599abe37518, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5046492687285013280, guid: a4808a8f88797e34fa753599abe37518, type: 3}
       propertyPath: anim

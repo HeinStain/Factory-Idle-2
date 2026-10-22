@@ -14,11 +14,16 @@ public class Machine : MonoBehaviour
     
     private void Start()
     {
-        TickManager.OnTick += delegate (object sender, TickManager.OnTickEventArgs e) 
-        { 
-            tickTimer++;
-        };
+        TickManager.OnTick += HandleTick;
     }
+
+    // Derived machines that override this must call base.OnDestroy()
+    protected virtual void OnDestroy()
+    {
+        TickManager.OnTick -= HandleTick;
+    }
+
+    private void HandleTick(object sender, TickManager.OnTickEventArgs e) => tickTimer++;
 
     public static Machine Create(Vector2 worldPos, Vector2Int originXY, MachineData.Direction direction, MachineData machineData, int tag)
     {

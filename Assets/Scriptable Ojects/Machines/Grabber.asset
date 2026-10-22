@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: Grabber
   m_EditorClassIdentifier: 
   machineName: Grabber
-  skill: {fileID: 0}
+  icon: {fileID: 7970884628830528546, guid: 09bd23c3b9a12744ea838cbb581569e4, type: 3}
+  description: Moves items between a belt and a machine. It only picks up what its
+    target can accept right now.
+  category: 2
   prefab: {fileID: 8361633519508303915, guid: 7f7767c7a40765c46b2e799e2547688f, type: 3}
   visual: {fileID: 1417175592132991586, guid: d0e981a0218f0c6438f0179eff7bdff2, type: 3}
   width: 1
   height: 1
   hasDispenseBelt: 0
   hasIntakeBelt: 0
+  energyCost: 0

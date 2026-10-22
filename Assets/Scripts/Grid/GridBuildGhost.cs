@@ -60,15 +60,18 @@ public class GridBuildGhost : MonoBehaviour
     private void Instance_OnBuildModeChanged(bool arg)
     {
         buildMode = arg;
-        if (visual == null) return;
-        visual.localScale = buildMode ? Vector2.one : Vector2.zero;
     }
 
     private void LateUpdate()
     {
+        var bm = BuildManager.Instance;
+
+        // Hide over UI or while the machine menu is open. A belt drag that started on the grid keeps its preview.
+        bool blocked = GameManager.Instance.IsMachineMenuOpen || (GameManager.IsPointerOverUI() && !bm.draggingBelt);
+        if (visual != null) visual.localScale = (buildMode && !blocked) ? Vector2.one : Vector2.zero;
+
         if (!buildMode) return;
 
-        var bm = BuildManager.Instance;
         var machine = bm.heldMachine;
 
         // default reset (for non-belt or idle states)

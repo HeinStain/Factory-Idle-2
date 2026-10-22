@@ -27,8 +27,9 @@ public class Machine_Producer : Machine
         BuildManager.Instance.OnMachinePlaced += RefreshBelt;
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         BuildManager.Instance.OnMachinePlaced -= RefreshBelt;
     }
 

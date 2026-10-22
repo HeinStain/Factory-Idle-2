@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: Bioforge
   m_EditorClassIdentifier: 
   machineName: Bioforge
+  icon: {fileID: -146704993487808623, guid: fa8f30f0505d5b344bf9c3b3b28039d1, type: 3}
+  description: 'Grows logs, fibre, resin and dye plants on demand. No ingredients:
+    pick one and flip the switch.'
+  category: 0
   prefab: {fileID: 4491798940824302409, guid: 9ef02de2a8185c043b796c5737ab640b, type: 3}
   visual: {fileID: 7967027145017852785, guid: a4808a8f88797e34fa753599abe37518, type: 3}
   width: 2
   height: 2
   hasDispenseBelt: 1
   hasIntakeBelt: 0
-  defaultCraftingInterval: 90
-  energyCost: 0
+  energyCost: 40

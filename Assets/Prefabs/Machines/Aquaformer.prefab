@@ -188,6 +188,10 @@ PrefabInstance:
       propertyPath: m_Value
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4600503326832523940, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5019993660742814117, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1

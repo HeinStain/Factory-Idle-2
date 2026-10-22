@@ -12,12 +12,19 @@ public class BuildManager : MonoBehaviour
     public event Action OnSelectedChanged;
     public event Action<Machine> OnMachinePlaced;
     public event Action<bool> OnBuildModeChanged;
+    public event Action OnQuickslotsChanged;
 
     private GridMap gridMap;
-    
+
+    // Every buildable machine. Order matters: Belt is detected as machineList[0].
     [SerializeField] public List<MachineData> machineList;
     public MachineData heldMachine;
     private MachineData.Direction direction = MachineData.Direction.Up;
+
+    // Machines on number keys 1 to QuickslotCount. Empty slots are allowed.
+    public const int QuickslotCount = 9;
+    [SerializeField] private MachineData[] quickslots = new MachineData[QuickslotCount];
+    public int SelectedQuickslot { get; private set; } = -1;
 
     private bool buildMode;
 
@@ -28,7 +35,15 @@ public class BuildManager : MonoBehaviour
 
         buildMode = false;
 
-        heldMachine = machineList[0];
+        if (quickslots == null || quickslots.Length != QuickslotCount) Array.Resize(ref quickslots, QuickslotCount);
+
+        SelectMachine(machineList[0]);
+    }
+
+    private void OnValidate()
+    {
+        // Keep exactly QuickslotCount slots in the Inspector
+        if (quickslots == null || quickslots.Length != QuickslotCount) Array.Resize(ref quickslots, QuickslotCount);
     }
 
     private void Start()
@@ -40,6 +55,16 @@ public class BuildManager : MonoBehaviour
     {
         if (buildMode == true)
         {
+            // Ignore all build input while the machine menu is open
+            if (GameManager.Instance.IsMachineMenuOpen)
+            {
+                if (pendingBeltDrag || draggingBelt) CancelDrag();
+                return;
+            }
+
+            // Don't place or delete through UI
+            bool pointerOverUI = GameManager.IsPointerOverUI();
+
             // Holding a belt
             if (heldMachine == machineList[0])
             {
@@ -48,14 +73,14 @@ public class BuildManager : MonoBehaviour
                 if (draggingBelt) return;
             }
 
-            if (Input.GetMouseButtonDown(0) && heldMachine != null) 
+            if (Input.GetMouseButtonDown(0) && heldMachine != null && !pointerOverUI)
             {
                 PlaceMachine();
             }
 
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1) && !pointerOverUI)
             {
-                
+
                 ClearMachine();
             }
 
@@ -240,16 +265,62 @@ public class BuildManager : MonoBehaviour
 #region Machine Selection
     private void HandleMachineSelection()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) { SelectMachineType(0); }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) { SelectMachineType(1); }
-        if (Input.GetKeyDown(KeyCode.Alpha3)) { SelectMachineType(2); }
-        if (Input.GetKeyDown(KeyCode.Alpha4)) { SelectMachineType(3); }
-        if (Input.GetKeyDown(KeyCode.Alpha5)) { SelectMachineType(4); }
-        if (Input.GetKeyDown(KeyCode.Alpha6)) { SelectMachineType(5); }
-        if (Input.GetKeyDown(KeyCode.Alpha7)) { SelectMachineType(6); }
-        if (Input.GetKeyDown(KeyCode.Alpha8)) { SelectMachineType(7); }
+        // Number keys from 1 pick quickslots from 0
+        for (int i = 0; i < QuickslotCount; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i)) { SelectQuickslot(i); }
+        }
         if (Input.GetKeyDown(KeyCode.Alpha0)) { DeselectAllMachineTypes(); }
     }
+#endregion
+
+#region Quickslots
+
+    public MachineData GetQuickslot(int index) => (index >= 0 && index < QuickslotCount) ? quickslots[index] : null;
+
+    // Selects a slot, even an empty one (an empty slot means an empty hand). An invalid slot does nothing.
+    public void SelectQuickslot(int index)
+    {
+        if (index < 0 || index >= QuickslotCount) return;
+
+        SelectedQuickslot = index;
+        heldMachine = quickslots[index];
+        RefreshSelectedMachine();
+    }
+
+    // Holds any machine, highlighting its quickslot if it has one
+    public void SelectMachine(MachineData machine)
+    {
+        heldMachine = machine;
+        SelectedQuickslot = machine != null ? Array.IndexOf(quickslots, machine) : -1;
+        RefreshSelectedMachine();
+    }
+
+    // Moves a machine into a quickslot, replacing whatever was there
+    public void AssignQuickslot(int index, MachineData machine)
+    {
+        if (index < 0 || index >= QuickslotCount) return;
+
+        // A machine sits in at most one slot, so clear the slot it is leaving
+        if (machine != null)
+        {
+            for (int i = 0; i < QuickslotCount; i++)
+            {
+                if (quickslots[i] == machine) quickslots[i] = null;
+            }
+        }
+
+        quickslots[index] = machine;
+
+        // The hand follows the selected slot; with no slot selected, the held machine's slot becomes selected
+        MachineData previousHeld = heldMachine;
+        if (SelectedQuickslot >= 0) heldMachine = quickslots[SelectedQuickslot];
+        else if (heldMachine != null) SelectedQuickslot = Array.IndexOf(quickslots, heldMachine);
+
+        OnQuickslotsChanged?.Invoke();
+        if (heldMachine != previousHeld) RefreshSelectedMachine();
+    }
+
 #endregion
 
 #region Functions
@@ -261,19 +332,15 @@ public class BuildManager : MonoBehaviour
 
     private void RefreshSelectedMachine()
     {
-        OnSelectedChanged?.Invoke();
-    }
+        // A belt drag left unfinished when the hand changes would otherwise place later from its old start tile
+        if (heldMachine != machineList[0] && (pendingBeltDrag || draggingBelt)) CancelDrag();
 
-    public void SelectMachineType(int index)
-    {
-        heldMachine = machineList[index]; 
-        RefreshSelectedMachine();
+        OnSelectedChanged?.Invoke();
     }
 
     private void DeselectAllMachineTypes()
     {
-        heldMachine = null;
-        RefreshSelectedMachine();
+        SelectMachine(null);
     }
 #endregion
 
@@ -315,7 +382,7 @@ public class BuildManager : MonoBehaviour
         Vector2Int tileXY = new(mouseX, mouseY);
 
         // ---- LMB down: arm a potential drag (no ghosts yet)
-        if (!pendingBeltDrag && !draggingBelt && Input.GetMouseButtonDown(0) && Walkable(tileXY))
+        if (!pendingBeltDrag && !draggingBelt && Input.GetMouseButtonDown(0) && !GameManager.IsPointerOverUI() && Walkable(tileXY))
         {
             pendingBeltDrag = true;
             dragStart = tileXY;
