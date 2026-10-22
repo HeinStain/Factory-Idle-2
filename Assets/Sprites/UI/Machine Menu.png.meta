@@ -676,6 +676,94 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Paper Menu
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 2
+        width: 46
+        height: 47
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 2}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c4ed3da7b531a8489de940b871d473b
+      internalID: 384826763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Energy Icon
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 34
+        width: 4
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b08a090e01e63784e84865fa97fa0eb6
+      internalID: -435844864
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blue Box
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 61
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 1}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f2bd0d5dd4ab1b48b490a8109b4a8cd
+      internalID: 173276519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Size Icon
+      rect:
+        serializedVersion: 2
+        x: 211
+        y: 34
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e66acc73289ee9e418723c596817b53b
+      internalID: -2007008057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -691,7 +779,9 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       52352525: 236561003
+      Blue Box: 173276519
       Clock Icon: -1192550035
+      Energy Icon: -435844864
       Exit Button: -113407750
       Folder 1: -1365798844
       Folder 2: 1940263803
@@ -703,11 +793,13 @@ TextureImporter:
       Mastery Icon: -155519548
       Mastery Pool Icon: 1798807067
       Money Icon: -1038275256
+      Paper Menu: 384826763
       Progress Bar 1: -136107494
       Progress Bar 2: 1688093476
       Progress Bar 3: 1147264259
       Progress Bar 4: -1541567533
       Progress Bar 5: -463223376
+      Size Icon: -2007008057
       Stone Box: 1502420996
       Stone Inset: -2130562440
       Stone Menu: -1448229960
