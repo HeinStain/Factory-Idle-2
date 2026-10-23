@@ -10,6 +10,7 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
     [Header("Function")]
         private Animator anim; 
         private ItemData selectedRecipe;
+        private Machine owner;
         private Machine machineScript;
         private MachineData machineData;
         private string skillName;
@@ -55,6 +56,10 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
 #region Setup
     private void Awake()
     {
+        // Only a placed machine's own visual binds to it. The build ghost's copy has no Machine above it.
+        owner = GetComponentInParent<Machine>();
+        if (owner == null) return;
+
         GameManager.Instance.OnMenuTriggered += MenuTrigger;
         BuildManager.Instance.OnMachinePlaced += Place;
     }
@@ -67,7 +72,7 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
 
     private void Place(Machine machine)
     {
-        if (placed) return;
+        if (placed || machine != owner) return;
 
         machineScript = machine;
         machineData = machineScript.GetMachineData();
@@ -95,38 +100,35 @@ public class Machine_Crafter_Visuals : MonoBehaviour, IRecipeMenu
         // Keep objects straight
         foreach (Transform obj in objectsToKeepStraight) { obj.eulerAngles = new Vector3(0,0,0); }
 
-        // If placed, animate and handle progress bars and menu
-        if (placed) 
-        { 
-            //anim.SetBool("IsActive", machineScript.turnedOn);
-            
-            if (machineScript != null) 
-            { 
-                MachineProgressBarVisuals(); 
+        // Stop if not placed yet, or the machine has been destroyed
+        if (!placed || machineScript == null) return;
 
-                if (machineScript.turnedOn && selectedRecipe != null)
-                {
-                    DisplayRecipe(selectedRecipe);
-                }
-                else
-                {
-                    ClearRecipeDisplay();
-                }
-            } 
+        // Animate and handle progress bars and menu
+        //if (anim != null) anim.SetBool("IsActive", machineScript.turnedOn);
 
-            if (menuOpen) 
-            { 
-                if (HasValidSelection()) 
-                {
-                    Update_DisplayCard();
-                    Update_RecipeCard();
-                }
-                else
-                { 
-                    ResetDisplayCard(); 
-                }
-            } 
-        } 
+        MachineProgressBarVisuals();
+
+        if (machineScript.turnedOn && selectedRecipe != null)
+        {
+            DisplayRecipe(selectedRecipe);
+        }
+        else
+        {
+            ClearRecipeDisplay();
+        }
+
+        if (menuOpen)
+        {
+            if (HasValidSelection())
+            {
+                Update_DisplayCard();
+                Update_RecipeCard();
+            }
+            else
+            {
+                ResetDisplayCard();
+            }
+        }
     }
 
 #endregion

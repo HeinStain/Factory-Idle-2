@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Mining Drill
   m_EditorClassIdentifier: 
   machineName: Mining Drill
+  icon: {fileID: 0}
+  description: 
+  category: 0
   prefab: {fileID: 6136277925444215783, guid: 63c6ecffa54444c42b1c04f5adddea2d, type: 3}
   visual: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}
   width: 2
   height: 2
   hasDispenseBelt: 1
   hasIntakeBelt: 0
-  defaultCraftingInterval: 90
-  energyCost: 0
+  energyCost: 50

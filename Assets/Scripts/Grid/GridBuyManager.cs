@@ -45,7 +45,8 @@ public class GridBuyManager : MonoBehaviour
     {
         if (buyMode == true)
         {
-            if (Input.GetMouseButtonDown(0))
+            // Don't buy through UI or while the machine menu is open
+            if (Input.GetMouseButtonDown(0) && !GameManager.IsPointerOverUI() && !GameManager.Instance.IsMachineMenuOpen)
             {
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 gridMap.GetXY(mousePosition, out int x, out int y);

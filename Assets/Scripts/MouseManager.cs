@@ -67,7 +67,7 @@ public class MouseManager : MonoBehaviour
         canvasMousePosition = Input.mousePosition;
         mouseObj.transform.position = canvasMousePosition;
 
-        if (!menuOpen)
+        if (!menuOpen && !GameManager.Instance.IsMachineMenuOpen)
         {
             if (dragPanActive)
             {
@@ -92,7 +92,7 @@ public class MouseManager : MonoBehaviour
                         SetMouseIcon(Icon.INTERACT);
 
                         // On Left Mouse Click
-                        if (Input.GetMouseButtonDown(0))
+                        if (Input.GetMouseButtonDown(0) && !GameManager.IsPointerOverUI())
                         {
                             hit.transform.SendMessage("OpenMenu", SendMessageOptions.DontRequireReceiver);
                         }
@@ -104,7 +104,7 @@ public class MouseManager : MonoBehaviour
                 }
             }
         }   
-        else if (menuOpen)
+        else
         {
             SetMouseIcon(Icon.DEFAULT);
         }

@@ -74,8 +74,9 @@ public class Machine_Grabber : Machine
         BuildManager.Instance.OnMachinePlaced += HandleMachinePlaced;
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         TickManager.OnTick -= HandleTick;
 
         BuildManager.Instance.OnMachinePlaced -= HandleMachinePlaced;

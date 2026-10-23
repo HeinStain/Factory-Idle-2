@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Furnace
   m_EditorClassIdentifier: 
   machineName: Furnace
+  icon: {fileID: 0}
+  description: 
+  category: 0
   prefab: {fileID: 3012144737511068728, guid: a184ec7f09b3bb44fb5596b5836b2241, type: 3}
   visual: {fileID: 8532194472827719981, guid: 7d0f5fe8684114846b197287b71aeb5f, type: 3}
   width: 2
   height: 2
   hasDispenseBelt: 1
   hasIntakeBelt: 0
-  defaultCraftingInterval: 180
-  energyCost: 0
+  energyCost: 110

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
@@ -130,9 +131,30 @@ public class GameManager : MonoBehaviour
         OnBuildModeTriggered?.Invoke(buildMode);
     }
 
-    #endregion 
+    public bool IsBuildMode => buildMode;
 
-  
+    // Turns build mode on or off, only toggling if it isn't already in that state
+    public void SetBuildMode(bool on)
+    {
+        if (buildMode != on) BuildModeTrigger();
+    }
+
+    #endregion
+
+    #region Machine Menu
+
+    // Kept separate from SetMenuOpen/OnMenuTriggered, which every placed machine's Visuals listens to
+    public bool IsMachineMenuOpen { get; private set; }
+    public void SetMachineMenuOpen(bool open) => IsMachineMenuOpen = open;
+
+    #endregion
+
+    #region Input
+
+    // True while the mouse is over a UI element that blocks raycasts
+    public static bool IsPointerOverUI() => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
+    #endregion
 
     #region Menu
  
