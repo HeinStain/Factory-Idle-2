@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Mining Drill
   m_EditorClassIdentifier: 
   machineName: Mining Drill
-  icon: {fileID: 0}
-  description: 
+  icon: {fileID: -3881707580235229223, guid: aec9c0a41731b3343bb1045c05074dcb, type: 3}
+  description: Bores into the ground and hauls up ore, coal and sand. It needs no
+    ingredients. Pick what to dig, and flip the switch.
   category: 0
   prefab: {fileID: 6136277925444215783, guid: 63c6ecffa54444c42b1c04f5adddea2d, type: 3}
   visual: {fileID: 9064750411375671381, guid: 743edf86e6f8db84383476388ed04713, type: 3}

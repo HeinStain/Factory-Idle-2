@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Aquaformer
   m_EditorClassIdentifier: 
   machineName: Aquaformer
-  icon: {fileID: 0}
-  description: 
+  icon: {fileID: -7930165836041933584, guid: 42dc8e6cf9b3e3e4299fe2b97e067dae, type: 3}
+  description: 'Draws water, acid, alcohol, oil, latex and solvent out of the ground.
+    No ingredients: pick one and flip the switch.'
   category: 0
   prefab: {fileID: 5350698049709243800, guid: dbf896c40757f2346bd07e1041b69ed0, type: 3}
   visual: {fileID: 5671109144962825261, guid: 8a71d65fc0d7f1e4c99e3fecfc023224, type: 3}

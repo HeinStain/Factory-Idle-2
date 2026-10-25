@@ -13,7 +13,14 @@ MonoBehaviour:
   m_Name: Belt
   m_EditorClassIdentifier: 
   machineName: Belt
+  icon: {fileID: 1778722900932984480, guid: 3562ba3755c2edf4e918acbf1c24bc5f, type: 3}
+  description: Carries items one tile at a time. Free to build, and the backbone
+    of every line.
+  category: 2
   prefab: {fileID: 3473014918671703096, guid: 39a6ed4aaf9e5834289b44ca145b28a5, type: 3}
   visual: {fileID: 4575655340692968468, guid: dd6026fc66580074db2493e5372f1bf1, type: 3}
   width: 1
   height: 1
+  hasDispenseBelt: 0
+  hasIntakeBelt: 0
+  energyCost: 0

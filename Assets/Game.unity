@@ -2134,10 +2134,20 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0df94d6630a9a4b419521034351082cc, type: 2}
   - {fileID: 11400000, guid: 6e30fd5439fb1dc4e8ed5316ccf06769, type: 2}
   - {fileID: 11400000, guid: 7d421f0b4f0af334a87aba799074ca3e, type: 2}
-  - {fileID: 11400000, guid: 792244270d5988047848957e31fc871d, type: 2}
-  - {fileID: 11400000, guid: fb10c13c5d401724582d49786cf5d095, type: 2}
   - {fileID: 11400000, guid: dc275962562e0e043a581af4ab8698ed, type: 2}
+  - {fileID: 11400000, guid: fb10c13c5d401724582d49786cf5d095, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   heldMachine: {fileID: 0}
+  quickslots:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   draggingBelt: 0
 --- !u!4 &616188007
 Transform:
