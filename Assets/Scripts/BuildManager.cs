@@ -21,8 +21,8 @@ public class BuildManager : MonoBehaviour
     public MachineData heldMachine;
     private MachineData.Direction direction = MachineData.Direction.Up;
 
-    // Machines on number keys 1 to 8. Empty slots are allowed.
-    public const int QuickslotCount = 8;
+    // Machines on number keys 1 to QuickslotCount. Empty slots are allowed.
+    public const int QuickslotCount = 9;
     [SerializeField] private MachineData[] quickslots = new MachineData[QuickslotCount];
     public int SelectedQuickslot { get; private set; } = -1;
 
@@ -42,7 +42,7 @@ public class BuildManager : MonoBehaviour
 
     private void OnValidate()
     {
-        // Keep exactly 8 slots in the Inspector
+        // Keep exactly QuickslotCount slots in the Inspector
         if (quickslots == null || quickslots.Length != QuickslotCount) Array.Resize(ref quickslots, QuickslotCount);
     }
 
@@ -265,7 +265,7 @@ public class BuildManager : MonoBehaviour
 #region Machine Selection
     private void HandleMachineSelection()
     {
-        // Keys 1 to 8 pick quickslots 0 to 7
+        // Number keys from 1 pick quickslots from 0
         for (int i = 0; i < QuickslotCount; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i)) { SelectQuickslot(i); }
@@ -297,10 +297,19 @@ public class BuildManager : MonoBehaviour
         RefreshSelectedMachine();
     }
 
-    // Puts a machine in a quickslot, replacing whatever was there
+    // Moves a machine into a quickslot, replacing whatever was there
     public void AssignQuickslot(int index, MachineData machine)
     {
         if (index < 0 || index >= QuickslotCount) return;
+
+        // A machine sits in at most one slot, so clear the slot it is leaving
+        if (machine != null)
+        {
+            for (int i = 0; i < QuickslotCount; i++)
+            {
+                if (quickslots[i] == machine) quickslots[i] = null;
+            }
+        }
 
         quickslots[index] = machine;
         SelectedQuickslot = heldMachine != null ? Array.IndexOf(quickslots, heldMachine) : -1;

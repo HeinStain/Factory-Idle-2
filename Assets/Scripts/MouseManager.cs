@@ -73,7 +73,12 @@ public class MouseManager : MonoBehaviour
             {
                 SetMouseIcon(Icon.PANNING);
             }
-            else if (!dragPanActive)
+            else if (GameManager.IsPointerOverUI())
+            {
+                // Standard cursor over UI, whatever mode is active
+                SetMouseIcon(Icon.DEFAULT);
+            }
+            else
             {
                 if (buildModeActive)
                 {

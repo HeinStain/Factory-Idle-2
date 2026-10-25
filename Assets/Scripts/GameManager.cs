@@ -144,8 +144,16 @@ public class GameManager : MonoBehaviour
     #region Machine Menu
 
     // Kept separate from SetMenuOpen/OnMenuTriggered, which every placed machine's Visuals listens to
+    public event Action<bool> OnMachineMenuChanged;
     public bool IsMachineMenuOpen { get; private set; }
-    public void SetMachineMenuOpen(bool open) => IsMachineMenuOpen = open;
+
+    // Raises OnMachineMenuChanged only when the state actually changes
+    public void SetMachineMenuOpen(bool open)
+    {
+        if (IsMachineMenuOpen == open) return;
+        IsMachineMenuOpen = open;
+        OnMachineMenuChanged?.Invoke(open);
+    }
 
     #endregion
 
