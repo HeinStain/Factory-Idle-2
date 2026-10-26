@@ -278,14 +278,13 @@ public class BuildManager : MonoBehaviour
 
     public MachineData GetQuickslot(int index) => (index >= 0 && index < QuickslotCount) ? quickslots[index] : null;
 
-    // Holds the machine in this quickslot. An empty or invalid slot does nothing.
+    // Selects a slot, even an empty one (an empty slot means an empty hand). An invalid slot does nothing.
     public void SelectQuickslot(int index)
     {
-        MachineData machine = GetQuickslot(index);
-        if (machine == null) return;
+        if (index < 0 || index >= QuickslotCount) return;
 
-        heldMachine = machine;
         SelectedQuickslot = index;
+        heldMachine = quickslots[index];
         RefreshSelectedMachine();
     }
 
@@ -312,8 +311,14 @@ public class BuildManager : MonoBehaviour
         }
 
         quickslots[index] = machine;
-        SelectedQuickslot = heldMachine != null ? Array.IndexOf(quickslots, heldMachine) : -1;
+
+        // The hand follows the selected slot; with no slot selected, the held machine's slot becomes selected
+        MachineData previousHeld = heldMachine;
+        if (SelectedQuickslot >= 0) heldMachine = quickslots[SelectedQuickslot];
+        else if (heldMachine != null) SelectedQuickslot = Array.IndexOf(quickslots, heldMachine);
+
         OnQuickslotsChanged?.Invoke();
+        if (heldMachine != previousHeld) RefreshSelectedMachine();
     }
 
 #endregion
@@ -327,14 +332,10 @@ public class BuildManager : MonoBehaviour
 
     private void RefreshSelectedMachine()
     {
-        OnSelectedChanged?.Invoke();
-    }
+        // A belt drag left unfinished when the hand changes would otherwise place later from its old start tile
+        if (heldMachine != machineList[0] && (pendingBeltDrag || draggingBelt)) CancelDrag();
 
-    // Old UI: selects by machineList index. Still called by the scene's Machine Buttons until they're removed.
-    public void SelectMachineType(int index)
-    {
-        if (index < 0 || index >= machineList.Count) return;
-        SelectMachine(machineList[index]);
+        OnSelectedChanged?.Invoke();
     }
 
     private void DeselectAllMachineTypes()

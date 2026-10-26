@@ -7,11 +7,13 @@ public class QuickslotSlotUI : MonoBehaviour
     [SerializeField] private Button button;
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI keyText;
-    [SerializeField] private GameObject highlight;
-    [SerializeField] private Image pulseIndicator;     // fades in and out while the menu is in assign mode
+    [SerializeField] private GameObject highlight;     // marks the held machine's slot, and pulses in assign mode
 
     private QuickslotBarUI bar;
     private int index;
+    private CanvasRenderer highlightRenderer;
+    private bool selected;
+    private bool pulsing;
 
     // Called once by the bar. Index is zero-based, shown as its number key (index + 1).
     public void Setup(QuickslotBarUI bar, int index)
@@ -24,7 +26,8 @@ public class QuickslotSlotUI : MonoBehaviour
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => this.bar.OnSlotClicked(this.index));
 
-        SetPulse(false, 0f);
+        highlightRenderer = highlight.GetComponent<CanvasRenderer>();
+        SetPulse(false, 1f);
     }
 
     public void UpdateVisual(MachineData machine, bool selected)
@@ -32,13 +35,17 @@ public class QuickslotSlotUI : MonoBehaviour
         icon.enabled = machine != null && machine.icon != null;
         if (icon.enabled) icon.sprite = machine.icon;
 
-        highlight.SetActive(selected);
+        // Remembered so ending a pulse can fall back to it. A pulsing slot stays lit.
+        this.selected = selected;
+        highlight.SetActive(selected || pulsing);
     }
 
-    // Alpha goes through the CanvasRenderer so the Image's own color is left alone
+    // Alpha goes through the CanvasRenderer so the Image's own color is left alone.
+    // Turning the pulse off restores full alpha and the selected state.
     public void SetPulse(bool active, float alpha)
     {
-        pulseIndicator.gameObject.SetActive(active);
-        if (active) pulseIndicator.canvasRenderer.SetAlpha(alpha);
+        pulsing = active;
+        highlightRenderer.SetAlpha(active ? alpha : 1f);
+        highlight.SetActive(selected || pulsing);
     }
 }

@@ -31,6 +31,7 @@ public class QuickslotBarUI : MonoBehaviour
         BuildManager.Instance.OnSelectedChanged += Refresh;
         BuildManager.Instance.OnQuickslotsChanged += Refresh;
         BuildManager.Instance.OnBuildModeChanged += OnVisibilityStateChanged;
+        BuildManager.Instance.OnBuildModeChanged += OnBuildModeChanged;
         GameManager.Instance.OnMachineMenuChanged += OnVisibilityStateChanged;
 
         Refresh();
@@ -44,6 +45,7 @@ public class QuickslotBarUI : MonoBehaviour
             BuildManager.Instance.OnSelectedChanged -= Refresh;
             BuildManager.Instance.OnQuickslotsChanged -= Refresh;
             BuildManager.Instance.OnBuildModeChanged -= OnVisibilityStateChanged;
+            BuildManager.Instance.OnBuildModeChanged -= OnBuildModeChanged;
         }
         if (GameManager.Instance != null) GameManager.Instance.OnMachineMenuChanged -= OnVisibilityStateChanged;
     }
@@ -59,18 +61,23 @@ public class QuickslotBarUI : MonoBehaviour
 
     private void OnVisibilityStateChanged(bool _) => UpdateVisibility();
 
+    // The Selected Indicator depends on build mode
+    private void OnBuildModeChanged(bool _) => Refresh();
+
     // Shown while the machine menu is open or in build mode
     private void UpdateVisibility()
     {
         bar.SetActive(GameManager.Instance.IsMachineMenuOpen || GameManager.Instance.IsBuildMode);
     }
 
+    // A slot shows as selected only while build mode is on and it holds the held machine
     private void Refresh()
     {
         BuildManager buildManager = BuildManager.Instance;
+        bool buildMode = GameManager.Instance.IsBuildMode;
         for (int i = 0; i < slots.Length; i++)
         {
-            slots[i].UpdateVisual(buildManager.GetQuickslot(i), i == buildManager.SelectedQuickslot);
+            slots[i].UpdateVisual(buildManager.GetQuickslot(i), buildMode && i == buildManager.SelectedQuickslot);
         }
     }
 

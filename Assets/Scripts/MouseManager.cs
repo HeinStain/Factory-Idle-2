@@ -42,7 +42,8 @@ public class MouseManager : MonoBehaviour
     private void OnDisable() 
     { 
         GameManager.OnBuyModeTriggered -= BuyModeTriggered; 
-        GameManager.OnBuildModeTriggered -= BuildModeTriggered; 
+        GameManager.OnBuildModeTriggered -= BuildModeTriggered;
+        if (GameManager.Instance != null) GameManager.Instance.OnMenuTriggered -= MenuOpenTriggered;
         CameraSystem.DragPanTriggered -= DragPanTriggered;
     }
     
